@@ -1,9 +1,9 @@
 package com.sullung2yo.seatcatcher.user.domain;
 
+import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
@@ -14,11 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 사용자 내부 Identifier
+public class User extends BaseEntity {
 
     @Column
     private String email; // 이메일
@@ -37,18 +33,15 @@ public class User {
     private String providerId; // 인증 제공자에서 받은 ID
 
     @Column(nullable = false)
-    private UserRole role; // 일반 사용자 or 어드민 (Enum)
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'ROLE_USER'") // default role = ROLE_USER
+    @Builder.Default
+    private UserRole role = UserRole.ROLE_USER; // 권한 레벨
 
     @Column(nullable = false)
-    private Long credit; // 사용자 보유 크레딧
-
-    @Column(nullable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt; // 가입 시간
-
-    @Column
-    @UpdateTimestamp
-    private LocalDateTime updatedAt; // 정보 변경 시간
+    @ColumnDefault("0")
+    @Builder.Default
+    private Long credit = 0L; // 사용자 보유 크레딧
 
     @Column
     private LocalDateTime lastLoginAt; // 마지막 로그인 시간
