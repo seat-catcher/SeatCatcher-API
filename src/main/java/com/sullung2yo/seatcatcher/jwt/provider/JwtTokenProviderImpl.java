@@ -22,6 +22,16 @@ public class JwtTokenProviderImpl implements TokenProvider {
     private long accessTokenValidMilliseconds;
     private long refreshTokenValidMilliseconds;
 
+    /**
+     * 주어진 JWT 비밀 문자열과 토큰 유효 기간을 사용하여 JwtTokenProviderImpl 인스턴스를 초기화합니다.
+     *
+     * 비밀 문자열을 이용해 JWT 서명에 사용할 SecretKey 객체를 생성하며,
+     * access 토큰과 refresh 토큰에 각각 적용될 유효 기간(밀리초 단위)을 설정합니다.
+     *
+     * @param secret JWT 서명에 필요한 비밀 문자열.
+     * @param accessTokenValidMilliseconds access 토큰의 유효 기간 (밀리초 단위).
+     * @param refreshTokenValidMilliseconds refresh 토큰의 유효 기간 (밀리초 단위).
+     */
     public JwtTokenProviderImpl(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-token-valid-millisecond}") long accessTokenValidMilliseconds,
@@ -32,6 +42,17 @@ public class JwtTokenProviderImpl implements TokenProvider {
         this.refreshTokenValidMilliseconds = refreshTokenValidMilliseconds;
     }
 
+    /**
+     * 주어진 이메일과 추가 클레임 정보를 바탕으로 JWT 토큰을 생성한다.
+     * 입력된 토큰 타입에 따라 액세스 토큰과 리프레시 토큰의 유효 기간을 적용하며,
+     * 유효하지 않은 토큰 타입이 전달되면 예외를 발생시킨다.
+     *
+     * @param email 사용자의 이메일 주소로, 토큰의 주체(subject)로 사용된다.
+     * @param payload JWT 토큰에 포함할 추가 정보를 담은 맵
+     * @param tokenType 생성할 토큰의 타입 (ACCESS 또는 REFRESH)
+     * @return 생성된 JWT 토큰 문자열
+     * @throws IllegalArgumentException 유효하지 않은 토큰 타입인 경우
+     */
     @Override
     public String createToken(String email, Map<String, ?> payload, TokenType tokenType) {
         Claims claims;
@@ -45,12 +66,31 @@ public class JwtTokenProviderImpl implements TokenProvider {
         }
     }
 
-        return Jwts.builder()
+        /**
+                 * 지정된 클레임과 비밀키를 사용하여 JWT 토큰 문자열을 생성합니다.
+                 *
+                 * 이 메서드는 Jwts.builder()를 통해 JWT 빌더를 초기화한 후, 
+                 * 제공된 클레임과 비밀키를 사용하여 JWT에 서명하고 compact() 메서드를 호출하여
+                 * 최종적으로 JWT 토큰 문자열을 반환합니다.
+                 *
+                 * @return 생성된 JWT 토큰 문자열
+                 */
+                return Jwts.builder()
                 .signWith(secretKey)
                 .claims(claims)
                 .compact();
     }
 
+    /**
+     * 주어진 주체와 추가 페이로드, 유효 기간을 바탕으로 JWT 생성을 위한 클레임(Claims) 객체를 생성합니다.
+     * 
+     * 클레임 객체에는 토큰의 주체, 발행 시각 및 만료 시각이 포함되며, 제공된 추가 데이터가 병합됩니다.
+     *
+     * @param subject JWT의 주체로, 일반적으로 사용자 이메일 또는 식별자를 나타냅니다.
+     * @param payload JWT 클레임에 추가될 사용자 정의 데이터
+     * @param tokenValidMilliseconds 토큰의 유효 기간(밀리초 단위)
+     * @return JWT 생성을 위한 클레임 객체
+     */
     private Claims generateClaims(String subject, Map<String, ?> payload, long tokenValidMilliseconds) {
         Date now = new Date();
         Date expiredAt = new Date(now.getTime() + tokenValidMilliseconds);

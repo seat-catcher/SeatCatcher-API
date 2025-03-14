@@ -24,6 +24,21 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtTokenProviderImpl jwtTokenProvider;
 
+    /**
+     * 지정된 인증 제공자와 토큰 요청 정보를 기반으로 사용자 인증 후 JWT 액세스 토큰과 리프레시 토큰을 생성합니다.
+     *
+     * <p>인증 방식에 따라 처리 로직이 달라집니다:
+     * <ul>
+     *   <li>LOCAL: 인증 처리를 수행하지 않고 null을 반환합니다.</li>
+     *   <li>KAKAO: 카카오 API를 통해 사용자 정보를 조회한 후, 신규 사용자 등록 또는 기존 사용자 정보를 업데이트하고 JWT 토큰을 생성합니다.</li>
+     *   <li>APPLE: 현재 구현되지 않아 null을 반환합니다.</li>
+     * </ul>
+     *
+     * @param provider 사용자를 인증할 때 선택한 인증 제공자 (예: LOCAL, KAKAO, APPLE)
+     * @param request  토큰 요청 정보가 담긴 객체로, 카카오 인증의 경우 provider access token을 포함합니다.
+     * @return 카카오 인증 시 JWT 액세스 및 리프레시 토큰이 담긴 리스트, 그 외의 경우 null 반환
+     * @throws Exception 제공자가 유효하지 않은 경우 예외 발생
+     */
     public List<String> authenticate(Provider provider, TokenReqeust request) throws Exception {
         WebClient webClient = WebClient.builder().build();
 
@@ -57,6 +72,16 @@ public class AuthService {
         }
     }
 
+    /**
+     * 카카오 API를 호출하여 사용자 정보를 조회하고, 해당 정보를 기반으로 신규 사용자 등록 또는 기존 사용자 업데이트를 수행한 후 User 객체를 반환합니다.
+     *
+     * <p>제공된 액세스 토큰을 사용하여 "https://kapi.kakao.com/v2/user/me" 엔드포인트로 요청하며, 응답이 없으면 예외를 발생시킵니다.
+     * 신규 사용자인 경우, 응답 정보를 토대로 User 객체를 생성하여 저장하며, 기존 사용자인 경우 이메일과 마지막 로그인 시간을 업데이트합니다.
+     *
+     * @param tokenReqeust 카카오 API 호출에 필요한 액세스 토큰 정보를 담은 요청 객체
+     * @throws Exception 카카오 API로부터 사용자 정보를 가져오지 못한 경우
+     * @return 인증 또는 회원가입 처리된 사용자 정보를 담은 User 객체
+     */
     private User kakaoAuthenticator(WebClient webClient, TokenReqeust tokenReqeust) throws Exception {
         String kakaoDataUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -96,6 +121,14 @@ public class AuthService {
         return user;
     }
 
+    /**
+     * 애플 인증을 수행하는 메서드.
+     * 
+     * 현재 해당 메서드는 구현되어 있지 않으며, 향후 애플 인증 로직이 추가될 예정입니다.
+     *
+     * @param tokenReqeust 애플 인증에 필요한 토큰 정보를 담은 객체
+     * @return 인증된 사용자 정보. 현재는 구현되지 않아 null을 반환합니다.
+     */
     private User appleAuthenticator(WebClient webClient, TokenReqeust tokenReqeust) {
         return null;
     }
