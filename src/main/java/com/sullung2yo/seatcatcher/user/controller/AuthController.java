@@ -25,9 +25,16 @@ public class AuthController {
     }
 
     @PostMapping("/kakao")
-    public TokenResponse authenticateKakao(TokenReqeust tokenReqeust) throws Exception {
-        List<String> tokens = authService.authenticate(Provider.KAKAO, tokenReqeust);
-        return new TokenResponse(tokens.get(0), tokens.get(1));
+    public TokenResponse authenticateKakao(@RequestBody TokenRequest tokenRequest) {
+        try {
+            List<String> tokens = authService.authenticate(Provider.KAKAO, tokenRequest);
+            if (tokens.size() < 2) {
+                throw new IllegalStateException("토큰 생성 실패: 필요한 토큰이 생성되지 않았습니다.");
+            }
+            return new TokenResponse(tokens.get(0), tokens.get(1));
+        } catch (Exception e) {
+            throw new RuntimeException("카카오 인증 처리 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
 
     @PostMapping("/local")
