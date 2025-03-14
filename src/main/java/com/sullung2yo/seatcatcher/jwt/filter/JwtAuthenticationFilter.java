@@ -29,6 +29,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
 
 
+    /**
+     * HTTP 요청에서 JWT를 추출하여 토큰을 검증한 후, 유효한 경우 사용자 인증 정보를 SecurityContext에 설정한다.
+     * 
+     * 요청 헤더의 "Authorization" 항목에서 JWT를 추출하고 토큰을 파싱하여 클레임으로부터 사용자 이메일을 확인한다.
+     * 이메일이 존재하고 현재 SecurityContext에 인증 정보가 없는 경우, 데이터베이스에서 사용자를 조회한 후 역할 정보를 포함한
+     * 인증 토큰을 생성하여 SecurityContext에 설정한다. 토큰 검증 중 JwtException이 발생하면 SecurityContext를 초기화한다.
+     * 마지막으로, 다음 필터 처리를 위해 요청과 응답을 필터 체인에 전달한다.
+     *
+     * @param request HTTP 요청 객체
+     * @param response HTTP 응답 객체
+     * @param filterChain 다음 필터 처리를 위한 체인
+     * @throws ServletException 서블릿 관련 예외 발생 시
+     * @throws IOException 입출력 관련 예외 발생 시
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -64,6 +78,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * HTTP 요청의 "Authorization" 헤더에서 JWT 토큰을 추출합니다.
+     *
+     * 요청 헤더에 "Bearer " 접두어가 포함되어 있을 경우, 접두어 이후의 토큰 문자열을 반환하며,
+     * 그렇지 않으면 빈 Optional을 반환합니다.
+     *
+     * @param request JWT 토큰이 포함될 수 있는 HTTP 요청
+     * @return 토큰 문자열이 포함된 Optional, 유효한 토큰이 없으면 empty Optional
+     */
     private Optional<String> extractToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
