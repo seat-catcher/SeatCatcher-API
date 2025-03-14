@@ -40,10 +40,10 @@ public class JwtTokenProviderImpl implements TokenProvider {
             claims = generateClaims(email, payload, accessTokenValidMilliseconds);
         } else if (tokenType == TokenType.REFRESH) {
             claims = generateClaims(email, payload, refreshTokenValidMilliseconds);
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다: " + tokenType);
         }
-        else {
-            throw new RuntimeException("Invalid token type");
-        }
+    }
 
         return Jwts.builder()
                 .signWith(secretKey)
