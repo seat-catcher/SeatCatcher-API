@@ -7,7 +7,7 @@
 
 ## How to Contribute
 
-```
+```markdown
 - Fork the repository (Not necessary if you are a collaborator)
 - Clone the repository
 - Create a branch (Recommended your name like "gildong")
@@ -18,3 +18,5 @@
 - Review and merge pull request
 - Sync changes with your fork
 ```
+
+![image](https://github.com/user-attachments/assets/d9e6a903-d203-4e46-a540-af6786365721)

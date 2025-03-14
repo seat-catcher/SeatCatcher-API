@@ -20,10 +20,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 사용자 내부 Identifier
 
-    @Column(nullable = true)
-    private String email; // 이메일 -> Only for Admin
+    @Column
+    private String email; // 이메일
 
-    @Column(nullable = true)
+    @Column
     private String password; // 비밀번호 -> Only for Admin
 
     @Column(nullable = false)
@@ -44,9 +44,12 @@ public class User {
 
     @Column(nullable = false)
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; // 가입 시간
 
-    @Column(nullable = true)
+    @Column
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt; // 정보 변경 시간
+
+    @Column
+    private LocalDateTime lastLoginAt; // 마지막 로그인 시간
 }
