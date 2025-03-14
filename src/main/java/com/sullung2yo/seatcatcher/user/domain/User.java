@@ -1,29 +1,31 @@
 package com.sullung2yo.seatcatcher.user.domain;
 
+import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+@Table(
+    name = "users",
+    uniqueConstraints = @UniqueConstraint(
+            name = "uk_provider_provider_id",
+            columnNames = {"provider", "providerId"}
+    )
+)
+public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 사용자 내부 Identifier
+    @Column
+    private String email; // 이메일
 
-    @Column(nullable = true)
-    private String email; // 이메일 -> Only for Admin
-
-    @Column(nullable = true)
+    @Column
     private String password; // 비밀번호 -> Only for Admin
 
     @Column(nullable = false)
@@ -37,16 +39,16 @@ public class User {
     private String providerId; // 인증 제공자에서 받은 ID
 
     @Column(nullable = false)
-    private UserRole role; // 일반 사용자 or 어드민 (Enum)
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'ROLE_USER'") // default role = ROLE_USER
+    @Builder.Default
+    private UserRole role = UserRole.ROLE_USER; // 권한 레벨
 
     @Column(nullable = false)
-    private Long credit; // 사용자 보유 크레딧
+    @ColumnDefault("0")
+    @Builder.Default
+    private Long credit = 0L; // 사용자 보유 크레딧
 
-    @Column(nullable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column(nullable = true)
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    @Column
+    private LocalDateTime lastLoginAt; // 마지막 로그인 시간
 }
