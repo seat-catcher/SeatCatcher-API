@@ -8,12 +8,18 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(
+    name = "users",
+    uniqueConstraints = @UniqueConstraint(
+            name = "uk_provider_provider_id",
+            columnNames = {"provider", "providerId"}
+    )
+)
 public class User extends BaseEntity {
 
     @Column
