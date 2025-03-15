@@ -24,8 +24,7 @@ public class JwtTokenProviderImpl implements TokenProvider {
 
     /**
      * 주어진 JWT 비밀 문자열과 토큰 유효 기간을 사용하여 JwtTokenProviderImpl 인스턴스를 초기화합니다.
-     *
-     * 비밀 문자열을 이용해 JWT 서명에 사용할 SecretKey 객체를 생성하며,
+     * jwt secret 을 이용해 JWT 서명에 사용할 SecretKey 객체를 생성하며,
      * access 토큰과 refresh 토큰에 각각 적용될 유효 기간(밀리초 단위)을 설정합니다.
      *
      * @param secret JWT 서명에 필요한 비밀 문자열.
@@ -64,18 +63,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
         } else {
             throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다: " + tokenType);
         }
-    }
 
-        /**
-                 * 지정된 클레임과 비밀키를 사용하여 JWT 토큰 문자열을 생성합니다.
-                 *
-                 * 이 메서드는 Jwts.builder()를 통해 JWT 빌더를 초기화한 후, 
-                 * 제공된 클레임과 비밀키를 사용하여 JWT에 서명하고 compact() 메서드를 호출하여
-                 * 최종적으로 JWT 토큰 문자열을 반환합니다.
-                 *
-                 * @return 생성된 JWT 토큰 문자열
-                 */
-                return Jwts.builder()
+        return Jwts.builder()
                 .signWith(secretKey)
                 .claims(claims)
                 .compact();
@@ -83,7 +72,6 @@ public class JwtTokenProviderImpl implements TokenProvider {
 
     /**
      * 주어진 주체와 추가 페이로드, 유효 기간을 바탕으로 JWT 생성을 위한 클레임(Claims) 객체를 생성합니다.
-     * 
      * 클레임 객체에는 토큰의 주체, 발행 시각 및 만료 시각이 포함되며, 제공된 추가 데이터가 병합됩니다.
      *
      * @param subject JWT의 주체로, 일반적으로 사용자 이메일 또는 식별자를 나타냅니다.

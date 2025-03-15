@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TokenReqeust {
+public class TokenRequest {
     private String provider_access_token;
 }
