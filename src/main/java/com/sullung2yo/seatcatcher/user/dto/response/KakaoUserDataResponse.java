@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class KakaoUserDataResponse {
     private String id; // Kakao user id
-    private KakaoAccount kakao_account; // Kakao account info
+    private KakaoAccount kakaoAccount; // Kakao account info
 
     @Getter
     public static class KakaoAccount {

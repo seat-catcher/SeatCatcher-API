@@ -23,7 +23,6 @@ public class SecurityConfig {
 
     /**
      * BCryptPasswordEncoder를 활용한 PasswordEncoder 빈을 생성합니다.
-     *
      * 이 빈은 사용자 비밀번호 암호화를 위해 사용되며, 스프링 시큐리티 설정에서 인증 과정에 활용됩니다.
      *
      * @return 비밀번호 암호화를 위한 BCryptPasswordEncoder 구현체
@@ -58,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/authenticate").permitAll() // JWT 토큰 발급 API는 누구나 접근 가능
                         .requestMatchers("/health").permitAll() // 헬스체크 용 API 엔드포인트
                         .requestMatchers("/h2-console/**").permitAll() // h2-console 접근 허용
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

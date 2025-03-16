@@ -5,7 +5,11 @@ import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.dto.request.TokenRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
 import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user/authenticate")
 @RequiredArgsConstructor
+@Tag(name = "Auth API", description = "User Authentication APIs")
 public class AuthController {
 
     private final AuthServiceImpl authServiceImpl;
@@ -45,13 +50,13 @@ public class AuthController {
      * @return 두 개의 토큰을 포함하는 TokenResponse 객체
      */
     @PostMapping("/kakao")
-    public TokenResponse authenticateKakao(@RequestBody TokenRequest tokenRequest) {
+    public ResponseEntity<TokenResponse> authenticateKakao(@RequestBody TokenRequest tokenRequest) {
         try {
             List<String> tokens = authServiceImpl.authenticate(Provider.KAKAO, tokenRequest);
             if (tokens.size() < 2) {
                 throw new IllegalStateException("토큰 생성 실패: 필요한 토큰이 생성되지 않았습니다.");
             }
-            return new TokenResponse(tokens.get(0), tokens.get(1));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new TokenResponse(tokens.get(0), tokens.get(1)));
         } catch (Exception e) {
             throw new RuntimeException("카카오 인증 처리 중 오류가 발생했습니다: " + e.getMessage(), e);
         }

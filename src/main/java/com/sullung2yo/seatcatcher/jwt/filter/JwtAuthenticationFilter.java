@@ -31,7 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * HTTP 요청에서 JWT를 추출하여 토큰을 검증한 후, 유효한 경우 사용자 인증 정보를 SecurityContext에 설정한다.
-     * 
      * 요청 헤더의 "Authorization" 항목에서 JWT를 추출하고 토큰을 파싱하여 클레임으로부터 사용자 이메일을 확인한다.
      * 이메일이 존재하고 현재 SecurityContext에 인증 정보가 없는 경우, 데이터베이스에서 사용자를 조회한 후 역할 정보를 포함한
      * 인증 토큰을 생성하여 SecurityContext에 설정한다. 토큰 검증 중 JwtException이 발생하면 SecurityContext를 초기화한다.

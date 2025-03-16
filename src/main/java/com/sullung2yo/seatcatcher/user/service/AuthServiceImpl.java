@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
 
         KakaoUserDataResponse response = webClient.get()
                 .uri(kakaoDataUrl)
-                .header("Authorization", "Bearer " + tokenRequest.getProvider_access_token())
+                .header("Authorization", "Bearer " + tokenRequest.getProviderAccessToken())
                 .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                 .retrieve()
                 .bodyToMono(KakaoUserDataResponse.class)
@@ -101,7 +101,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (user == null) { // If new user
             user = User.builder()
-                    .email(response.getKakao_account().getEmail())
+                    .email(response.getKakaoAccount().getEmail())
                     .name("Random Name 123") // TODO: Implement random name generator !!!
                     .providerId(providerId)
                     .provider(Provider.KAKAO)
@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
             userRepository.save(user);
         }
         else { // If user already exists
-            user.setEmail(response.getKakao_account().getEmail()); // update if email has changed
+            user.setEmail(response.getKakaoAccount().getEmail()); // update if email has changed
             user.setLastLoginAt(LocalDateTime.now());
             userRepository.save(user);
         }
