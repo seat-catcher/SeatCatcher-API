@@ -67,6 +67,7 @@ public class AuthServiceImpl implements AuthService {
         }
         else if (provider == Provider.APPLE) {
             AppleAuthRequest appleAuthRequest = (AppleAuthRequest) request; // Type cast to AppleAuthRequest
+            User user = appleAuthenticator(webClient, appleAuthRequest);
             // TODO: Implement Apple authentication !!!
             return null;
         }
@@ -127,10 +128,11 @@ public class AuthServiceImpl implements AuthService {
      * 애플 인증을 수행하는 메서드.
      * 현재 해당 메서드는 구현되어 있지 않으며, 향후 애플 인증 로직이 추가될 예정입니다.
      *
-     * @param kakaoAuthRequest 애플 인증에 필요한 토큰 정보를 담은 객체
+     * @param appleAuthRequest 애플 인증에 필요한 토큰 정보를 담은 객체
      * @return 인증된 사용자 정보. 현재는 구현되지 않아 null을 반환합니다.
      */
-    private User appleAuthenticator(WebClient webClient, KakaoAuthRequest kakaoAuthRequest) {
+    private User appleAuthenticator(WebClient webClient, AppleAuthRequest appleAuthRequest) {
+        // TODO: Implement Apple authentication !!!
         return null;
     }
 }
