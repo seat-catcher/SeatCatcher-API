@@ -1,13 +1,12 @@
 package com.sullung2yo.seatcatcher.user.controller;
 
 
-import com.sullung2yo.seatcatcher.user.domain.Provider;
-import com.sullung2yo.seatcatcher.user.dto.request.TokenRequest;
+import com.sullung2yo.seatcatcher.user.dto.request.AppleAuthRequest;
+import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
 import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,30 +28,30 @@ public class AuthController {
      * 애플 인증 요청을 처리하는 POST 엔드포인트입니다.
      * 이 메서드는 "/apple" 경로에 대한 요청을 처리하며, "hello world apple" 문자열을 응답합니다.
      *
-     * @return "hello world apple" 문자열
+     * @return "hello world apple" 임시 문자열
      */
     @PostMapping("/apple")
-    public String authenticateApple() {
+    public ResponseEntity<TokenResponse> authenticateApple(@RequestBody AppleAuthRequest appleAuthRequest) throws Exception {
         // TODO: Implement Apple authentication
-        return "hello world apple";
+        return ResponseEntity.status(HttpStatus.CREATED).body(new TokenResponse("hello world apple 1", "hello world apple 2"));
     }
 
     /**
      * 카카오 인증을 수행하여 두 개의 토큰을 반환합니다.
-     * 주어진 TokenRequest 객체를 기반으로 AuthService의 인증 메서드를 호출하여, 
+     * 주어진 KakaoAuthRequest 객체를 기반으로 AuthService의 인증 메서드를 호출하여,
      * Provider.KAKAO 방식의 인증을 진행합니다. 반환된 토큰 리스트에서 첫 번째와 두 번째 토큰을 추출한 후,
      * 두 토큰을 포함하는 TokenResponse 객체로 변환하여 반환합니다.
      * 토큰 리스트의 크기가 2개 미만인 경우, 즉 Access 또는 Refresh 토큰 생성 중 하나라도 실패하는 경우
      * "토큰 생성 실패: 필요한 토큰이 생성되지 않았습니다."라는 메시지와 함께 IllegalStateException이 발생하며,
      * 인증 처리 중 다른 예외가 발생할 경우 RuntimeException으로 전달됩니다.
      *
-     * @param tokenRequest 카카오 인증 요청 정보를 담은 TokenRequest 객체
+     * @param kakaoAuthRequest 카카오 인증 요청 정보를 담은 KakaoAuthRequest 객체
      * @return 두 개의 토큰을 포함하는 TokenResponse 객체
      */
     @PostMapping("/kakao")
-    public ResponseEntity<TokenResponse> authenticateKakao(@RequestBody TokenRequest tokenRequest) {
+    public ResponseEntity<TokenResponse> authenticateKakao(@RequestBody KakaoAuthRequest kakaoAuthRequest) throws Exception {
         try {
-            List<String> tokens = authServiceImpl.authenticate(Provider.KAKAO, tokenRequest);
+            List<String> tokens = authServiceImpl.authenticate(kakaoAuthRequest);
             if (tokens.size() < 2) {
                 throw new IllegalStateException("토큰 생성 실패: 필요한 토큰이 생성되지 않았습니다.");
             }

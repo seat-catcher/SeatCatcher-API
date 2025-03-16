@@ -5,12 +5,14 @@ import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
+import com.sullung2yo.seatcatcher.user.dto.request.AppleAuthRequest;
+import com.sullung2yo.seatcatcher.user.dto.request.AuthReqeust;
+import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.KakaoUserDataResponse;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.sullung2yo.seatcatcher.user.dto.request.TokenRequest;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,21 +35,22 @@ public class AuthServiceImpl implements AuthService {
      *   <li>APPLE: 현재 구현되지 않아 null을 반환합니다.</li>
      * </ul>
      *
-     * @param provider 사용자를 인증할 때 선택한 인증 제공자 (예: LOCAL, KAKAO, APPLE)
      * @param request  토큰 요청 정보가 담긴 객체로, 카카오 인증의 경우 provider access token을 포함합니다.
      * @return 카카오 인증 시 JWT 액세스 및 리프레시 토큰이 담긴 리스트, 그 외의 경우 null 반환
      * @throws Exception 제공자가 유효하지 않은 경우 예외 발생
      */
-    public List<String> authenticate(Provider provider, TokenRequest request) throws Exception {
+    public List<String> authenticate(AuthReqeust request) throws Exception {
         WebClient webClient = WebClient.builder().build();
+        Provider provider = request.getProvider();
 
-        // Request user information with provider_access_token in TokenRequest
+        // Request user information with provider_access_token in KakaoAuthRequest
         if (provider == Provider.LOCAL) {
             return null;
         }
         else if (provider == Provider.KAKAO) {
             // Get user information from Kakao
-            User user = kakaoAuthenticator(webClient, request);
+            KakaoAuthRequest kakaoAuthRequest = (KakaoAuthRequest) request; // Type cast to KakaoAuthRequest
+            User user = kakaoAuthenticator(webClient, kakaoAuthRequest);
 
             // Generate JWT token (Access, Refresh)
             String accessToken = jwtTokenProvider.createToken(
@@ -63,7 +66,8 @@ public class AuthServiceImpl implements AuthService {
             return List.of(accessToken, refreshToken);
         }
         else if (provider == Provider.APPLE) {
-            String appleDataUrl = "https://appleid.apple.com/auth/token";
+            AppleAuthRequest appleAuthRequest = (AppleAuthRequest) request; // Type cast to AppleAuthRequest
+            // TODO: Implement Apple authentication !!!
             return null;
         }
         else {
@@ -76,16 +80,16 @@ public class AuthServiceImpl implements AuthService {
      * 제공된 액세스 토큰을 사용하여 "<a href="https://kapi.kakao.com/v2/user/me">...</a>" 엔드포인트로 요청하며, 응답이 없으면 예외를 발생시킵니다.
      * 신규 사용자인 경우, 응답 정보를 토대로 User 객체를 생성하여 저장하며, 기존 사용자인 경우 이메일과 마지막 로그인 시간을 업데이트합니다.
      *
-     * @param tokenRequest 카카오 API 호출에 필요한 액세스 토큰 정보를 담은 요청 객체
+     * @param kakaoAuthRequest 카카오 API 호출에 필요한 액세스 토큰 정보를 담은 요청 객체
      * @throws Exception 카카오 API로부터 사용자 정보를 가져오지 못한 경우
      * @return 인증 또는 회원가입 처리된 사용자 정보를 담은 User 객체
      */
-    private User kakaoAuthenticator(WebClient webClient, TokenRequest tokenRequest) throws Exception {
+    private User kakaoAuthenticator(WebClient webClient, KakaoAuthRequest kakaoAuthRequest) throws Exception {
         String kakaoDataUrl = "https://kapi.kakao.com/v2/user/me";
 
         KakaoUserDataResponse response = webClient.get()
                 .uri(kakaoDataUrl)
-                .header("Authorization", "Bearer " + tokenRequest.getProviderAccessToken())
+                .header("Authorization", "Bearer " + kakaoAuthRequest.getAccessToken())
                 .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                 .retrieve()
                 .bodyToMono(KakaoUserDataResponse.class)
@@ -123,10 +127,10 @@ public class AuthServiceImpl implements AuthService {
      * 애플 인증을 수행하는 메서드.
      * 현재 해당 메서드는 구현되어 있지 않으며, 향후 애플 인증 로직이 추가될 예정입니다.
      *
-     * @param tokenRequest 애플 인증에 필요한 토큰 정보를 담은 객체
+     * @param kakaoAuthRequest 애플 인증에 필요한 토큰 정보를 담은 객체
      * @return 인증된 사용자 정보. 현재는 구현되지 않아 null을 반환합니다.
      */
-    private User appleAuthenticator(WebClient webClient, TokenRequest tokenRequest) {
+    private User appleAuthenticator(WebClient webClient, KakaoAuthRequest kakaoAuthRequest) {
         return null;
     }
 }
