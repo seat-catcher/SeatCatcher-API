@@ -1,10 +1,7 @@
-package com.example.demo.entity;
+package com.sullung2yo.seatcatcher.subway_station.domain
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -13,7 +10,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 // 일단 임의로 테이블 이름을 subway_station 이라고 해두겠습니다.
-@Table(name="subway_station", uniqueConstraints = {@UniqueConstraint(columnNames = {"sbwy_stns_nm"})})
+@Table(name="subway_station", uniqueConstraints = {@UniqueConstraint(columnNames = {"sbwy_stns_nm", "sbwy_rout_ln"})})
 public class SubwayStation extends BaseEntity{
 
     /*
@@ -66,6 +63,11 @@ public class SubwayStation extends BaseEntity{
 
     // 소스에서 데이터가 "분:초" 형식으로 오는데, 이걸 넣으면 그게 몇 초인지 리턴해주는 함수입니다!
     private long convertStringToSeconds(String timeString) {
+
+        if(timeString == null || timeString.isEmpty() || !timeString.contains(":")) {
+            throw new IllegalArgumentException("Invalid time string: " + timeString);
+        }
+
         String[] timeParts = timeString.split(":");
         int minutes = Integer.parseInt(timeParts[0]);
         int seconds = Integer.parseInt(timeParts[1]);
