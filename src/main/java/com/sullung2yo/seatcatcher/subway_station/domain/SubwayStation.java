@@ -1,7 +1,8 @@
-package com.sullung2yo.seatcatcher.subway_station.domain
+package com.sullung2yo.seatcatcher.subway_station.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 
 @Entity
 @Getter
@@ -69,8 +70,21 @@ public class SubwayStation extends BaseEntity{
         }
 
         String[] timeParts = timeString.split(":");
-        int minutes = Integer.parseInt(timeParts[0]);
-        int seconds = Integer.parseInt(timeParts[1]);
-        return (long)minutes * 60 + seconds;
+        try
+        {
+            int minutes = Integer.parseInt(timeParts[0]);
+            int seconds = Integer.parseInt(timeParts[1]);
+
+            if(seconds < 0 || seconds > 59) {
+                throw new IllegalArgumentException("Invalid time string: " + timeString);
+            }
+
+            return (long)minutes * 60 + seconds;
+        }
+        catch(NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid time string: " + timeString + ": " + e.getMessage());
+        }
+
     }
 }
