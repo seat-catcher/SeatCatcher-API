@@ -24,16 +24,17 @@ public class AuthController {
 
     private final AuthServiceImpl authServiceImpl;
 
-    /**
-     * 애플 인증 요청을 처리하는 POST 엔드포인트입니다.
-     * 이 메서드는 "/apple" 경로에 대한 요청을 처리하며, "hello world apple" 문자열을 응답합니다.
-     *
-     * @return "hello world apple" 임시 문자열
-     */
     @PostMapping("/apple")
-    public ResponseEntity<TokenResponse> authenticateApple(@RequestBody AppleAuthRequest appleAuthRequest) throws Exception {
-        // TODO: Implement Apple authentication
-        return ResponseEntity.status(HttpStatus.CREATED).body(new TokenResponse("hello world apple 1", "hello world apple 2"));
+    public ResponseEntity<TokenResponse> authenticateApple(@RequestBody AppleAuthRequest appleAuthRequest) {
+        try {
+            List<String> tokens = authServiceImpl.authenticate(appleAuthRequest);
+            if (tokens.size() < 2) {
+                throw new IllegalStateException("토큰 생성 실패: 필요한 토큰이 생성되지 않았습니다.");
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(new TokenResponse(tokens.get(0), tokens.get(1)));
+        } catch (Exception e) {
+            throw new RuntimeException("애플 인증 처리 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -49,7 +50,7 @@ public class AuthController {
      * @return 두 개의 토큰을 포함하는 TokenResponse 객체
      */
     @PostMapping("/kakao")
-    public ResponseEntity<TokenResponse> authenticateKakao(@RequestBody KakaoAuthRequest kakaoAuthRequest) throws Exception {
+    public ResponseEntity<TokenResponse> authenticateKakao(@RequestBody KakaoAuthRequest kakaoAuthRequest) {
         try {
             List<String> tokens = authServiceImpl.authenticate(kakaoAuthRequest);
             if (tokens.size() < 2) {
@@ -62,7 +63,7 @@ public class AuthController {
     }
 
     /**
-     * 로컬 사용자 인증 요청을 처리하는 POST 엔드포인트입니다.
+     * 로컬 사용자 인증 요청을 처리하는 POST 엔드포인트입니다. (미구현)
      * 로컬 인증 요청에 대해 "hello world local" 문자열 응답을 반환합니다.
      *
      * @return "hello world local" 응답 문자열

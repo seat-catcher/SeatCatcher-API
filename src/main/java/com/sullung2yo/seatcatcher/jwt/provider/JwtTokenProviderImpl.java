@@ -46,20 +46,20 @@ public class JwtTokenProviderImpl implements TokenProvider {
      * 입력된 토큰 타입에 따라 액세스 토큰과 리프레시 토큰의 유효 기간을 적용하며,
      * 유효하지 않은 토큰 타입이 전달되면 예외를 발생시킨다.
      *
-     * @param email 사용자의 이메일 주소로, 토큰의 주체(subject)로 사용된다.
+     * @param providerId 외부 인증 서버에서 전달받은 사용자 Identifier, 토큰의 주체(subject)로 사용된다.
      * @param payload JWT 토큰에 포함할 추가 정보를 담은 맵
      * @param tokenType 생성할 토큰의 타입 (ACCESS 또는 REFRESH)
      * @return 생성된 JWT 토큰 문자열
      * @throws IllegalArgumentException 유효하지 않은 토큰 타입인 경우
      */
     @Override
-    public String createToken(String email, Map<String, ?> payload, TokenType tokenType) {
+    public String createToken(String providerId, Map<String, ?> payload, TokenType tokenType) {
         Claims claims;
 
         if (tokenType == TokenType.ACCESS) {
-            claims = generateClaims(email, payload, accessTokenValidMilliseconds);
+            claims = generateClaims(providerId, payload, accessTokenValidMilliseconds);
         } else if (tokenType == TokenType.REFRESH) {
-            claims = generateClaims(email, payload, refreshTokenValidMilliseconds);
+            claims = generateClaims(providerId, payload, refreshTokenValidMilliseconds);
         } else {
             throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다: " + tokenType);
         }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AppleAuthRequest extends AuthReqeust{
-    private String authCode;
+    private String identityToken;
 
     public AppleAuthRequest() {
         this.setProvider(Provider.APPLE);
