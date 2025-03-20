@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class KakaoAuthRequest extends AuthReqeust {
+public class KakaoAuthRequest extends AuthRequest {
     private String accessToken;
 
     public KakaoAuthRequest() {

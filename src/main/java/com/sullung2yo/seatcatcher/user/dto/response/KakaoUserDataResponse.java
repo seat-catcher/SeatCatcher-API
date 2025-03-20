@@ -7,14 +7,4 @@ import lombok.Setter;
 @Setter
 public class KakaoUserDataResponse {
     private String id; // Kakao user id
-    private KakaoAccount kakaoAccount; // Kakao account info
-
-    @Getter
-    public static class KakaoAccount {
-        /**
-         * Reference
-         * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#kakaoaccount">...</a>
-         */
-        private String email;
-    }
 }

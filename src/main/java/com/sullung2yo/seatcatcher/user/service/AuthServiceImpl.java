@@ -15,12 +15,13 @@ import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.dto.request.AppleAuthRequest;
-import com.sullung2yo.seatcatcher.user.dto.request.AuthReqeust;
+import com.sullung2yo.seatcatcher.user.dto.request.AuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.KakaoUserDataResponse;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,14 +35,20 @@ import java.util.List;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final JwtTokenProviderImpl jwtTokenProvider;
+    private final WebClient webClient;
 
     @Value("${apple.client.id}")
     private String appleClientId;
+
+    public AuthServiceImpl(UserRepository userRepository, JwtTokenProviderImpl jwtTokenProvider, WebClient.Builder webClientBuilder) {
+        this.userRepository = userRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.webClient = webClientBuilder.build();
+    }
 
     /**
      * 지정된 인증 제공자와 토큰 요청 정보를 기반으로 사용자 인증 후 JWT 액세스 토큰과 리프레시 토큰을 생성합니다.
@@ -57,8 +64,7 @@ public class AuthServiceImpl implements AuthService {
      * @return 카카오 인증 시 JWT 액세스 및 리프레시 토큰이 담긴 리스트, 그 외의 경우 null 반환
      * @throws Exception 제공자가 유효하지 않은 경우 예외 발생
      */
-    public List<String> authenticate(AuthReqeust request) throws Exception {
-        WebClient webClient = WebClient.builder().build();
+    public List<String> authenticate(AuthRequest request) throws Exception {
         Provider provider = request.getProvider();
 
         // Request user information with provider_access_token in KakaoAuthRequest
@@ -68,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
         else if (provider == Provider.KAKAO) {
             // Get user information from Kakao
             KakaoAuthRequest kakaoAuthRequest = (KakaoAuthRequest) request; // Type cast to KakaoAuthRequest
-            User user = kakaoAuthenticator(webClient, kakaoAuthRequest);
+            User user = kakaoAuthenticator(kakaoAuthRequest);
 
             // Generate JWT token (Access, Refresh)
             String accessToken = jwtTokenProvider.createToken(
@@ -115,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
      * @throws Exception 카카오 API로부터 사용자 정보를 가져오지 못한 경우
      * @return 인증 또는 회원가입 처리된 사용자 정보를 담은 User 객체
      */
-    private User kakaoAuthenticator(WebClient webClient, KakaoAuthRequest kakaoAuthRequest) throws Exception {
+    private User kakaoAuthenticator(KakaoAuthRequest kakaoAuthRequest) throws Exception {
         String kakaoDataUrl = "https://kapi.kakao.com/v2/user/me";
 
         KakaoUserDataResponse response = webClient.get()
@@ -134,9 +140,8 @@ public class AuthServiceImpl implements AuthService {
         String providerId = response.getId();
         User user = userRepository.findByProviderId(providerId).orElse(null);
 
-        if (user == null) { // 만약 새로운 사용자라면
+        if (user == null) { // If new user, register
             user = User.builder()
-                    .email("TEMP_EMAIL") // 토큰에 이메일 정보가 첨부되어 오는지 모르니까 일단 임시로 설정했습니다
                     .name("Random Name 123") // TODO: Implement random name generator !!!
                     .providerId(providerId)
                     .provider(Provider.KAKAO)
@@ -145,8 +150,7 @@ public class AuthServiceImpl implements AuthService {
                     .build();
             userRepository.save(user);
         }
-        else { // If user already exists
-            user.setEmail(response.getKakaoAccount().getEmail()); // update if email has changed
+        else { // If user already exists, update last login time
             user.setLastLoginAt(LocalDateTime.now());
             userRepository.save(user);
         }
@@ -157,9 +161,8 @@ public class AuthServiceImpl implements AuthService {
     private User appleAuthenticator(AppleAuthRequest appleAuthRequest) throws Exception {
         String providerId = validateAppleIdentityToken(appleAuthRequest.getIdentityToken());
         User user = userRepository.findByProviderId(providerId).orElse(null);
-        if (user == null) { // 만약 새로운 사용자라면
+        if (user == null) { // if new user
             user = User.builder()
-                    .email("TEMP_EMAIL") // 토큰에 이메일 정보가 첨부되어 오는지 모르니까 일단 임시로 설정했습니다
                     .name("Random Name 123") // TODO: Implement random name generator !!!
                     .providerId(providerId)
                     .provider(Provider.APPLE)
@@ -175,7 +178,7 @@ public class AuthServiceImpl implements AuthService {
         return user;
     }
 
-    private String validateAppleIdentityToken(String identityToken) throws Exception {
+    public String validateAppleIdentityToken(String identityToken) throws Exception {
         try {
             String issuer = "https://appleid.apple.com";
             JWT jwt = JWTParser.parse(identityToken);

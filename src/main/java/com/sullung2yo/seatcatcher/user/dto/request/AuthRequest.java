@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AuthReqeust {
+public abstract class AuthRequest {
     private Provider provider; // 소셜 로그인 공급자 (Apple, Kakao, Local)
 }

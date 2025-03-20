@@ -5,6 +5,8 @@ import com.sullung2yo.seatcatcher.user.dto.request.AppleAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
 import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,8 @@ public class AuthController {
     private final AuthServiceImpl authServiceImpl;
 
     @PostMapping("/apple")
+    @Operation(summary = "Authenticate with Apple", description = "Apple OAuth2 API")
+    @ApiResponse(responseCode = "201", description = "Created")
     public ResponseEntity<TokenResponse> authenticateApple(@RequestBody AppleAuthRequest appleAuthRequest) {
         try {
             List<String> tokens = authServiceImpl.authenticate(appleAuthRequest);
@@ -50,6 +54,8 @@ public class AuthController {
      * @return 두 개의 토큰을 포함하는 TokenResponse 객체
      */
     @PostMapping("/kakao")
+    @Operation(summary = "Authenticate with Kakao", description = "Kakao OAuth2 API")
+    @ApiResponse(responseCode = "201", description = "Created")
     public ResponseEntity<TokenResponse> authenticateKakao(@RequestBody KakaoAuthRequest kakaoAuthRequest) {
         try {
             List<String> tokens = authServiceImpl.authenticate(kakaoAuthRequest);

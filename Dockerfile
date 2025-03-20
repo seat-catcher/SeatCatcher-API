@@ -17,6 +17,8 @@ WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar app.jar
 
+COPY src/main/resources/prod.properties /config/application.properties
+
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java","-jar","app.jar", "--spring.config.location=file:/config/application.properties"]
