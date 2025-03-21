@@ -24,20 +24,34 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+/**
+ * Kakao 로그인 인증 로직에 대한 단위 테스트 클래스.
+ * WebClient를 통한 실제 카카오 서버와 통신하는게 아니라, Mock 객체를 사용해 테스트한다.
+ */
+@ExtendWith(MockitoExtension.class) // Mockito를 편리하게 사용하도록 설정하는 Annotation -> @Mock, @InjectMocks 등을 메서드마다 선언하지 않게 해준다.
 class KakaoAuthTest {
+
+    // Mock 필드 - 가짜 객체를 사용하기 위해 선언하는 필드
 
     @Mock
     private UserRepository userRepository;
+    // 이 테스트 케이스는 UserRepository를 테스트하는게 아니라, 카카오 인증 자체에 대한 테스트를 수행하므로 실제 UserRepository를 사용하지 않고 Mock 객체를 사용함
 
     @Mock
     private JwtTokenProviderImpl jwtTokenProvider;
+    // JWT 발급도 실제 작동할 필요 X -> Mocking
 
     @Mock
     private WebClient.Builder webClientBuilder;
+    // 실제 코드에서 WebClient Builder를 사용하는데, 테스트 환경에서는 사용 불가 -> Mocking
 
     @Mock
     private WebClient webClient;
+    // WebClient는 외부와 통신할 때 사용하는 객체이므로, 테스트 환경에서는 사용 불가 -> Mocking
+
+    // ====================Web Client 체이닝 메서드 호출에 필요한 다양한 타입 Mocking===========================
+    // WebClient -> RequestHeadersUriSpec -> RequestHeadersSpec -> ResponseSpec -> Mono<KakaoUserDataResponse> 순으로 호출되므로
+    // 각각의 Mock 객체를 생성하여 WebClient의 메서드 호출에 대한 반환값을 설정해준다.
 
     @Mock
     private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
@@ -51,18 +65,32 @@ class KakaoAuthTest {
     @Mock
     private Mono<KakaoUserDataResponse> monoResponse;
 
-    private AuthServiceImpl authService;
+    // =================================================================================================
 
+    private AuthServiceImpl authService; // 실제 테스트 대상 객체
+
+    /**
+     * 각 테스트 메서드 실행 전(BeforeEach)에 공통으로 수행할 셋업 로직.
+     * WebClient 체이닝을 Mock으로 연결해줌과 동시에, 테스트 대상 서비스 인스턴스를 생성한다.
+     */
     @BeforeEach
     void setUp() {
-        // Setup WebClient mock chain
+        // 1. WebClient Builder Mocking
         when(webClientBuilder.build()).thenReturn(webClient);
+
+        // 2. GET 요청 시 requestHeadersUriSpec을 반환하는 Mocking 설정
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
+
+        // 3. REQUEST URI 설정 시 requestHeadersSpec을 반환하는 Mocking 설정
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+
+        // 4. Header 설정 시 requestHeadersSpec을 반환하는 Mocking 설정
         when(requestHeadersSpec.header(anyString(), anyString())).thenReturn(requestHeadersSpec);
+
+        // 5. Response 시 responseSpec을 반환하는 Mocking 설정
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
-        // Create service with mocked dependencies
+        // authService 인스턴스 생성해야 하니까 Mocking WebClient + 필요한 의존성 주입
         authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder);
     }
 
@@ -72,25 +100,25 @@ class KakaoAuthTest {
         KakaoAuthRequest request = new KakaoAuthRequest();
         request.setAccessToken("fake-token");
 
-        // Create mock Kakao response
+        // Create mock Kakao response - 카카오 인증 서버에서 "kakao-123" 반환했다고 가정
         KakaoUserDataResponse kakaoResponse = new KakaoUserDataResponse();
         kakaoResponse.setId("kakao-123");
 
-        // Mock WebClient response - this is the key fix
+        // Mock WebClient response
         when(responseSpec.bodyToMono(KakaoUserDataResponse.class)).thenReturn(monoResponse);
         when(monoResponse.block()).thenReturn(kakaoResponse);
 
-        // Mock repository (new user)
+        // 실제로 DB에는 없을거니까 kakao-123 쿼리했을 때 반환되는게 없을거라고 가정
         when(userRepository.findByProviderId("kakao-123")).thenReturn(Optional.empty());
 
-        // Mock JWT token generation
+        // JWT 잘 생성했다고 가정
         when(jwtTokenProvider.createToken(eq("kakao-123"), isNull(), eq(TokenType.ACCESS)))
                 .thenReturn("access-token");
         when(jwtTokenProvider.createToken(eq("kakao-123"), isNull(), eq(TokenType.REFRESH)))
                 .thenReturn("refresh-token");
 
         // When
-        List<String> tokens = authService.authenticate(request);
+        List<String> tokens = authService.authenticate(request, Provider.KAKAO);
 
         // Then
         assertNotNull(tokens);
@@ -98,7 +126,7 @@ class KakaoAuthTest {
         assertEquals("access-token", tokens.get(0));
         assertEquals("refresh-token", tokens.get(1));
 
-        // Verify user was saved
+        // 사용자 저장되었는지 테스트 (실제로 저장되는건 아님)
         verify(userRepository).save(argThat(user ->
                 user.getProviderId().equals("kakao-123") &&
                         user.getProvider() == Provider.KAKAO &&
@@ -112,11 +140,11 @@ class KakaoAuthTest {
         KakaoAuthRequest request = new KakaoAuthRequest();
         request.setAccessToken("fake-token");
 
-        // Create mock Kakao response
+        // Create mock Kakao response - 카카오 인증 서버에서 "kakao-123" 반환했다고 가정
         KakaoUserDataResponse kakaoResponse = new KakaoUserDataResponse();
         kakaoResponse.setId("kakao-123");
 
-        // Create existing user
+        // 현재 DB에 이 사용자 존재한다고 가정
         User existingUser = User.builder()
                 .providerId("kakao-123")
                 .provider(Provider.KAKAO)
@@ -127,7 +155,7 @@ class KakaoAuthTest {
         when(responseSpec.bodyToMono(KakaoUserDataResponse.class)).thenReturn(monoResponse);
         when(monoResponse.block()).thenReturn(kakaoResponse);
 
-        // Mock repository (existing user)
+        // 실제 DB에 쿼리하는게 아니므로 existingUser 반환한다고 설정
         when(userRepository.findByProviderId("kakao-123")).thenReturn(Optional.of(existingUser));
 
         // Mock JWT token generation
@@ -137,7 +165,7 @@ class KakaoAuthTest {
                 .thenReturn("refresh-token");
 
         // When
-        List<String> tokens = authService.authenticate(request);
+        List<String> tokens = authService.authenticate(request, Provider.KAKAO);
 
         // Then
         assertNotNull(tokens);
@@ -153,13 +181,12 @@ class KakaoAuthTest {
         KakaoAuthRequest request = new KakaoAuthRequest();
         request.setAccessToken("invalid-token");
 
-        // Mock WebClient to return empty mono with null block result
         when(responseSpec.bodyToMono(KakaoUserDataResponse.class)).thenReturn(monoResponse);
         when(monoResponse.block()).thenReturn(null);
 
         // When/Then
         Exception exception = assertThrows(Exception.class, () -> {
-            authService.authenticate(request);
+            authService.authenticate(request, Provider.KAKAO);
         });
         assertEquals("Failed to get user information from Kakao", exception.getMessage());
     }

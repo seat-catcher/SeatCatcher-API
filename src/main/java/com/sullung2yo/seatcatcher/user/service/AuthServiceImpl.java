@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
                 .block();
 
         if (response == null) {
-            throw new Exception("Failed to get user information from Kakao");
+            throw new Exception("카카오 서버에서 사용자 정보를 가져오는데 실패했습니다.");
         }
 
         // Check if the user is already registered
