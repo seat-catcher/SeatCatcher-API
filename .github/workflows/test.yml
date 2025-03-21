@@ -1,0 +1,34 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - uijong
+      - yuseok
+      - wonseok
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [17]
+    outputs:
+        test_status: ${{ steps.test_status.outputs.status }}
+    name: Run All unit tests on Java ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - name: Set test status
+        id: test_status
+        if: success()
+        run: echo "status=success" >> $GITHUB_OUTPUT

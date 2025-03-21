@@ -188,6 +188,6 @@ class KakaoAuthTest {
         Exception exception = assertThrows(Exception.class, () -> {
             authService.authenticate(request, Provider.KAKAO);
         });
-        assertEquals("Failed to get user information from Kakao", exception.getMessage());
+        assertEquals("카카오 서버에서 사용자 정보를 가져오는데 실패했습니다.", exception.getMessage());
     }
 }
