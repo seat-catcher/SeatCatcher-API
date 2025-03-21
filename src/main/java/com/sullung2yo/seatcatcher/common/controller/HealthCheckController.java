@@ -19,7 +19,7 @@ public class HealthCheckController {
     @GetMapping
     @Operation(summary = "Health Check", description = "Check the health status of the application")
     @ApiResponse(responseCode = "200", description = "OK")
-    public ResponseEntity<String> healthCheck() throws Exception {
+    public ResponseEntity<String> healthCheck() {
         log.info("Health check request received");
         return ResponseEntity.ok("ok");
     }
@@ -27,7 +27,7 @@ public class HealthCheckController {
     @GetMapping("/auth")
     @Operation(summary = "Auth Check", description = "Check if request user is authenticated")
     @ApiResponse(responseCode = "200", description = "OK")
-    public ResponseEntity<String> authCheck() throws Exception {
+    public ResponseEntity<String> authCheck() {
         log.info("Auth check request received");
         return ResponseEntity.ok("ok");
     }

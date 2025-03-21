@@ -51,7 +51,8 @@ public class AuthServiceImpl implements AuthService {
     public List<String> authenticate(Object request, Provider provider) throws Exception {
 
         if (provider == Provider.LOCAL) {
-            return null;
+            // TODO: 로컬 인증 구현 필요 시 구현예정
+            throw new UnsupportedOperationException("로컬 인증 미구현");
         }
         else if (provider == Provider.KAKAO) {
             // 카카오에 사용자 정보 요청
