@@ -1,0 +1,46 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - uijong
+      - yuseok
+      - wonseok
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [17]
+
+    outputs:
+        test_status: ${{ steps.test_status.outputs.status }}
+
+    name: Run All unit tests on Java ${{ matrix.java }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup java ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+          cache: gradle # Gradle dependency caching
+
+      - name: Setup application.properties
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - name: Set test status
+        id: test_status
+        if: success()
+        run: echo "status=success" >> $GITHUB_OUTPUT

@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### Spring Boot ###
-src/main/resources/application.properties
+src/main/resources/*.properties
