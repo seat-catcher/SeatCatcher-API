@@ -30,4 +30,13 @@ public class HealthCheckController {
         log.info("Health check request received");
         return ResponseEntity.ok("ok");
     }
+
+    @GetMapping("/auth")
+    @Operation(summary = "Auth Check", description = "Check if request user is authenticated")
+    @ApiResponse(responseCode = "200", description = "OK")
+    public ResponseEntity<String> authCheck() throws Exception {
+        log.info("Auth check request received");
+        return ResponseEntity.ok("ok");
+    }
+
 }

@@ -15,13 +15,10 @@ import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.dto.request.AppleAuthRequest;
-import com.sullung2yo.seatcatcher.user.dto.request.AuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.KakaoUserDataResponse;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,6 +27,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -50,33 +48,17 @@ public class AuthServiceImpl implements AuthService {
         this.webClient = webClientBuilder.build();
     }
 
-    /**
-     * 지정된 인증 제공자와 토큰 요청 정보를 기반으로 사용자 인증 후 JWT 액세스 토큰과 리프레시 토큰을 생성합니다.
-     *
-     * <p>인증 방식에 따라 처리 로직이 달라집니다:
-     * <ul>
-     *   <li>LOCAL: 인증 처리를 수행하지 않고 null을 반환합니다.</li>
-     *   <li>KAKAO: 카카오 API를 통해 사용자 정보를 조회한 후, 신규 사용자 등록 또는 기존 사용자 정보를 업데이트하고 JWT 토큰을 생성합니다.</li>
-     *   <li>APPLE: 현재 구현되지 않아 null을 반환합니다.</li>
-     * </ul>
-     *
-     * @param request  토큰 요청 정보가 담긴 객체로, 카카오 인증의 경우 provider access token을 포함합니다.
-     * @return 카카오 인증 시 JWT 액세스 및 리프레시 토큰이 담긴 리스트, 그 외의 경우 null 반환
-     * @throws Exception 제공자가 유효하지 않은 경우 예외 발생
-     */
-    public List<String> authenticate(AuthRequest request) throws Exception {
-        Provider provider = request.getProvider();
+    public List<String> authenticate(Object request, Provider provider) throws Exception {
 
-        // Request user information with provider_access_token in KakaoAuthRequest
         if (provider == Provider.LOCAL) {
             return null;
         }
         else if (provider == Provider.KAKAO) {
-            // Get user information from Kakao
-            KakaoAuthRequest kakaoAuthRequest = (KakaoAuthRequest) request; // Type cast to KakaoAuthRequest
+            // 카카오에 사용자 정보 요청
+            KakaoAuthRequest kakaoAuthRequest = (KakaoAuthRequest) request;
             User user = kakaoAuthenticator(kakaoAuthRequest);
 
-            // Generate JWT token (Access, Refresh)
+            // JWT 토큰 생성 (Access, Refresh)
             String accessToken = jwtTokenProvider.createToken(
                     user.getProviderId(),
                     null,
@@ -90,11 +72,14 @@ public class AuthServiceImpl implements AuthService {
             return List.of(accessToken, refreshToken);
         }
         else if (provider == Provider.APPLE) {
-            AppleAuthRequest appleAuthRequest = (AppleAuthRequest) request; // Type cast to AppleAuthRequest
+            log.debug("Apple authenticate 메서드 호출됨");
 
+            // IdentityToken 검증 (이미 token에 필요한 정보가 들어있다)
+            AppleAuthRequest appleAuthRequest = (AppleAuthRequest) request;
             User user = appleAuthenticator(appleAuthRequest);
+            log.debug("Apple 토큰 검증 성공 및 사용자 갱신(생성) 완료 : {}", user);
 
-            // Generate JWT token (Access, Refresh)
+            // JWT 토큰 생성 (Access, Refresh)
             String accessToken = jwtTokenProvider.createToken(
                     user.getProviderId(),
                     null,
@@ -105,6 +90,8 @@ public class AuthServiceImpl implements AuthService {
                     null,
                     TokenType.REFRESH
             );
+            log.debug("JWT 토큰 생성 완료: accessToken={}, refreshToken={}", accessToken, refreshToken);
+
             return List.of(accessToken, refreshToken);
         }
         else {
@@ -112,15 +99,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    /**
-     * 카카오 API를 호출하여 사용자 정보를 조회하고, 해당 정보를 기반으로 신규 사용자 등록 또는 기존 사용자 업데이트를 수행한 후 User 객체를 반환합니다.
-     * 제공된 액세스 토큰을 사용하여 "<a href="https://kapi.kakao.com/v2/user/me">...</a>" 엔드포인트로 요청하며, 응답이 없으면 예외를 발생시킵니다.
-     * 신규 사용자인 경우, 응답 정보를 토대로 User 객체를 생성하여 저장하며, 기존 사용자인 경우 이메일과 마지막 로그인 시간을 업데이트합니다.
-     *
-     * @param kakaoAuthRequest 카카오 API 호출에 필요한 액세스 토큰 정보를 담은 요청 객체
-     * @throws Exception 카카오 API로부터 사용자 정보를 가져오지 못한 경우
-     * @return 인증 또는 회원가입 처리된 사용자 정보를 담은 User 객체
-     */
     private User kakaoAuthenticator(KakaoAuthRequest kakaoAuthRequest) throws Exception {
         String kakaoDataUrl = "https://kapi.kakao.com/v2/user/me";
 
@@ -159,6 +137,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private User appleAuthenticator(AppleAuthRequest appleAuthRequest) throws Exception {
+        log.debug("appleAuthenticator 메서드 호출됨");
+
         String providerId = validateAppleIdentityToken(appleAuthRequest.getIdentityToken());
         User user = userRepository.findByProviderId(providerId).orElse(null);
         if (user == null) { // if new user
@@ -170,9 +150,11 @@ public class AuthServiceImpl implements AuthService {
                     .credit(0L)
                     .build();
             userRepository.save(user);
+            log.debug("새로운 사용자 등록 완료: {}", user);
         } else {
             user.setLastLoginAt(LocalDateTime.now());
             userRepository.save(user);
+            log.debug("기존 사용자 업데이트 완료: {}", user);
         }
 
         return user;
@@ -180,54 +162,82 @@ public class AuthServiceImpl implements AuthService {
 
     public String validateAppleIdentityToken(String identityToken) throws Exception {
         try {
+            log.debug("validateAppleIdentityToken 메서드 호출됨 -> IdentityToken 검증 시작 : {}", identityToken);
+
             String issuer = "https://appleid.apple.com";
-            JWT jwt = JWTParser.parse(identityToken);
+            String decodedToken = new String(Base64.getDecoder().decode(identityToken));
+            log.debug("Base64 Decode : {}", decodedToken);
+
+            JWT jwt = JWTParser.parse(decodedToken);
             JWTClaimsSet claimsSet = jwt.getJWTClaimsSet(); // Get JWT claims
+            log.debug("issuer: {}", issuer);
+            log.debug("claimsSet: {}", claimsSet);
 
             // 1. exp 검증
             Date expirationTime = claimsSet.getExpirationTime();
             if (expirationTime == null || expirationTime.before(new Date())) {
                 throw new Exception("This identity token is expired");
             }
+            log.debug("성공적으로 exp 검증 완료");
 
             // 2. iss 검증
             if (!claimsSet.getIssuer().equals(issuer)) {
                 throw new Exception("This identity token is not issued by Apple");
             }
+            log.debug("성공적으로 iss 검증 완료");
 
             // 3. aud 검증 ( Apple Developer 계정의 Client ID와 일치하는지 검증)
             if (!claimsSet.getAudience().contains(appleClientId)) {
                 throw new Exception("This identity token is not intended for this client");
             }
+            log.debug("성공적으로 aud 검증 완료");
 
             // 4. signature 검증
             SignedJWT signedJWT = (SignedJWT) jwt;
-            String keyId = signedJWT.getHeader().getKeyID(); // 애플의 public Key 가져오기
+            String keyId = signedJWT.getHeader().getKeyID(); // identity token의 Key ID 가져오기
+            log.debug("keyId: {}", keyId);
 
             JWKSet jwkSet = loadApplePublicKeys();
-            List<JWK> keys = jwkSet.getKeys();
+            List<JWK> keys = jwkSet.getKeys(); // Apple에서 제공하는 Public Key 가져오기
+            log.debug("apple provide keys: {}", keys);
 
             RSAKey publicKey = null;
             for (JWK key : keys) { // 애플의 Public Key와 일치하는 Key 찾기 -> 발견하면 성공
                 if (key.getKeyID().equals(keyId)) {
-                    publicKey = (RSAKey) key;
-                    break;
+                    try {
+                        publicKey = (RSAKey) key;
+                        log.debug("매칭되는 key를 찾았어요: {}", publicKey);
+                        break;
+                    } catch (Exception e) {
+                        log.error("키 매칭 중 에러 발생: {}", e.getMessage());
+                        throw new Exception("키 매칭 중 에러 발생 : " + e.getMessage());
+                    }
                 }
             }
 
             if (publicKey == null) {
-                throw new Exception("Failed to find Apple public key");
+                throw new Exception("identityToken에서 추출한 keyId와 애플에서 제공하는 Public KeyId가 일치하지 않습니다.");
             }
 
-            RSASSAVerifier verifier = new RSASSAVerifier(publicKey);
+            RSASSAVerifier verifier = new RSASSAVerifier(publicKey.toRSAPublicKey());
             if (!signedJWT.verify(verifier)) {
-                throw new Exception("Failed to verify Apple identity token (Invalid signature)");
+                log.error("identityToken의 signature 검증 실패");
+                throw new Exception("identityToken의 signature 검증 실패");
             }
 
             // 최종적으로 애플이 제공한 사용자 ID를 반환한다
+            log.debug("Apple identityToken 검증 성공! 사용자 ID 반환: {}", claimsSet.getSubject());
             return claimsSet.getSubject();
-        } catch (ParseException | JOSEException e) {
-            throw new Exception("Failed to verify Apple identity token : ", e);
+
+        } catch (ParseException e) {
+            log.error("Parse error during token validation", e);
+            throw new Exception("애플 IdentityToken 검증 오류: " + e.getMessage());
+        } catch (JOSEException e) {
+            log.error("JOSE error during token validation", e);
+            throw new Exception("애플 IdentityToken 검증 오류: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Unexpected error during token validation", e);
+            throw new Exception("애플 IdentityToken 검증 오류: " + e.getMessage());
         }
     }
 
@@ -236,7 +246,7 @@ public class AuthServiceImpl implements AuthService {
             String applePublicKeyUrl = "https://appleid.apple.com/auth/keys";
             return JWKSet.load(new URL(applePublicKeyUrl));
         } catch (IOException e) {
-            throw new Exception("Failed to load Apple public keys", e);
+            throw new Exception("애플 PublicKey를 가져오는데 실패했습니다", e);
         }
     }
 }

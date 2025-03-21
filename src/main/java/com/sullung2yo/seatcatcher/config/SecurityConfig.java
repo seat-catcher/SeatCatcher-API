@@ -48,6 +48,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 보안 설정을 비활성화
                 .cors(AbstractHttpConfigurer::disable) // CORS 설정 비활성화 해서 모든 도메인에서 요청을 받을 수 있게 설정
+                .formLogin(AbstractHttpConfigurer::disable) // API 서버라서 폼 로그인 비활성화
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)) //// H2 console은 iframe 사용
                 .sessionManagement( // 세션 관리 설정 -> REST API 서버이기 때문에 세션을 사용하지 않으므로 STATELESS로 설정
@@ -73,4 +74,11 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 토큰 검증 필터 추가
         return http.build();
     }
+
+//    @Bean
+//    private BearerTokenResolver bearerTokenResolver() {
+//        DefaultBearerTokenResolver bearerTokenResolver = new DefaultBearerTokenResolver();
+//        bearerTokenResolver.setBearerTokenHeaderName(HttpHeaders.PROXY_AUTHORIZATION);
+//        return bearerTokenResolver;
+//    }
 }

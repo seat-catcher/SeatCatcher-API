@@ -4,8 +4,10 @@ import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,32 +15,25 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
 
+@Slf4j
 @Component
-@NoArgsConstructor
 public class JwtTokenProviderImpl implements TokenProvider {
 
     @Getter
     private SecretKey secretKey;
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Value("${jwt.access-token-valid-millisecond}")
     private long accessTokenValidMilliseconds;
+
+    @Value("${jwt.refresh-token-valid-millisecond}")
     private long refreshTokenValidMilliseconds;
 
-    /**
-     * 주어진 JWT 비밀 문자열과 토큰 유효 기간을 사용하여 JwtTokenProviderImpl 인스턴스를 초기화합니다.
-     * jwt secret 을 이용해 JWT 서명에 사용할 SecretKey 객체를 생성하며,
-     * access 토큰과 refresh 토큰에 각각 적용될 유효 기간(밀리초 단위)을 설정합니다.
-     *
-     * @param secret JWT 서명에 필요한 비밀 문자열.
-     * @param accessTokenValidMilliseconds access 토큰의 유효 기간 (밀리초 단위).
-     * @param refreshTokenValidMilliseconds refresh 토큰의 유효 기간 (밀리초 단위).
-     */
-    public JwtTokenProviderImpl(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-valid-millisecond}") long accessTokenValidMilliseconds,
-            @Value("${jwt.refresh-token-valid-millisecond}") long refreshTokenValidMilliseconds
-    ) {
+    @PostConstruct // Value로 의존성 주입이 이루어진 후 secretKey 초기화 작업 수행
+    public void initSecretKey(){
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
-        this.accessTokenValidMilliseconds = accessTokenValidMilliseconds;
-        this.refreshTokenValidMilliseconds = refreshTokenValidMilliseconds;
     }
 
     /**
@@ -54,6 +49,7 @@ public class JwtTokenProviderImpl implements TokenProvider {
      */
     @Override
     public String createToken(String providerId, Map<String, ?> payload, TokenType tokenType) {
+
         Claims claims;
 
         if (tokenType == TokenType.ACCESS) {
@@ -80,8 +76,11 @@ public class JwtTokenProviderImpl implements TokenProvider {
      * @return JWT 생성을 위한 클레임 객체
      */
     private Claims generateClaims(String subject, Map<String, ?> payload, long tokenValidMilliseconds) {
+        log.debug("토큰 생성: subject={}, payload={}, 유효 기간={}ms", subject, payload, tokenValidMilliseconds);
+
         Date now = new Date();
         Date expiredAt = new Date(now.getTime() + tokenValidMilliseconds);
+        log.debug("토큰 유효 기간: {}", expiredAt);
 
         return Jwts.claims()
                 .subject(subject)
