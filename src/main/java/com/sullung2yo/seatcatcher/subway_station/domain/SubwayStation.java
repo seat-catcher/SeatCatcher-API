@@ -1,8 +1,13 @@
 package com.sullung2yo.seatcatcher.subway_station.domain;
 
+import com.sullung2yo.seatcatcher.subway_line.domain.SubwayLine;
+import com.sullung2yo.seatcatcher.subway_stations_subway_lines.domain.SubwayStationSubwayLine;
 import jakarta.persistence.*;
 import lombok.*;
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
+
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -11,7 +16,7 @@ import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 @AllArgsConstructor
 @Builder
 // 일단 임의로 테이블 이름을 subway_station 이라고 해두겠습니다.
-@Table(name="subway_station", uniqueConstraints = {@UniqueConstraint(columnNames = {"station_name", "line_no"})})
+@Table(name="subway_stations", uniqueConstraints = {@UniqueConstraint(columnNames = {"station_name", "line_no"})})
 public class SubwayStation extends BaseEntity{
 
     /*
@@ -22,12 +27,13 @@ public class SubwayStation extends BaseEntity{
         해당 세 칼럼은 정의하지 않았습니다.
     */
 
+
+    //양방향 Many To Many 구현을 위해 Mapping Table SubwayStationSubwayLine을 이용
+    @OneToMany(mappedBy = "subwayStation")
+    private Set<SubwayStationSubwayLine> subwayStationSubwayLines;
+
     @Column(name="station_name", nullable = false)
     private String stationName; // 역의 이름입니다. (subway stations name)
-
-    //TODO :: 데이터셋에는 string으로 되어 있습니다만, Jackson이 알아서 변환도 해준다고 해서 int로 뒀습니다. 확인이 필요합니다!
-    @Column(name="line_no", nullable = false)
-    private int lineNo; // 호선 번호입니다. (subway route line)
 
     @Column(name="dist_km", nullable = false)
     private float distance; // 전 역에서 해당 역까지의 거리입니다.
