@@ -1,8 +1,6 @@
-package com.sullung2yo.seatcatcher.subway_stations_subway_lines.domain;
+package com.sullung2yo.seatcatcher.subway_station.domain;
 
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
-import com.sullung2yo.seatcatcher.subway_line.domain.SubwayLine;
-import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;

@@ -1,12 +1,9 @@
 package com.sullung2yo.seatcatcher.subway_station.domain;
 
-import com.sullung2yo.seatcatcher.subway_line.domain.SubwayLine;
-import com.sullung2yo.seatcatcher.subway_stations_subway_lines.domain.SubwayStationSubwayLine;
 import jakarta.persistence.*;
 import lombok.*;
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 // 일단 임의로 테이블 이름을 subway_station 이라고 해두겠습니다.
-@Table(name="subway_stations", uniqueConstraints = {@UniqueConstraint(columnNames = {"station_name", "line_no"})})
+@Table(name="subway_stations")
 public class SubwayStation extends BaseEntity{
 
     /*

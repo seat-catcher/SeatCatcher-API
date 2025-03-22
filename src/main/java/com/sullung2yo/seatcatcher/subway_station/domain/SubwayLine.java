@@ -1,12 +1,10 @@
-package com.sullung2yo.seatcatcher.subway_line.domain;
+package com.sullung2yo.seatcatcher.subway_station.domain;
 
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
-import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
-import com.sullung2yo.seatcatcher.subway_stations_subway_lines.domain.SubwayStationSubwayLine;
+import com.sullung2yo.seatcatcher.train.domain.Train;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="subway_lines", uniqueConstraints = {@UniqueConstraint(columnNames = {""})})
+@Table(name="subway_lines")
 public class SubwayLine extends BaseEntity {
 
     /*
@@ -30,6 +28,9 @@ public class SubwayLine extends BaseEntity {
     @OneToMany(mappedBy = "subwayLine")
     private Set<SubwayStationSubwayLine> subwayStationSubwayLines;
 
-    @Column(name = "line_name", nullable = false)
+    @OneToMany(mappedBy = "subwayLine")
+    private Set<Train> trains;
+
+    @Column(name = "line_name", nullable = false, unique = true)
     private String lineName;
 }
