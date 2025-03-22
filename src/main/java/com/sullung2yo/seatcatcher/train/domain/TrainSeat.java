@@ -31,10 +31,6 @@ public class TrainSeat extends BaseEntity {
     @JoinColumn(name = "seat_group_id", nullable = false)
     private TrainSeatGroup trainSeatGroup;
 
-    @OneToOne(mappedBy = "mySeat")
-    private User user;
-    //TODO :: User 쪽에도 매핑을 시켜줘야 합니다!
-
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'SEAT_TYPE_NORMAL'")
