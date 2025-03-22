@@ -14,7 +14,7 @@ import lombok.*;
 public class UserAlarm extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private User user; // 알람을 소유한 유저
 
     @Column(name = "content")

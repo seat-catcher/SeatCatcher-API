@@ -25,7 +25,7 @@ public class TrainSeatGroup extends BaseEntity {
     */
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "train_car_id", nullable = false)
     private TrainCar trainCar;
 
     @OneToMany(mappedBy = "trainSeatGroup", cascade = CascadeType.ALL, orphanRemoval = true)

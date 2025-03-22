@@ -18,10 +18,10 @@ import lombok.*;
 public class SubwayRideLog extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "station_id")
     private SubwayStation subwayStation; // 탑승역
 }

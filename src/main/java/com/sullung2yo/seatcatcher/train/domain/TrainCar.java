@@ -16,7 +16,7 @@ import java.util.Set;
 public class TrainCar extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "train_id", nullable = false)
     private Train train;
 
     @OneToMany(mappedBy = "trainCar", cascade = CascadeType.ALL, orphanRemoval = true)

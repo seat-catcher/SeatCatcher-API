@@ -28,10 +28,10 @@ public class UserTrainSeat extends BaseEntity {
         One To One 관계를 구현하기 위해 생성되었습니다.
     */
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "seat_id")
     private TrainSeat trainSeat;
 }

@@ -27,10 +27,10 @@ public class SubwayStationSubwayLine extends BaseEntity {
         ManyToMany 관계를 구현하기 위해 생성되었습니다.
     */
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "station_id")
     private SubwayStation subwayStation;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "line_id")
     private SubwayLine subwayLine;
 }

@@ -23,15 +23,15 @@ public class PathBookmark extends BaseEntity {
 
     //@ManyToOne
     @ManyToOne
-    @JoinColumn(name ="id", nullable = false)
+    @JoinColumn(name ="user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "start_station_id", nullable = false)
     private SubwayStation startStation;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "end_station_id", nullable = false)
     private SubwayStation endStation;
 
     @Column(name="use_count")
