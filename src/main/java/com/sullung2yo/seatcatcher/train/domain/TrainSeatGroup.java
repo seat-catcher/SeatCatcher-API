@@ -33,9 +33,9 @@ public class TrainSeatGroup extends BaseEntity {
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'SEAT_GROUP_TYPE_NORMAL_1'")
+    @ColumnDefault("'NORMAL_1'")
     @Builder.Default
-    private SeatGroupType type = SeatGroupType.SEAT_GROUP_TYPE_NORMAL_A;
+    private SeatGroupType type = SeatGroupType.NORMAL_A;
     // 좌석 그룹 타입은 다음과 같습니다.
     // 노약자구역 A, 일반구역 A B C , 노약자구역 B
 }

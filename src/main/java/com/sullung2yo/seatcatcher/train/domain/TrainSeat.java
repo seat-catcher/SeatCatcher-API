@@ -33,9 +33,9 @@ public class TrainSeat extends BaseEntity {
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'SEAT_TYPE_NORMAL'")
+    @ColumnDefault("'NORMAL'")
     @Builder.Default
-    private SeatType seatType = SeatType.SEAT_TYPE_NORMAL; // 노약자석 / 임산부좌석 / 일반좌석 세 가지만 일단 존재합니다.
+    private SeatType seatType = SeatType.NORMAL; // 노약자석 / 임산부좌석 / 일반좌석 세 가지만 일단 존재합니다.
 
     @Column(name = "jjim_count")
     private int jjimCount;
