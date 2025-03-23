@@ -51,4 +51,8 @@ public class User extends BaseEntity {
 
     @Column
     private LocalDateTime lastLoginAt; // 마지막 로그인 시간
+
+    @ManyToOne
+    @JoinColumn(name = "tag_id")
+    private UserTag tag;
 }
