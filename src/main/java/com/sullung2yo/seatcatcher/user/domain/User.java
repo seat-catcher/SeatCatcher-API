@@ -2,7 +2,9 @@ package com.sullung2yo.seatcatcher.user.domain;
 
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -46,6 +48,7 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     @ColumnDefault("0")
+    @Min(value = 0L, message = "크레딧은 0 이상이어야 합니다.")
     @Builder.Default
     private Long credit = 0L; // 사용자 보유 크레딧
 

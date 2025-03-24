@@ -3,31 +3,43 @@ package com.sullung2yo.seatcatcher.user.repository;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
+import org.hibernate.AssertionFailure;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@DataJpaTest // JPA 테스트 시 더 가볍고 빠르게 테스트 가능하다 -> @Entity 클래스만 스캔하므로 @Service, @Component, @Repository 등은 스캔 X
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@EnableJpaAuditing
 class UserRepositoryTest {
 
     @Autowired
     UserRepository userRepository;
-    String appleProviderId = "test1234";
-    String kakaoProviderId = "1234test";
+
+    @Autowired
+    EntityManager entityManager;
+
+    private static final String APPLE_PROVIDER_ID = "test1234";
+    private static final String KAKAO_PROVIDER_ID = "1234test";
 
     @BeforeEach
     void setUp() {
         User appleUser = User.builder()
                 .provider(Provider.APPLE)
-                .providerId(appleProviderId)
+                .providerId(APPLE_PROVIDER_ID)
                 .role(UserRole.ROLE_USER)
                 .name("Apple USER")
                 .lastLoginAt(LocalDateTime.now())
@@ -37,7 +49,7 @@ class UserRepositoryTest {
 
         User kakaoUser = User.builder()
                 .provider(Provider.KAKAO)
-                .providerId(kakaoProviderId)
+                .providerId(KAKAO_PROVIDER_ID)
                 .role(UserRole.ROLE_USER)
                 .name("Kakao USER")
                 .lastLoginAt(LocalDateTime.now())
@@ -60,32 +72,65 @@ class UserRepositoryTest {
                 .role(UserRole.ROLE_USER)
                 .name("Apple USER")
                 .lastLoginAt(LocalDateTime.now())
-                .credit(300L)
+                .credit(12345L)
                 .build();
 
         userRepository.save(test);
 
-        Optional<User> foundedUser = userRepository.findByProviderId(providerId);
-        assertTrue(foundedUser.isPresent());
-        assertEquals(providerId, foundedUser.get().getProviderId());
+        Optional<User> foundUser = userRepository.findByProviderId(providerId);
+        assertTrue(foundUser.isPresent());
+        assertEquals(providerId, foundUser.get().getProviderId());
+    }
+
+    @Test
+    void createNegativeCreditUser() {
+        //Given
+        String providerId = "hello123";
+        User test = User.builder()
+                .provider(Provider.APPLE)
+                .providerId(providerId)
+                .role(UserRole.ROLE_USER)
+                .name("Apple USER")
+                .lastLoginAt(LocalDateTime.now())
+                .credit(-12345L)
+                .build();
+
+        //When, Then
+        assertThrows(ConstraintViolationException.class, () -> {
+            try {
+                userRepository.save(test);
+                entityManager.flush();
+            } finally {
+                entityManager.clear();
+            }
+        });
+
+        assertTrue(userRepository.findByProviderId(providerId).isEmpty());
     }
 
     @Test
     void createDuplicateAppleUser() {
-        Optional<User> foundedUser = userRepository.findByProviderId(appleProviderId);
-        assertTrue(foundedUser.isPresent());
-        assertEquals(appleProviderId, foundedUser.get().getProviderId());
+        Optional<User> foundUser = userRepository.findByProviderId(APPLE_PROVIDER_ID);
+        assertTrue(foundUser.isPresent());
+        assertEquals(APPLE_PROVIDER_ID, foundUser.get().getProviderId());
 
         User duplicate_user = User.builder()
                 .provider(Provider.APPLE)
-                .providerId("test1234")
+                .providerId(APPLE_PROVIDER_ID)
                 .role(UserRole.ROLE_USER)
                 .name("Apple USER")
                 .lastLoginAt(LocalDateTime.now())
                 .credit(300L)
                 .build();
 
-        assertThrows(DataIntegrityViolationException.class, () -> userRepository.save(duplicate_user));
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            try {
+                userRepository.save(duplicate_user);
+                entityManager.flush();
+            } finally {
+                entityManager.clear();
+            }
+        });
     }
 
     @Test
@@ -95,13 +140,13 @@ class UserRepositoryTest {
 
     @Test
     void findByProviderId() {
-        Optional<User> apple = userRepository.findByProviderId(appleProviderId);
+        Optional<User> apple = userRepository.findByProviderId(APPLE_PROVIDER_ID);
         assertTrue(apple.isPresent());
-        assertEquals(appleProviderId, apple.get().getProviderId());
+        assertEquals(APPLE_PROVIDER_ID, apple.get().getProviderId());
 
-        Optional<User> kakao = userRepository.findByProviderId(kakaoProviderId);
+        Optional<User> kakao = userRepository.findByProviderId(KAKAO_PROVIDER_ID);
         assertTrue(kakao.isPresent());
-        assertEquals(kakaoProviderId, kakao.get().getProviderId());
+        assertEquals(KAKAO_PROVIDER_ID, kakao.get().getProviderId());
     }
 
 }
