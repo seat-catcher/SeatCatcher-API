@@ -11,8 +11,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="path_bookmarks")
-public class PathBookmark extends BaseEntity {
+@Table(name="path_histories")
+public class PathHistory extends BaseEntity {
     /*
         BaseEntity 를 상속받아
         id   ::   id 는 지하철 역에 대한 고유 식별자로써, 인덱싱 역할을 수행합니다.
@@ -34,6 +34,9 @@ public class PathBookmark extends BaseEntity {
     @JoinColumn(name = "end_station_id", nullable = false)
     private SubwayStation endStation;
 
-    @Column(name="use_count")
-    private int useCount; // 경로가 사용된 횟수
+    /*
+        @Column(name="use_count")
+        private int useCount; // 경로가 사용된 횟수
+    */
 }
+
