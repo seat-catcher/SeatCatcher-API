@@ -11,7 +11,7 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 COPY src/main/resources/prod.properties src/main/resources/application.properties
 
 RUN addgroup -S seat-catcher && \
-    adduser -S seat-catcher-user -G seat-catcher \
+    adduser -S seat-catcher-user -G seat-catcher && \
     chown -R seat-catcher-user:seat-catcher /app
 
 USER seat-catcher-user
