@@ -2,13 +2,13 @@
 FROM bellsoft/liberica-openjdk-alpine:17 AS builder
 WORKDIR /app
 COPY . .
+COPY src/main/resources/prod.properties src/main/resources/application.properties
 RUN ./gradlew clean build -x test
 
 # Run stage
 FROM bellsoft/liberica-openjdk-alpine:17
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
-COPY src/main/resources/prod.properties src/main/resources/application.properties
 
 RUN addgroup -S seat-catcher && \
     adduser -S seat-catcher-user -G seat-catcher && \
