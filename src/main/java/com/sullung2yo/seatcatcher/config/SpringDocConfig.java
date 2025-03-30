@@ -15,10 +15,12 @@ import java.util.List;
 
 @Configuration
 public class SpringDocConfig {
-    private final String securitySchemeName = "Bearer Authentication";
 
     @Bean
     public OpenAPI customOpenAPI() {
+        String securitySchemeName = "Bearer Authentication";
+        String contactUrl = "https://github.com/seat-catcher/SeatCatcher-API";
+        String tryOutServerUrl = "https://api.dev.seatcatcher.site";
         return new OpenAPI()
                 .info(new Info()
                         .title("SeatCatcher API")
@@ -27,7 +29,7 @@ public class SpringDocConfig {
                         .contact(new Contact()
                                 .name("SeatCatcher Team")
                                 .email("sullung2yo@gmail.com")
-                                .url("https://github.com/seat-catcher/SeatCatcher-API")
+                                .url(contactUrl)
                         )
                         .license(new License()
                                 .name("Apache 2.0")
@@ -35,7 +37,7 @@ public class SpringDocConfig {
                         )
                 )
                 .servers(List.of(
-                        new Server().url("https://api.dev.seatcatcher.site")
+                        new Server().url(tryOutServerUrl)
                                 .description("Docker internal API Server")
                 ))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
