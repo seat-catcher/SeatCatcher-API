@@ -3,6 +3,7 @@ package com.sullung2yo.seatcatcher.common.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class HealthCheckController {
     @GetMapping("/auth")
     @Operation(summary = "Auth Check", description = "Check if request user is authenticated")
     @ApiResponse(responseCode = "200", description = "OK")
+    @SecurityRequirement(name = "Bearer Authentication") // 클래스 레벨에 붙이면 해당 클래스의 모든 API에 적용되고, 메서드에 붙이면 해당 메서드에만 적용됨
     public ResponseEntity<String> authCheck() {
         log.info("Auth check request received");
         return ResponseEntity.ok("ok");
