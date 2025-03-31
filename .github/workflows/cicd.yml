@@ -1,10 +1,10 @@
 name: Integration and Deploy
 
 on:
-  #  push:
-  #    branches:
-  #      - main # main 브랜치에 머지될 때 트리거
-  workflow_dispatch: # 수동으로 트리거해서 테스트
+  push:
+    branches:
+      - main # main 브랜치에 머지될 때 트리거
+  # workflow_dispatch: # 수동으로 트리거해서 테스트
 
 jobs:
   springboot-integration: # Spring Boot 도커 이미지 생성 및 ECR 푸시
@@ -104,8 +104,9 @@ jobs:
           username: ${{ secrets.DEV_EC2_USERNAME }}
           key: ${{ secrets.DEV_EC2_KEY }}
           script: |
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
-            docker-compose -f docker-compose.dev.yml restart springboot
+            docker-compose -f docker-compose.dev.yml restart api
 
       - name: Check docker health
         uses: appleboy/ssh-action@v1
@@ -143,7 +144,7 @@ jobs:
           username: ${{ secrets.DEV_EC2_USERNAME }}
           key: ${{ secrets.DEV_EC2_KEY }}
           source: ./artifact/openapi.json
-          target: ~/openapi.json
+          target: ~/
 
       - name: Deploy swagger server
         uses: appleboy/ssh-action@v1
@@ -152,7 +153,7 @@ jobs:
           username: ${{ secrets.DEV_EC2_USERNAME }}
           key: ${{ secrets.DEV_EC2_KEY }}
           script: |
-            docker-compose -f docker-compose.dev.yml restart swagger-ui
+            docker-compose -f docker-compose.dev.yml restart docs
 
       - name: Check docker health
         uses: appleboy/ssh-action@v1
