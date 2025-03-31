@@ -97,6 +97,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
       - name: Deploy API server
         uses: appleboy/ssh-action@v1
         with:
@@ -143,7 +147,7 @@ jobs:
           username: ${{ secrets.DEV_EC2_USERNAME }}
           key: ${{ secrets.DEV_EC2_KEY }}
           source: ./artifact/openapi.json
-          target: ~/openapi.json
+          target: ~/
 
       - name: Deploy swagger server
         uses: appleboy/ssh-action@v1
