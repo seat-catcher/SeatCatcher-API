@@ -1,10 +1,10 @@
 name: Deploy to development server
 
 on:
-#  push:
-#    branches:
-#      - main
-    workflow_dispatch: # 수동으로 트리거해서 테스트
+  #  push:
+  #    branches:
+  #      - main
+  workflow_dispatch: # 수동으로 트리거해서 테스트
 
 jobs:
   springboot-deploy:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get openapi json from github artifact
         uses: actions/download-artifact@v4
