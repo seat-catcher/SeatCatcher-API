@@ -45,7 +45,7 @@ jobs:
         run: |
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
 
-  swagger-intergration: # Swagger 배포 파일 생성
+  swagger-integration: # Swagger 배포 파일 생성
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
