@@ -1,16 +1,18 @@
-name: Deploy
+name: Deploy to development server
 
 on:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
+    workflow_dispatch: # 수동으로 트리거해서 테스트
 
 jobs:
-  integration:
+  springboot-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -19,4 +21,73 @@ jobs:
           distribution: 'adopt'
           cache: gradle # Gradle dependency caching
 
-      # 추후 ECR 생성 후 추가 예정
+      - name: Deploy API server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEV_EC2_HOST }}
+          username: ${{ secrets.DEV_EC2_USERNAME }}
+          key: ${{ secrets.DEV_EC2_KEY }}
+          script: |
+            docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
+            docker-compose -f docker-compose.dev.yml restart springboot
+
+      - name: Check docker health
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEV_EC2_HOST }}
+          username: ${{ secrets.DEV_EC2_USERNAME }}
+          key: ${{ secrets.DEV_EC2_KEY }}
+          script: |
+            sleep 60
+            if [ $(docker inspect --format='{{.State.Health.Status}}' springboot) == "healthy" ]; then
+              echo "🥳 API server is healthy"
+            else
+              echo "👺 API server is not healthy"
+              exit 1
+            fi
+
+  swagger-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get openapi json from github artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: openapi-json # 다운로드할 아티팩트 이름
+          path: ./artifact # 다운로드 경로
+
+      - name: Upload swagger file to dev server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEV_EC2_HOST }}
+          username: ${{ secrets.DEV_EC2_USERNAME }}
+          key: ${{ secrets.DEV_EC2_KEY }}
+          source: ./artifact/openapi.json
+          target: ~/openapi.json
+
+      - name: Deploy swagger server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEV_EC2_HOST }}
+          username: ${{ secrets.DEV_EC2_USERNAME }}
+          key: ${{ secrets.DEV_EC2_KEY }}
+          script: |
+            docker-compose -f docker-compose.dev.yml restart swagger-ui
+
+      - name: Check docker health
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEV_EC2_HOST }}
+          username: ${{ secrets.DEV_EC2_USERNAME }}
+          key: ${{ secrets.DEV_EC2_KEY }}
+          script: |
+            sleep 60
+            if [ $(docker inspect --format='{{.State.Health.Status}}' swagger-ui) == "healthy" ]; then
+              echo "🥳 Swagger server is healthy"
+            else
+              echo "👺 Swagger server is not healthy"
+              exit 1
+            fi

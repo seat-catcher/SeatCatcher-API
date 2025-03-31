@@ -1,6 +1,5 @@
 package com.sullung2yo.seatcatcher.auth;
 
-import com.nimbusds.jwt.JWTParser;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
@@ -13,13 +12,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +28,7 @@ import static org.mockito.Mockito.*;
 class AppleAuthTest {
 
     @Mock
-    private UserRepository userRepository; // userrepository 의존 Mocking
+    private UserRepository userRepository; // user repository 의존 Mocking
 
     @Mock
     private JwtTokenProviderImpl jwtTokenProvider; // jwtTokenProvider 의존 Mocking

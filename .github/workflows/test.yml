@@ -13,22 +13,16 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [17]
 
-    outputs:
-        test_status: ${{ steps.test_status.outputs.status }}
-
-    name: Run All unit tests on Java ${{ matrix.java }}
+    name: Run All unit tests on Java 17
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup java ${{ matrix.java }}
+      - name: Setup java
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java }}
+          java-version: 17
           distribution: 'adopt'
           cache: gradle # Gradle dependency caching
 
@@ -37,10 +31,5 @@ jobs:
           mkdir -p ./src/main/resources
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
 
-      - name: Run tests
+      - name: Run tests # 전체 테스트 실행
         run: ./gradlew test
-
-      - name: Set test status
-        id: test_status
-        if: success()
-        run: echo "status=success" >> $GITHUB_OUTPUT
