@@ -97,10 +97,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Login to Amazon ECR
-        run: |
-          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-
       - name: Deploy API server
         uses: appleboy/ssh-action@v1
         with:
@@ -108,8 +104,9 @@ jobs:
           username: ${{ secrets.DEV_EC2_USERNAME }}
           key: ${{ secrets.DEV_EC2_KEY }}
           script: |
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
-            docker-compose -f docker-compose.dev.yml restart springboot
+            docker-compose -f docker-compose.dev.yml restart api
 
       - name: Check docker health
         uses: appleboy/ssh-action@v1
@@ -156,7 +153,7 @@ jobs:
           username: ${{ secrets.DEV_EC2_USERNAME }}
           key: ${{ secrets.DEV_EC2_KEY }}
           script: |
-            docker-compose -f docker-compose.dev.yml restart swagger-ui
+            docker-compose -f docker-compose.dev.yml restart docs
 
       - name: Check docker health
         uses: appleboy/ssh-action@v1
