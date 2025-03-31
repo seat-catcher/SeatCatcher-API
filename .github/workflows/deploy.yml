@@ -21,6 +21,13 @@ jobs:
           distribution: 'adopt'
           cache: gradle # Gradle dependency caching
 
+      - name: Set AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
       - name: Deploy API server
         uses: appleboy/ssh-action@v1
         with:
@@ -54,7 +61,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Get openapi json from github artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: openapi-json # 다운로드할 아티팩트 이름
           path: ./artifact # 다운로드 경로
