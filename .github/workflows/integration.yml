@@ -66,7 +66,7 @@ jobs:
 
       - name: Generate Swagger JSON
         run: |
-          ./gradlew generate generateOpenApi
+          ./gradlew generateOpenApi
 
       - name: Save swagger json into Actions artifact
         uses: actions/upload-artifact@v4
