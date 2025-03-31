@@ -38,7 +38,7 @@ public class SpringDocConfig {
                 )
                 .servers(List.of(
                         new Server().url(tryOutServerUrl)
-                                .description("Docker internal API Server")
+                                .description("Development Server")
                 ))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
