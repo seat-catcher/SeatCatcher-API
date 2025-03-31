@@ -1,14 +1,83 @@
-name: Deploy to development server
+name: Integration and Deploy
 
 on:
   #  push:
   #    branches:
-  #      - main
+  #      - main # main 브랜치에 머지될 때 트리거
   workflow_dispatch: # 수동으로 트리거해서 테스트
 
 jobs:
+  springboot-integration: # Spring Boot 도커 이미지 생성 및 ECR 푸시
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'adopt'
+          cache: gradle # Gradle dependency caching
+
+      - name: Setup application.properties
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+          echo "${{ secrets.PRODUCTION_PROPERTIES }}" > ./src/main/resources/prod.properties
+
+      - name: Set AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Create new docker image
+        run: |
+          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }} .
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+      - name: Push to Amazon ECR
+        run: |
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
+
+  swagger-integration: # Swagger 배포 파일 생성
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'adopt'
+          cache: gradle # Gradle dependency caching
+
+      - name: Setup application.properties
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+          echo "${{ secrets.PRODUCTION_PROPERTIES }}" > ./src/main/resources/prod.properties
+
+      - name: Generate Swagger JSON
+        run: |
+          ./gradlew generateOpenApi
+
+      - name: Save swagger json into Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-json # 업로드할 아티팩트 이름
+          path: |
+            ./build/openapi.json
+
   springboot-deploy:
     runs-on: ubuntu-latest
+    needs: [springboot-integration] # springboot-integration이 완료된 후 실행
 
     steps:
       - name: Checkout repository
@@ -55,13 +124,14 @@ jobs:
 
   swagger-deploy:
     runs-on: ubuntu-latest
+    needs: [swagger-integration] # swagger-integration이 완료된 후 실행
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Get openapi json from github artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: openapi-json # 다운로드할 아티팩트 이름
           path: ./artifact # 다운로드 경로
