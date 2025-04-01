@@ -8,8 +8,7 @@ import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.repository.RefreshTokenRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils; // 리플렉션을 사용하여 private 필드에 접근하기 위한 유틸리티!!
 
-import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -85,6 +84,8 @@ public class JwtTest {
                 .name("TestUser")
                 .build();
 
+        when(userRepository.findByProviderId(testUser.getProviderId())).thenReturn(Optional.of(testUser));
+
         // When
         String refreshToken = tokenProvider.createToken(
                 testUser.getProviderId(),
@@ -124,19 +125,23 @@ public class JwtTest {
                 .name("TestUser")
                 .build();
 
+        when(userRepository.findByProviderId(testUser.getProviderId())).thenReturn(Optional.of(testUser));
+
         String refreshToken = tokenProvider.createToken(
                 testUser.getProviderId(),
                 Map.of("role", testUser.getRole().toString()),
                 TokenType.REFRESH
         );
+
+        LocalDateTime expiredAt = LocalDateTime.now().plusDays(7); // 7일 후 만료된다고 가정
         RefreshToken refreshTokenEntity = RefreshToken.builder()
                 .user(testUser)
                 .refreshToken(refreshToken)
+                .expiredAt(expiredAt)
                 .build();
 
         // When
         when(refreshTokenRepository.findRefreshTokenByUserAndRefreshToken(testUser, refreshToken)).thenReturn(Optional.of(refreshTokenEntity));
-        when(userRepository.findByProviderId(testUser.getProviderId())).thenReturn(Optional.of(testUser));
         List<String> newTokens = tokenProvider.refreshToken(refreshToken);
 
         // Then

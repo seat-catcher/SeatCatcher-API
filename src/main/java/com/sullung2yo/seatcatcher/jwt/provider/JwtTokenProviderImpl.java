@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Slf4j
@@ -72,10 +74,22 @@ public class JwtTokenProviderImpl implements TokenProvider {
             throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다: " + tokenType);
         }
 
-        return Jwts.builder()
-                .signWith(secretKey)
-                .claims(claims)
-                .compact();
+        String token = Jwts.builder().signWith(secretKey).claims(claims).compact();
+        if (tokenType == TokenType.REFRESH) {
+            // RefreshToken은 DB에 저장
+            Optional<User> userOptional = userRepository.findByProviderId(providerId);
+            if (userOptional.isPresent()) {
+                RefreshToken refreshToken = RefreshToken.builder()
+                        .user(userOptional.get())
+                        .refreshToken(token)
+                        .expiredAt(claims.getExpiration().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                        .build();
+                refreshTokenRepository.save(refreshToken);
+            } else {
+                throw new RuntimeException("User not found");
+            }
+        }
+        return token;
     }
 
     @Override
@@ -107,7 +121,12 @@ public class JwtTokenProviderImpl implements TokenProvider {
         Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findRefreshTokenByUserAndRefreshToken(userOptional.get(), refreshToken);
         if (refreshTokenOptional.isPresent()) {
             RefreshToken existingRefreshToken = refreshTokenOptional.get();
-            existingRefreshToken.setRefreshToken(newRefreshToken);
+            existingRefreshToken.setRefreshToken(newRefreshToken); // 새로운 RefreshToken 저장
+
+            Jws<Claims> claimsJws = parseToken(newRefreshToken);
+            Date expiredAt = claimsJws.getPayload().getExpiration();
+            existingRefreshToken.setExpiredAt(expiredAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()); // 만료 시간 갱신
+
             refreshTokenRepository.save(existingRefreshToken);
         } else {
             throw new RuntimeException("Refresh token not found in database");
