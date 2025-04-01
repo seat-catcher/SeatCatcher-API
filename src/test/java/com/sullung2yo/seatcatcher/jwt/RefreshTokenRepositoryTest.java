@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @EnableJpaAuditing
 public class RefreshTokenRepositoryTest {
+    // TODO: 추후 구현 예정
 }

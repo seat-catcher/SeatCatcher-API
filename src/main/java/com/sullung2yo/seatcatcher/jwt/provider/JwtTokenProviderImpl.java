@@ -117,30 +117,36 @@ public class JwtTokenProviderImpl implements TokenProvider {
     }
 
     public Boolean validateToken(String token, TokenType tokenType) {
-        // 1. 토큰에서 providerId 추출
-        String providerId = getProviderIdFromToken(token);
-        if (providerId.isEmpty()) {
-            return false;
-        }
-
-        // 2. providerId에 해당하는 사용자 탐색
-        Optional<User> user = userRepository.findByProviderId(providerId);
-        if (user.isEmpty()) {
-            return false;
-        }
-
-        // 3. refreshToken의 경우, RefreshToken 테이블 확인 및 만료 여부 확인
-        if (tokenType.equals(TokenType.REFRESH)) {
-            Optional<RefreshToken> foundedToken = refreshTokenRepository.findRefreshTokenByUserAndRefreshToken(user.get(), token);
-            if (foundedToken.isEmpty()) {
+        try {
+            // 1. 토큰에서 providerId 추출
+            String providerId = getProviderIdFromToken(token);
+            if (providerId.isEmpty()) {
                 return false;
             }
-        }
 
-        // 4. Token 만료 여부 확인
-        Claims payload = getPayloadFromToken(token);
-        Date expiration = payload.getExpiration();
-        return expiration != null && !expiration.before(new Date());
+            // 2. providerId에 해당하는 사용자 탐색
+            Optional<User> user = userRepository.findByProviderId(providerId);
+            if (user.isEmpty()) {
+                return false;
+            }
+
+            // 3. refreshToken의 경우, RefreshToken 테이블 확인 및 만료 여부 확인
+            if (tokenType.equals(TokenType.REFRESH)) {
+                Optional<RefreshToken> foundedToken = refreshTokenRepository.findRefreshTokenByUserAndRefreshToken(user.get(), token);
+                if (foundedToken.isEmpty() || foundedToken.get().isExpired()) {
+                    return false;
+                }
+            }
+
+            // 4. Token 만료 여부 확인
+            Claims payload = getPayloadFromToken(token);
+            Date expiration = payload.getExpiration();
+            return expiration != null && !expiration.before(new Date());
+        } catch (RuntimeException e) {
+            // JWT 파싱 실패, 유효하지 않은 토큰 등.. 예외 발생 시 false 반환
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     private String getProviderIdFromToken(String token) {
