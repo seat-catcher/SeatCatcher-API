@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class AuthController {
     private final AuthServiceImpl authServiceImpl;
 
     @PostMapping("/apple")
-    @Operation(summary = "Authenticate with Apple", description = "Apple OAuth2 API")
+    @Operation(summary = "Authenticate with Apple", description = "애플 OAuth 인증 API")
     @ApiResponse(responseCode = "201", description = "Created")
     public ResponseEntity<?> authenticateApple(@RequestBody AppleAuthRequest appleAuthRequest) {
         try {
@@ -50,7 +51,7 @@ public class AuthController {
 
 
     @PostMapping("/kakao")
-    @Operation(summary = "Authenticate with Kakao", description = "Kakao OAuth2 API")
+    @Operation(summary = "Authenticate with Kakao", description = "카카오 OAuth 인증 API")
     @ApiResponse(responseCode = "201", description = "Created")
     public ResponseEntity<?> authenticateKakao(@RequestBody KakaoAuthRequest kakaoAuthRequest) {
         try {
@@ -67,17 +68,14 @@ public class AuthController {
         }
     }
 
-    /**
-     * 로컬 사용자 인증 요청을 처리하는 POST 엔드포인트입니다. (미구현)
-     * 로컬 인증 요청에 대해 "hello world local" 문자열 응답을 반환합니다.
-     *
-     * @return "hello world local" 응답 문자열
-     */
+
     @PostMapping("/local")
-    public String authenticateLocal() {
+    @ApiResponse(responseCode = "501", description = "아직 구현하지 않았습니다.")
+    public ResponseEntity<?> authenticateLocal() {
         // TODO: Implement local authentication
-        return "hello world local";
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
+
 
     private ResponseEntity<?> returnAfterTokenValidation(List<String> tokens) {
         if (tokens == null) {

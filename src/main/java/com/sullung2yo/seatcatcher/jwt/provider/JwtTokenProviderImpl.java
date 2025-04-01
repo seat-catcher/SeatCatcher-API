@@ -1,23 +1,30 @@
 package com.sullung2yo.seatcatcher.jwt.provider;
 
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
+import com.sullung2yo.seatcatcher.user.domain.RefreshToken;
+import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.repository.RefreshTokenRepository;
+import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
 public class JwtTokenProviderImpl implements TokenProvider {
+
+    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Getter
     private SecretKey secretKey;
@@ -30,6 +37,11 @@ public class JwtTokenProviderImpl implements TokenProvider {
 
     @Value("${jwt.refresh-token-valid-millisecond}")
     private long refreshTokenValidMilliseconds;
+
+    public JwtTokenProviderImpl(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository) {
+        this.userRepository = userRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     @PostConstruct // Value로 의존성 주입이 이루어진 후 secretKey 초기화 작업 수행
     public void initSecretKey(){
@@ -53,9 +65,9 @@ public class JwtTokenProviderImpl implements TokenProvider {
         Claims claims;
 
         if (tokenType == TokenType.ACCESS) {
-            claims = generateClaims(providerId, payload, accessTokenValidMilliseconds);
+            claims = generateClaims(providerId, payload, TokenType.ACCESS);
         } else if (tokenType == TokenType.REFRESH) {
-            claims = generateClaims(providerId, payload, refreshTokenValidMilliseconds);
+            claims = generateClaims(providerId, payload, TokenType.REFRESH);
         } else {
             throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다: " + tokenType);
         }
@@ -66,27 +78,121 @@ public class JwtTokenProviderImpl implements TokenProvider {
                 .compact();
     }
 
+    @Override
+    public List<String> refreshToken(String refreshToken) {
+        // 1. refreshToken 유효성 검증
+        if (!validateToken(refreshToken, TokenType.REFRESH)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        // 2. refreshToken에서 providerId 추출
+        String providerId = getProviderIdFromToken(refreshToken);
+
+        // 3. providerId에 해당하는 사용자 탐색
+        Optional<User> userOptional = userRepository.findByProviderId(providerId);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        // 4. accessToken 및 refreshToken 재발급 (Token Rotation)
+        Claims accessClaims = generateClaims(providerId, null, TokenType.ACCESS);
+        Claims refreshClaims = generateClaims(providerId, null, TokenType.REFRESH);
+
+        String newAccessToken = Jwts.builder().signWith(secretKey).claims(accessClaims).compact();
+        String newRefreshToken = Jwts.builder().signWith(secretKey).claims(refreshClaims).compact();
+
+        // 5. RefreshToken DB에 저장
+        // RefreshToken을 갱신한다는건, 로그인을 통해 이미 RefreshToken을 발급받아서 DB에 저장한 상태이므로
+        // DB에 있는 RefreshToken값을 업데이트한다
+        Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findRefreshTokenByUserAndRefreshToken(userOptional.get(), refreshToken);
+        if (refreshTokenOptional.isPresent()) {
+            RefreshToken existingRefreshToken = refreshTokenOptional.get();
+            existingRefreshToken.setRefreshToken(newRefreshToken);
+            refreshTokenRepository.save(existingRefreshToken);
+        } else {
+            throw new RuntimeException("Refresh token not found in database");
+        }
+
+        return List.of(newAccessToken, newRefreshToken);
+    }
+
+    public Boolean validateToken(String token, TokenType tokenType) {
+        // 1. 토큰에서 providerId 추출
+        String providerId = getProviderIdFromToken(token);
+        if (providerId.isEmpty()) {
+            return false;
+        }
+
+        // 2. providerId에 해당하는 사용자 탐색
+        Optional<User> user = userRepository.findByProviderId(providerId);
+        if (user.isEmpty()) {
+            return false;
+        }
+
+        // 3. refreshToken의 경우, RefreshToken 테이블 확인 및 만료 여부 확인
+        if (tokenType.equals(TokenType.REFRESH)) {
+            Optional<RefreshToken> foundedToken = refreshTokenRepository.findRefreshTokenByUserAndRefreshToken(user.get(), token);
+            if (foundedToken.isEmpty()) {
+                return false;
+            }
+        }
+
+        // 4. Token 만료 여부 확인
+        Claims payload = getPayloadFromToken(token);
+        Date expiration = payload.getExpiration();
+        return expiration != null && !expiration.before(new Date());
+    }
+
+    private String getProviderIdFromToken(String token) {
+        Claims payload = getPayloadFromToken(token); // JWT
+        return payload.getSubject();
+    }
+
     /**
-     * 주어진 주체와 추가 페이로드, 유효 기간을 바탕으로 JWT 생성을 위한 클레임(Claims) 객체를 생성합니다.
-     * 클레임 객체에는 토큰의 주체, 발행 시각 및 만료 시각이 포함되며, 제공된 추가 데이터가 병합됩니다.
-     *
-     * @param subject JWT의 주체로, 일반적으로 사용자 이메일 또는 식별자를 나타냅니다.
-     * @param payload JWT 클레임에 추가될 사용자 정의 데이터
-     * @param tokenValidMilliseconds 토큰의 유효 기간(밀리초 단위)
-     * @return JWT 생성을 위한 클레임 객체
+     * JWT 토큰에서 payload를 추출하는 함수
+     * @param token JWT 토큰
+     * @return Claims (JWT payload)
      */
-    private Claims generateClaims(String subject, Map<String, ?> payload, long tokenValidMilliseconds) {
-        log.debug("토큰 생성: subject={}, payload={}, 유효 기간={}ms", subject, payload, tokenValidMilliseconds);
+    private Claims getPayloadFromToken(String token) {
+        try {
+            Jws<Claims> claimsJws = parseToken(token); // JWT 파싱
+            return claimsJws.getPayload(); // JWT에서 payload 추출해서 반환
+        } catch (JwtException e) {
+            log.debug("JWT 토큰 파싱 실패: {}", e.getMessage());
+            throw new RuntimeException("Invalid JWT token: " + e.getMessage());
+        }
+    }
+
+    /**
+     * JWT 토큰을 파싱하여 Claims 객체를 반환하는 함수
+     * @param token JWT 토큰
+     * @return Jws<Claims> (JWT 서명된 Claims)
+     */
+    private Jws<Claims> parseToken(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token); // 이렇게 파싱한다고 하네요!
+    }
+
+    private Claims generateClaims(String subject, Map<String, ?> payload, TokenType tokenType) {
+        log.debug("토큰 생성: type={}, subject={}, payload={}", tokenType.name(), subject, payload);
+
+        long tokenValidMilliseconds = 0L;
+        if (tokenType.equals(TokenType.ACCESS)) {
+            tokenValidMilliseconds = accessTokenValidMilliseconds;
+        } else if (tokenType.equals(TokenType.REFRESH)) {
+            tokenValidMilliseconds = refreshTokenValidMilliseconds;
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다: " + tokenType);
+        }
 
         Date now = new Date();
         Date expiredAt = new Date(now.getTime() + tokenValidMilliseconds);
         log.debug("토큰 유효 기간: {}", expiredAt);
 
         return Jwts.claims()
-                .subject(subject)
-                .issuedAt(now)
-                .expiration(expiredAt)
-                .add(payload)
+                .subject(subject) // subject로 providerId 사용
+                .issuedAt(now) // 발급 시간
+                .expiration(expiredAt) // 만료 시간
+                .add(payload) // 추가 클레임 정보
                 .build();
     }
 }
