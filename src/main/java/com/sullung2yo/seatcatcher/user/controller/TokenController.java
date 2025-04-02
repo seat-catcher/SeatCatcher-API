@@ -47,8 +47,8 @@ public class TokenController {
 
     @GetMapping("/validate")
     @Operation(
-            summary = "Validate access token",
-            description = "Access token 유효성 검사 API",
+            summary = "Access token 유효성 검사 API",
+            description = "헤더에 첨부한 Access token의 유효성 여부를 검사하는 API",
             responses = {
                     @ApiResponse(
                             responseCode = "200",

@@ -27,14 +27,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/user/authenticate")
 @RequiredArgsConstructor
-@Tag(name = "Auth API", description = "User Authentication APIs")
+@Tag(name = "인증 API", description = "사용자 인증 관련 API")
 public class AuthController {
 
     private final AuthServiceImpl authServiceImpl;
 
     @PostMapping("/apple")
     @Operation(
-            summary = "Authenticate with Apple",
+            summary = "애플로 로그인하기",
             description = "애플 OAuth 인증 API",
             responses = {
                     @ApiResponse(
@@ -68,7 +68,7 @@ public class AuthController {
 
     @PostMapping("/kakao")
     @Operation(
-            summary = "Authenticate with Kakao",
+            summary = "카카오로 로그인하기",
             description = "카카오 OAuth 인증 API",
             responses = {
                     @ApiResponse(
