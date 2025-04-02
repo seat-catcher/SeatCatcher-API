@@ -34,7 +34,7 @@ public class TokenController {
             responses = {
                     @ApiResponse(
                             responseCode = "201",
-                            description = "성공적으로 토큰 발급",
+                            description = "성공적으로 토큰 재발급",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponse.class))
                     )
             }
