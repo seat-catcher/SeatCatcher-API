@@ -100,6 +100,16 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    public List<String> refreshToken(String token) throws Exception {
+        return jwtTokenProvider.refreshToken(token);
+    }
+
+    @Override
+    public Boolean validateAccessToken(String token) throws Exception {
+        return jwtTokenProvider.validateToken(token, TokenType.ACCESS);
+    }
+
     private User kakaoAuthenticator(KakaoAuthRequest kakaoAuthRequest) throws Exception {
         String kakaoDataUrl = "https://kapi.kakao.com/v2/user/me";
 
