@@ -1,5 +1,7 @@
 package com.sullung2yo.seatcatcher.jwt.provider;
 
+import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.user.domain.RefreshToken;
 import com.sullung2yo.seatcatcher.user.domain.User;
@@ -71,7 +73,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
         } else if (tokenType == TokenType.REFRESH) {
             claims = generateClaims(providerId, payload, TokenType.REFRESH);
         } else {
-            throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다: " + tokenType);
+            log.error("Unsupported token type: {}", tokenType);
+            throw new TokenException("유효하지 않은 토큰 타입입니다: " + tokenType, ErrorCode.INVALID_TOKEN);
         }
 
         String token = Jwts.builder().signWith(secretKey).claims(claims).compact();
@@ -86,7 +89,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
                         .build();
                 refreshTokenRepository.save(refreshToken);
             } else {
-                throw new RuntimeException("User not found");
+                log.error("User with id {} not found", providerId);
+                throw new TokenException("토큰에 담긴 사용자 정보가 유효하지 않습니다.", ErrorCode.USER_NOT_FOUND);
             }
         }
         return token;
@@ -96,7 +100,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
     public List<String> refreshToken(String refreshToken) {
         // 1. refreshToken 유효성 검증
         if (!validateToken(refreshToken, TokenType.REFRESH)) {
-            throw new RuntimeException("Invalid refresh token");
+            log.error("Invalid refresh token: {}", refreshToken);
+            throw new TokenException("Refresh 토큰이 유효하지 않습니다.", ErrorCode.INVALID_TOKEN);
         }
 
         // 2. refreshToken에서 providerId 추출
@@ -105,7 +110,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
         // 3. providerId에 해당하는 사용자 탐색
         Optional<User> userOptional = userRepository.findByProviderId(providerId);
         if (userOptional.isEmpty()) {
-            throw new RuntimeException("User not found");
+            log.error("User with id {} not found", providerId);
+            throw new TokenException("토큰에 담긴 사용자 정보가 유효하지 않습니다.", ErrorCode.USER_NOT_FOUND);
         }
 
         // 4. accessToken 및 refreshToken 재발급 (Token Rotation)
@@ -129,7 +135,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
 
             refreshTokenRepository.save(existingRefreshToken);
         } else {
-            throw new RuntimeException("Refresh token not found in database");
+            log.error("Refresh token not found in database for user: {}", providerId);
+            throw new TokenException("Refresh 토큰 데이터베이스 검증 실패", ErrorCode.TOKEN_NOT_FOUND);
         }
 
         return List.of(newAccessToken, newRefreshToken);
@@ -183,8 +190,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
             Jws<Claims> claimsJws = parseToken(token); // JWT 파싱
             return claimsJws.getPayload(); // JWT에서 payload 추출해서 반환
         } catch (JwtException e) {
-            log.debug("JWT 토큰 파싱 실패: {}", e.getMessage());
-            throw new RuntimeException("Invalid JWT token: " + e.getMessage());
+            log.error("JWT 토큰 파싱 실패: {}", e.getMessage());
+            throw new TokenException("Invalid JWT token: " + e.getMessage(), ErrorCode.INVALID_TOKEN);
         }
     }
 

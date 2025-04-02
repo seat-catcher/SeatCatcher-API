@@ -45,6 +45,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/authenticate/**").permitAll() // JWT 토큰 발급 API는 누구나 접근 가능
+                        .requestMatchers("/token/**").permitAll() // 리프레시, 검증 API는 누구나 접근 가능
                         .requestMatchers("/health").permitAll() // 헬스체크 용 API 엔드포인트
                         .requestMatchers("/h2-console/**").permitAll() // h2-console 접근 허용
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()

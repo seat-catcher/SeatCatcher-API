@@ -91,8 +91,7 @@ public class AuthServiceImpl implements AuthService {
                     null,
                     TokenType.REFRESH
             );
-            log.debug("JWT 토큰 생성 완료: accessToken={}, refreshToken={}", accessToken, refreshToken);
-
+            log.info("JWT 토큰 생성 완료: accessToken={}, refreshToken={}", accessToken, refreshToken);
             return List.of(accessToken, refreshToken);
         }
         else {
@@ -101,12 +100,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<String> refreshToken(String token) throws Exception {
+    public List<String> refreshToken(String token) {
         return jwtTokenProvider.refreshToken(token);
     }
 
     @Override
-    public Boolean validateAccessToken(String token) throws Exception {
+    public Boolean validateAccessToken(String token) {
         return jwtTokenProvider.validateToken(token, TokenType.ACCESS);
     }
 
