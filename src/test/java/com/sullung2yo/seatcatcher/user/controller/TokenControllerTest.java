@@ -2,91 +2,140 @@ package com.sullung2yo.seatcatcher.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
-import com.sullung2yo.seatcatcher.jwt.filter.JwtAuthenticationFilter;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserRole;
+
 import com.sullung2yo.seatcatcher.user.dto.request.TokenRefreshRequest;
 import com.sullung2yo.seatcatcher.user.repository.RefreshTokenRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
+import jakarta.transaction.Transactional;
+import org.aspectj.lang.annotation.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(
-    controllers = TokenController.class,
-    excludeAutoConfiguration = {SecurityAutoConfiguration.class}
-)
+@AutoConfigureMockMvc
+@Transactional
+@SpringBootTest
 class TokenControllerTest {
 
     @Autowired
-    private MockMvc mvc;
+    MockMvc mockMvc; // 요청 보내주는 MockMvc 객체
 
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper 객체
 
-    @MockitoBean
-    private JwtTokenProviderImpl tokenProvider;
+    @Autowired
+    private JwtTokenProviderImpl jwtTokenProvider;
 
-    @MockitoBean
+    @Autowired
     private UserRepository userRepository;
 
-    @MockitoBean
+    @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
-    @MockitoBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    @MockitoBean
-    private AuthServiceImpl authService;
-
-    private User user;
-    private final String mockAccessToken = "mock-access-token";
-    private final String mockRefreshToken = "mock-refresh-token";
+    private User testUser;
 
     @BeforeEach
-    void setUp() throws Exception {
-        // 사용자 생성
-        user = User.builder()
+    void setUp() {
+        ReflectionTestUtils.setField(jwtTokenProvider, "refreshTokenValidMilliseconds", 3600000L);
+        ReflectionTestUtils.setField(jwtTokenProvider, "accessTokenValidMilliseconds", 3600000L);
+        testUser = User.builder()
                 .provider(Provider.APPLE)
-                .providerId("test")
-                .role(UserRole.ROLE_USER)
-                .name("test")
+                .providerId("testProviderId")
+                .name("testUser")
                 .build();
-        when(authService.refreshToken(anyString())).thenReturn(List.of(mockAccessToken, mockRefreshToken));
+        userRepository.save(testUser);
     }
 
     @Test
-    void tokenRefresh() throws Exception {
-        // Given
+    @DisplayName("토큰 갱신 테스트")
+    void testRefreshToken() throws Exception {
+        //Given
+        String refreshToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.REFRESH);
         TokenRefreshRequest tokenRefreshRequest = new TokenRefreshRequest();
-        tokenRefreshRequest.setRefreshToken(mockRefreshToken);
+        tokenRefreshRequest.setRefreshToken(refreshToken);
 
-        // When & Then
-        mvc.perform(post("/token/refresh")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(tokenRefreshRequest)))
-                .andDo(print())
+        //When
+        String requestBody = objectMapper.writeValueAsString(tokenRefreshRequest);
+
+        //Then
+        mockMvc.perform(post("/token/refresh")
+                        .contentType(MediaType.APPLICATION_JSON) // ContentType 설정
+                        .content(requestBody) // RequestBody 설정
+                )
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.accessToken").value(mockAccessToken))
-                .andExpect(jsonPath("$.refreshToken").value(mockRefreshToken));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    @DisplayName("만료된 Refresh Token으로 갱신 요청하는 경우 테스트")
+    void testExpiredRefreshToken() throws Exception {
+        // Given
+        ReflectionTestUtils.setField(jwtTokenProvider, "refreshTokenValidMilliseconds", 0L);
+        String expired_refreshToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.REFRESH);
+
+        TokenRefreshRequest tokenRefreshRequest = new TokenRefreshRequest();
+        tokenRefreshRequest.setRefreshToken(expired_refreshToken);
+
+        // When
+        String requestBody = objectMapper.writeValueAsString(tokenRefreshRequest);
+
+        // Then
+        mockMvc.perform(post("/token/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Access Token 유효성 검사 테스트")
+    void testValidateAccessToken() throws Exception {
+        // Given
+        String accessToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.ACCESS);
+
+        // When
+        mockMvc.perform(get("/token/validate")
+                        .header("Authorization", "Bearer " + accessToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Valid"));
+    }
+
+    @Test
+    @DisplayName("만료된 Access Token으로 유효성 검사 요청하는 경우 테스트")
+    void testExpiredAccessToken() throws Exception {
+        // Given
+        ReflectionTestUtils.setField(jwtTokenProvider, "accessTokenValidMilliseconds", 0L);
+        String expiredAccessToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.ACCESS);
+
+        // When
+        mockMvc.perform(get("/token/validate")
+                        .header("Authorization", "Bearer " + expiredAccessToken)
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Expired"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        refreshTokenRepository.deleteAll();
+        userRepository.deleteAll();
     }
 }

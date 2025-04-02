@@ -1,6 +1,8 @@
 package com.sullung2yo.seatcatcher.user.controller;
 
 
+import com.sullung2yo.seatcatcher.config.exception.GlobalExceptionHandler;
+import com.sullung2yo.seatcatcher.config.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.user.dto.request.TokenRefreshRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
 import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
@@ -36,10 +38,20 @@ public class TokenController {
                             responseCode = "201",
                             description = "성공적으로 토큰 재발급",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Refresh 토큰이 만료되었거나 유효하지 않음",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "토큰에 담긴 사용자 또는 Refresh 토큰이 데이터베이스에 존재하지 않음",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
                     )
             }
     )
-    public ResponseEntity<TokenResponse> tokenRefresh(@RequestBody TokenRefreshRequest tokenRefreshRequest) throws Exception {
+    public ResponseEntity<TokenResponse> tokenRefresh(@RequestBody TokenRefreshRequest tokenRefreshRequest) {
         // Refresh token 재발급
         List<String> tokens = authServiceImpl.refreshToken(tokenRefreshRequest.getRefreshToken());
         return ResponseEntity.status(HttpStatus.CREATED).body(new TokenResponse(tokens.get(0), tokens.get(1)));
@@ -63,8 +75,9 @@ public class TokenController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String accessToken) throws Exception {
+    public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String bearerToken) {
         // accessToken 검증
+        String accessToken = bearerToken.replace("Bearer ", "");
         boolean isValid = authServiceImpl.validateAccessToken(accessToken);
         if (!isValid) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Expired");
