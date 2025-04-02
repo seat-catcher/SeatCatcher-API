@@ -32,7 +32,7 @@ public class TrainSeat extends BaseEntity {
     private TrainSeatGroup trainSeatGroup;
 
     @Column(name = "seat_index", nullable = false)
-    private int index; // 좌석 위치와 매핑되는 정보.
+    private int seatIndex; // 좌석 위치와 매핑되는 정보.
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)

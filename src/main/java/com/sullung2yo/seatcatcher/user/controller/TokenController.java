@@ -77,6 +77,9 @@ public class TokenController {
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String bearerToken) {
         // accessToken 검증
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token format");
+        }
         String accessToken = bearerToken.replace("Bearer ", "");
         boolean isValid = authServiceImpl.validateAccessToken(accessToken);
         if (!isValid) {
