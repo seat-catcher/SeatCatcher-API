@@ -106,7 +106,8 @@ jobs:
           script: |
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
-            docker-compose -f docker-compose.dev.yml restart api
+            docker-compose -f docker-compose.dev.yml stop api
+            docker-compose -f docker-compose.dev.yml up -d api
 
       - name: Check docker health
         uses: appleboy/ssh-action@v1
