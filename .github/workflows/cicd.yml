@@ -153,6 +153,7 @@ jobs:
           username: ${{ secrets.DEV_EC2_USERNAME }}
           key: ${{ secrets.DEV_EC2_KEY }}
           script: |
+            cp ./artifact/openapi.json ./openapi.json
             docker-compose -f docker-compose.dev.yml restart docs
 
       - name: Check docker health
