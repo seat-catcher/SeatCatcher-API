@@ -7,11 +7,12 @@ import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
 import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
 
 @Slf4j
 @RestController
@@ -31,8 +33,22 @@ public class AuthController {
     private final AuthServiceImpl authServiceImpl;
 
     @PostMapping("/apple")
-    @Operation(summary = "Authenticate with Apple", description = "애플 OAuth 인증 API")
-    @ApiResponse(responseCode = "201", description = "Created")
+    @Operation(
+            summary = "Authenticate with Apple",
+            description = "애플 OAuth 인증 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "성공적으로 애플 인증 성공 및 인증 토큰 발급",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "서버에서 토큰이 정상적으로 생성되지 않은 경우",
+                            content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))
+                    )
+            }
+    )
     public ResponseEntity<?> authenticateApple(@RequestBody AppleAuthRequest appleAuthRequest) {
         try {
             // RequestBody로 제대로 들어왔는지 검증
@@ -51,8 +67,22 @@ public class AuthController {
 
 
     @PostMapping("/kakao")
-    @Operation(summary = "Authenticate with Kakao", description = "카카오 OAuth 인증 API")
-    @ApiResponse(responseCode = "201", description = "Created")
+    @Operation(
+            summary = "Authenticate with Kakao",
+            description = "카카오 OAuth 인증 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "성공적으로 카카오 인증 성공 및 인증 토큰 발급",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "서버에서 토큰이 정상적으로 생성되지 않은 경우",
+                            content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))
+                    )
+            }
+    )
     public ResponseEntity<?> authenticateKakao(@RequestBody KakaoAuthRequest kakaoAuthRequest) {
         try {
             // RequestBody로 제대로 들어왔는지 검증

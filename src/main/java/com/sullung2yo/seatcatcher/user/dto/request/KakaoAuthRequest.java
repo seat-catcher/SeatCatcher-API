@@ -1,16 +1,14 @@
 package com.sullung2yo.seatcatcher.user.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 카카오 인증에 필요한 accessToken DTO 클래스
- */
+
 @Getter
 @Setter
+@Schema(description = "카카오 인증 요청 DTO")
 public class KakaoAuthRequest{
-    /**
-     * 카카오 Auth server에서 제공받은 accessToken
-     */
+    @Schema(description = "카카오 Auth server에서 제공받은 accessToken", example = "qwer.asdf.zxcv")
     private String accessToken;
 }
