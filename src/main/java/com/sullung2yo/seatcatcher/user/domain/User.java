@@ -58,4 +58,10 @@ public class User extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "tag_id")
     private UserTag tag;
+
+    @Column
+    private String profileImageUrl;
+
+    @Column
+    private String backgroundColor;
 }
