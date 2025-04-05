@@ -4,6 +4,9 @@ import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -35,8 +38,18 @@ public class PathHistory extends BaseEntity {
     private SubwayStation endStation;
 
     /*
-        @Column(name="use_count")
-        private int useCount; // 경로가 사용된 횟수
+        PathHistory 가 실제로 StartStation, EndStation 을 기반으로 만들어질 때
+        calculateExpectedArrivalTime 을 호출하여 예상 도착 시간을 계산해주셔야 합니다!
     */
+    @Column(name="expected_arrival_time")
+    private LocalDateTime expectedArrivalTime;
+
+    public void calculateExpectedArrivalTime(SubwayStation startStation, SubwayStation endStation) {
+        this.expectedArrivalTime = getCreatedAt().plusSeconds(
+                Math.abs(
+                        endStation.getAccumulateHourMinuteInSeconds() - startStation.getAccumulateHourMinuteInSeconds()
+                )
+        );
+    }
 }
 

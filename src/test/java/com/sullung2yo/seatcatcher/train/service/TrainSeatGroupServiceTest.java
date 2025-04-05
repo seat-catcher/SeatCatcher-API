@@ -80,7 +80,7 @@ public class TrainSeatGroupServiceTest {
             Assertions.assertEquals(group, seat.getTrainSeatGroup());
             Assertions.assertEquals(i, seat.getSeatLocation());
             Assertions.assertEquals(0, seat.getJjimCount());
-            Assertions.assertEquals(SeatType.NORMAL, seat.getSeatType());
+            Assertions.assertEquals(SeatType.ELDERLY, seat.getSeatType());
         }
     }
 }
