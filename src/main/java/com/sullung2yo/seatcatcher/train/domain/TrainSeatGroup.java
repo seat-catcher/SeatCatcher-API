@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,13 +30,13 @@ public class TrainSeatGroup extends BaseEntity {
     private TrainCar trainCar;
 
     @OneToMany(mappedBy = "trainSeatGroup", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TrainSeat> trainSeats;
+    private List<TrainSeat> trainSeats;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'NORMAL_A'")
+    @ColumnDefault("'NORMAL_A_14'")
     @Builder.Default
-    private SeatGroupType type = SeatGroupType.NORMAL_A;
+    private SeatGroupType type = SeatGroupType.NORMAL_A_14;
     // 좌석 그룹 타입은 다음과 같습니다.
     // 노약자구역 A, 일반구역 A B C , 노약자구역 B
 }
