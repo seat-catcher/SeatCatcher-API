@@ -30,6 +30,7 @@ public class TrainSeatGroup extends BaseEntity {
     private TrainCar trainCar;
 
     @OneToMany(mappedBy = "trainSeatGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("seatLocation asc")
     private List<TrainSeat> trainSeats;
 
     @Column(name = "type", nullable = false)
