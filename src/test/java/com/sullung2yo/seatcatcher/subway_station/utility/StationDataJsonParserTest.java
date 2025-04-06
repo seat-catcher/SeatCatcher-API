@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
@@ -19,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StationDataJsonParserTest {
 
     private StationDataJsonParser parser;
+    private final String filePath = "src/main/resources/json/seoul_subway_info.json";
 
     @BeforeEach
     void setUp() {
@@ -28,13 +28,13 @@ class StationDataJsonParserTest {
     @Test
     void testParseExceptionNotOccurs() {
         // 예외 발생 여부만 간단히 확인
-        assertDoesNotThrow(() -> parser.parseJsonData());
+        assertDoesNotThrow(() -> parser.parseJsonData(filePath));
     }
 
     @Test
     void testParseSubwayInfoJson() {
         try {
-            List<SubwayStationData> stations = parser.parseJsonData();
+            List<SubwayStationData> stations = parser.parseJsonData(filePath);
 
             // stations가 null이 아니고, 비어있지 않아야 함
             assertNotNull(stations, "역 정보 리스트가 null이 아니어야 합니다.");
