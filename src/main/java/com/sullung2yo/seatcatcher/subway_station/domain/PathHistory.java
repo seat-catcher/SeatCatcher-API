@@ -47,7 +47,7 @@ public class PathHistory extends BaseEntity {
     public void calculateExpectedArrivalTime(SubwayStation startStation, SubwayStation endStation) {
         this.expectedArrivalTime = getCreatedAt().plusSeconds(
                 Math.abs(
-                        endStation.getAccumulateHourMinuteInSeconds() - startStation.getAccumulateHourMinuteInSeconds()
+                        endStation.getAccumulateTime() - startStation.getAccumulateTime() // 데이터소스에서 넣을 때 계산해서 넣기때문에 getAccumulateTime()만 호출하도록 변경
                 )
         );
     }

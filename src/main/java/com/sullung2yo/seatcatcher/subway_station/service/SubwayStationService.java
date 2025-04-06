@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SubwayStationService {
-
     private final SubwayStationSubwayLineRepository subwayStationSubwayLineRepository;
     private final SubwayStationRepository subwayStationRepository;
     private final SubwayLineRepository subwayLineRepository;
@@ -31,6 +31,7 @@ public class SubwayStationService {
     @Transactional
     public void saveSubwayData(List<SubwayStationData> stations) {
         // Json에 들어있는 데이터 개수가 250개 언저리라 배치처리 안해도 될 듯 합니다.
+        long accumulateTime = 0L;
         List<SubwayStation> subwayStations = new ArrayList<>();
         List<SubwayStationSubwayLine> subwayStationSubwayLines = new ArrayList<>();
         for (SubwayStationData station : stations) {
@@ -39,8 +40,12 @@ public class SubwayStationService {
                     .distance(station.getDistanceKm())
                     .timeMinSec(station.getHourMinutes())
                     .accumulateDistance(station.getAccumulatedDistance())
-                    .accumulateTime("0:00") // TODO: 이 부분은 나중에 수정 예정
                     .build();
+
+            // 누적시간 계산
+            long stationSeconds = subwayStation.convertStringToSeconds(station.getHourMinutes());
+            accumulateTime += stationSeconds;
+            subwayStation.setAccumulateTime(accumulateTime);
 
             // Line 정보 가져오기
             String lineName = station.getSubwayLine();
