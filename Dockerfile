@@ -9,6 +9,7 @@ RUN ./gradlew clean build -x test
 FROM bellsoft/liberica-openjdk-alpine:17
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
+COPY src/main/resources/json src/main/resources/json
 
 RUN addgroup -S seat-catcher && \
     adduser -S seat-catcher-user -G seat-catcher && \
