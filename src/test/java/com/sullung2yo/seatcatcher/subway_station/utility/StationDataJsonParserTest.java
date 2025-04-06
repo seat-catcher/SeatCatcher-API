@@ -56,10 +56,10 @@ class StationDataJsonParserTest {
         // 첫 번째 역 검증 (테스트용)
         log.debug("역 정보 리스트의 첫 번째 역: " + stations.get(0).toString());
         SubwayStationData first = stations.get(0);
-        assertNotNull(first.getSubwayStationName(), "역 이름이 null입니다");
-        assertFalse(first.getSubwayStationName().isEmpty(), "역 이름이 비어있습니다");
-        assertNotNull(first.getSubwayLine(), "노선 정보가 null입니다");
-        assertFalse(first.getSubwayLine().isEmpty(), "노선 정보가 비어있습니다");
-        assertNotEquals(0.0f, first.getDistanceKm(), "거리 정보가 0입니다");
+        assertNotEquals("", first.getSubwayStationName(), "역 이름이 비어있습니다");
+        assertNotEquals("", first.getSubwayLine(), "노선 번호가 비어있습니다");
+        assertNotEquals(0.0f, first.getDistanceKm(), "거리 정보가 반영되지 않았습니다");
+        assertNotEquals("0:00", first.getHourMinutes(), "소요 시간 정보가 반영되지 않았습니다");
+        assertNotEquals(0.0f, first.getAccumulatedDistance(), "누적 거리 정보가 반영되지 않았습니다");
     }
 }
