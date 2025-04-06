@@ -1,12 +1,15 @@
 package com.sullung2yo.seatcatcher.subway_station.utility;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.subway_station.dto.SubwayStationData;
 import com.sullung2yo.seatcatcher.subway_station.utility.parser.StationDataJsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
@@ -14,21 +17,27 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @Slf4j
-@SpringBootTest
+@ExtendWith(SpringExtension.class) // 이 테스트는 Spring 컨텍스트에 크게 의존하지 않고, 단위 테스트(Parser) 테스트이므로 이걸 사용하는게 더 효율적이라고 하네요
 class StationDataJsonParserTest {
-
     private StationDataJsonParser parser;
-    private final String filePath = "src/main/resources/json/seoul_subway_info.json";
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String filePath = "src/test/resources/subway_parse_test.json";
 
     @BeforeEach
     void setUp() {
-        parser = new StationDataJsonParser();
+        parser = new StationDataJsonParser(objectMapper);
     }
 
     @Test
     void testParseExceptionNotOccurs() {
         // 예외 발생 여부만 간단히 확인
         assertDoesNotThrow(() -> parser.parseJsonData(filePath));
+    }
+
+    @Test
+    void testParseWithNonExistentFile() {
+        String nonExistentFilePath = "invalid/path/to/non_existent_file.json";
+        assertThrows(Exception.class, () -> parser.parseJsonData(nonExistentFilePath));
     }
 
     @Test
@@ -51,9 +60,5 @@ class StationDataJsonParserTest {
         } catch (Exception e) {
             fail("파싱 중 Exception 발생: " + e.getMessage());
         }
-    }
-
-    @AfterEach
-    void tearDown() {
     }
 }

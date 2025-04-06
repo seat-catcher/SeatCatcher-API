@@ -13,26 +13,26 @@ public class SubwayStationData {
      */
 
     @JsonProperty("acml_dist")
-    private float accumulatedDistance; // 기준역부터 축적거리 (km)
+    private float accumulatedDistance = 0.0f; // 기준역부터 축적거리 (km)
 
     @JsonProperty("sbwy_rout_ln")
-    private String subwayLine; // 지하철 노선 번호 (1, 2, ...)
+    private String subwayLine = ""; // 지하철 노선 번호 (1, 2, ...)
 
     @JsonProperty("dist_km")
-    private float distanceKm; // 현재 위치에서 다음 역까지 거리 (km)
+    private float distanceKm = 0.0f; // 현재 위치에서 다음 역까지 거리 (km)
 
     @JsonProperty("hm")
-    private String hourMinutes; // 현재 위치에서 다음 역까지 소요 시간 (H:MM)
+    private String hourMinutes = "0:00"; // 현재 위치에서 다음 역까지 소요 시간 (H:MM)
 
     @JsonProperty("sbwy_stns_nm")
-    private String subwayStationName; // 지하철 역 이름 (서울시청, 강남역, ...)
+    private String subwayStationName = ""; // 지하철 역 이름 (서울시청, 강남역, ...)
 
     @Override
     public String toString() {
-        return "노선번호 : " + subwayLine +
-                ", 역명 : " + subwayStationName +
-                ", 축적거리 : " + accumulatedDistance +
-                ", 거리 : " + distanceKm +
-                ", 소요시간 : " + hourMinutes;
+        return "노선번호 : " + (subwayLine.isEmpty() ? subwayLine : "") +
+                ", 역명 : " + (subwayStationName.isEmpty() ? subwayStationName : "") +
+                ", 축적거리 : " + (accumulatedDistance != 0.0f ? accumulatedDistance : "") +
+                ", 거리 : " + (distanceKm != 0.0f ? distanceKm : "") +
+                ", 소요시간 : " + (hourMinutes.equals("0:00") ? hourMinutes : "");
     }
 }

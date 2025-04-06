@@ -1,6 +1,8 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
 
+import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.config.exception.SubwayLineNotFoundException;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayLine;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStationSubwayLine;
@@ -28,7 +30,7 @@ public class SubwayStationService {
 
     @Transactional
     public void saveSubwayData(List<SubwayStationData> stations) {
-        // Bulk Insert, Update
+        // Json에 들어있는 데이터 개수가 250개 언저리라 배치처리 안해도 될 듯 합니다.
         List<SubwayStation> subwayStations = new ArrayList<>();
         List<SubwayStationSubwayLine> subwayStationSubwayLines = new ArrayList<>();
         for (SubwayStationData station : stations) {
@@ -46,28 +48,25 @@ public class SubwayStationService {
             SubwayLine subwayLine = subwayLineRepository.findByLineName(lineName);
             if (subwayLine == null) {
                 log.error("지하철 노선 정보를 찾을 수 없습니다. : " + lineName);
-                throw new RuntimeException("지하철 노선 정보를 찾을 수 없습니다. : " + lineName);
+                throw new SubwayLineNotFoundException("지하철 노선 정보를 찾을 수 없습니다. : " + lineName, ErrorCode.SUBWAY_LINE_NOT_FOUND);
             }
 
             // Station와 Line 관계 설정 (중간 테이블 엔티티 생성)
             SubwayStationSubwayLine subwayStationSubwayLine = SubwayStationSubwayLine.builder()
-                    .subwayLine(subwayLine)
                     .subwayStation(subwayStation)
+                    .subwayLine(subwayLine)
                     .build();
+            subwayStationSubwayLine.setRelationships(subwayStation, subwayLine); // 중간 테이블 관계 설정 -> SubwayStationSubwayLine.java 참고
 
             // subwayStations, subwayStationSubwayLines 리스트에 추가
             subwayStations.add(subwayStation);
             subwayStationSubwayLines.add(subwayStationSubwayLine);
-
-            // Line과 SubwayLine에 각각 중간 엔티티 정보 삽입
-            subwayStation.getSubwayStationSubwayLines().add(subwayStationSubwayLine);
-            subwayLine.getSubwayStationSubwayLines().add(subwayStationSubwayLine);
         }
 
-        // 역 정보 저장
+        // 역 정보 저장 (bulk insert)
         subwayStationRepository.saveAll(subwayStations);
 
-        // 중간 테이블 정보 저장
+        // 중간 테이블 정보 저장 (bulk insert)
         subwayStationSubwayLineRepository.saveAll(subwayStationSubwayLines);
     }
 

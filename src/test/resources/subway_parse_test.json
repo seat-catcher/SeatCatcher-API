@@ -1,0 +1,6 @@
+{
+  "DESCRIPTION" : {"DIST_KM":"거리(km)","ACML_DIST":"누계(km)","SBWY_ROUT_LN":"호선","HM":"시간(분)","SBWY_STNS_NM":"역명"},
+  "DATA" : [
+    {"acml_dist":0.0,"sbwy_rout_ln":"1","dist_km":0.0,"hm":"0:00","sbwy_stns_nm":"서울역"}
+  ]
+}
