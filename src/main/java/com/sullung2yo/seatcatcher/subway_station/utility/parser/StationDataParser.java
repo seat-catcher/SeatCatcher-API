@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface StationDataParser {
 
-    List<SubwayStationData> parseJsonData() throws IOException;
+    List<SubwayStationData> parseJsonData(String filePath) throws IOException;
 }

@@ -20,9 +20,9 @@ public class StationDataJsonParser implements StationDataParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public List<SubwayStationData> parseJsonData() throws IOException {
+    public List<SubwayStationData> parseJsonData(String filePath) throws IOException {
         // JSON 파일 지정
-        File jsonFile = new File("src/main/resources/json/seoul_subway_info.json");
+        File jsonFile = new File(filePath);
         log.debug("JSON 파일 읽기 성공");
 
         // SubwayDataRoot 객체로 역 전체 정보 매핑하기
