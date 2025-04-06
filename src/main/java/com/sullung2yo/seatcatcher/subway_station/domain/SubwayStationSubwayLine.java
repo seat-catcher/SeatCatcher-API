@@ -33,4 +33,12 @@ public class SubwayStationSubwayLine extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "line_id")
     private SubwayLine subwayLine;
+
+    public void setRelationships(SubwayStation subwayStation, SubwayLine subwayLine) {
+        this.subwayLine = subwayLine;
+        this.subwayStation = subwayStation;
+
+        subwayStation.getSubwayStationSubwayLines().add(this);
+        subwayLine.getSubwayStationSubwayLines().add(this);
+    }
 }

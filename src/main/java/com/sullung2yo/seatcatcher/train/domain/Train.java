@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.subway_station.domain.SubwayLine;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -31,7 +32,8 @@ public class Train extends BaseEntity {
     private SubwayLine subwayLine;
 
     @OneToMany(mappedBy = "train", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TrainCar> trainCars;
+    @Builder.Default
+    private Set<TrainCar> trainCars = new HashSet<>();
 
     @Column(name="train_code", nullable = false)
     private String trainCode;

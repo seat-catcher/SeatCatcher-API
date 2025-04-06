@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.train.domain.Train;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -26,7 +27,8 @@ public class SubwayLine extends BaseEntity {
 
     //양방향 Many To Many 구현을 위해 Mapping Table SubwayStationSubwayLine을 이용
     @OneToMany(mappedBy = "subwayLine")
-    private Set<SubwayStationSubwayLine> subwayStationSubwayLines;
+    @Builder.Default
+    private Set<SubwayStationSubwayLine> subwayStationSubwayLines = new HashSet<>();
 
     @OneToMany(mappedBy = "subwayLine")
     private Set<Train> trains;
