@@ -1,21 +1,29 @@
 package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
+import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
 import java.util.List;
 
+@ExtendWith(MockitoExtension.class)
 public class TrainSeatGroupServiceTest {
 
     private TrainSeatGroupService service;
 
+    @Mock
+    private TrainSeatGroupRepository trainSeatGroupRepository;
+
     @BeforeEach
     void setUp() {
-        service = new TrainSeatGroupServiceImpl();
+        service = new TrainSeatGroupServiceImpl(trainSeatGroupRepository);
     }
 
     @Test
