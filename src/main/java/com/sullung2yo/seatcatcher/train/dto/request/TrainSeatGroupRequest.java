@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "SeatGroup's request DTO")
+@Schema(description = "SeatGroup에 대한 Request DTO입니다.")
 public class TrainSeatGroupRequest {
-    @Schema(description = "Seat Group's Type.")
+    @Schema(description = "Seat Group의 타입입니다.")
     private SeatGroupType type;
 
     public TrainSeatGroupRequest(TrainSeatGroup trainSeatGroup) {
