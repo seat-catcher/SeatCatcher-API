@@ -3,5 +3,5 @@ package com.sullung2yo.seatcatcher.train.repository;
 import com.sullung2yo.seatcatcher.train.domain.TrainCar;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TrainCarRepositoryForTest extends JpaRepository<TrainCar, Long> {
+public interface TrainCarRepository extends JpaRepository<TrainCar, Long> {
 }

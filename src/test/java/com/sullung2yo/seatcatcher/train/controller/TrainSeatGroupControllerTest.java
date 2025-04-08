@@ -1,10 +1,11 @@
-package com.sullung2yo.seatcatcher.train.service;
+package com.sullung2yo.seatcatcher.train.controller;
 
 import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
 import com.sullung2yo.seatcatcher.train.domain.Train;
 import com.sullung2yo.seatcatcher.train.domain.TrainCar;
-import com.sullung2yo.seatcatcher.train.repository.TrainCarRepositoryForTest;
-import com.sullung2yo.seatcatcher.train.repository.TrainRepositoryForTest;
+import com.sullung2yo.seatcatcher.train.repository.TrainCarRepository;
+import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
+import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,10 +35,10 @@ public class TrainSeatGroupControllerTest {
     MockMvc mockMvc;
 
     @Autowired
-    private TrainCarRepositoryForTest trainCarRepository;
+    private TrainCarRepository trainCarRepository;
 
     @Autowired
-    private TrainRepositoryForTest trainRepository;
+    private TrainRepository trainRepository;
 
     @Autowired
     private TrainSeatGroupService trainSeatGroupService;
@@ -48,7 +49,6 @@ public class TrainSeatGroupControllerTest {
     @BeforeEach
     void setUp(){
         // 우선 테스트를 하려면 DB에 샘플 Train 과 샘플 TrainCar 가 존재해야 함.
-        //TODO :: 현재는 검증되지 않은 RepositoryForTest 를 사용하여 save 를 수행합니다. 나중에는 해당 부분을 검증된 진짜 Repository로 교체해야 합니다.
         Train sampleTrain = Train.builder()
                 .trainCode("test")
                 .carCount(1)

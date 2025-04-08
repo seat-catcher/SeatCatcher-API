@@ -29,7 +29,7 @@ public class TrainSeatGroupController {
             description = "열차 id와 량 id를 이용하여 해당 량에 속한 모든 TrainSeatGroup 들을 가져옵니다.",
             responses = {
                     @ApiResponse(
-                            responseCode = "201",
+                            responseCode = "200",
                             description = "성공적으로 TrainSeatGroup들 반환",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TrainSeatGroupResponse.class))
                     )
@@ -52,6 +52,8 @@ public class TrainSeatGroupController {
 
 
 /*
+    // TODO :: 나중에 개발자 전용 페이지를 만들게 될 때 구현해야 합니다!
+
     @GetMapping("/{seatGroupId}")
     public ResponseEntity<TrainSeatGroupResponse> getCertainGroup(
             @PathVariable Long trainId,

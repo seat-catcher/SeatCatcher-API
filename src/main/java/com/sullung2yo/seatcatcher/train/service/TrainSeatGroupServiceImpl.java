@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -60,17 +61,20 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
     @Override
     public TrainSeatGroup findBySeatGroupId(Long seatGroupId) {
-        return trainSeatGroupRepository.findById(seatGroupId).orElse(null);
+        return trainSeatGroupRepository.findById(seatGroupId)
+                .orElseThrow(() -> new EntityNotFoundException("SeatGroup not found with id: " + seatGroupId));
         // 일단 만들어놓긴 했는데 우선순위가 낮아서 사용하진 않음.
     }
 
     @Override
     public void update(TrainSeatGroup trainSeatGroup) {
+        throw new UnsupportedOperationException("Not supported yet.");
         // 우선순위가 높지 않으므로 일단 미구현
     }
 
     @Override
     public void delete(TrainSeatGroup trainSeatGroup) {
+        throw new UnsupportedOperationException("Not supported yet.");
         // 우선순위가 높지 않으므로 일단 미구현
     }
 }
