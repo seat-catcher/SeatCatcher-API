@@ -21,7 +21,7 @@ public class Tag extends BaseEntity {
     @Builder.Default
     private Set<UserTag> userTag = new HashSet<>();
 
-    @Column
+    @Column(nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'USERTAG_NULL'")
     @Builder.Default

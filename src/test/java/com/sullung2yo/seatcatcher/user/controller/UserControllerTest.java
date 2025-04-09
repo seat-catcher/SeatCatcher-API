@@ -1,11 +1,14 @@
 package com.sullung2yo.seatcatcher.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.*;
+import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserTagRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +19,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @SpringBootTest
+@Transactional
 @AutoConfigureMockMvc
 class UserControllerTest {
 
@@ -40,16 +47,14 @@ class UserControllerTest {
     @Autowired
     private UserTagRepository userTagRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private String accessToken;
 
     @BeforeEach
     void setUp() {
         // 테스트할 사용자 생성
-        Tag tag = Tag.builder()
-                .tagName(UserTagType.USERTAG_NULL)
-                .build();
-        tagRepository.save(tag);
-
         User user = User.builder()
                 .provider(Provider.APPLE)
                 .providerId("testProviderId")
@@ -58,6 +63,8 @@ class UserControllerTest {
                 .profileImageNum(ProfileImageNum.IMAGE_1)
                 .build();
         userRepository.save(user);
+
+        Tag tag = tagRepository.findByTagName(UserTagType.USERTAG_CARRIER);
 
         UserTag userTag = UserTag.builder()
                 .user(user)
@@ -91,10 +98,33 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.tags").exists());
     }
 
+    @Test
+    void updateUserInformation() throws Exception{
+        // Given
+        UserInformationUpdateRequest userInformationUpdateRequest = UserInformationUpdateRequest.builder()
+                .credit(555L)
+                .tags(List.of(UserTagType.USERTAG_NULL, UserTagType.USERTAG_LONGDISTANCE))
+                .build();
+
+        // When
+        mockMvc.perform(patch("/user/me")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userInformationUpdateRequest))
+                .header("Authorization", "Bearer " + accessToken))
+
+        // Then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.profileImageNum").exists())
+                .andExpect(jsonPath("$.credit").value(555L))
+                .andExpect(jsonPath("$.tags").exists());
+    }
+
     @AfterEach
     void tearDown() {
         userTagRepository.deleteAll();
         userRepository.deleteAll();
         tagRepository.deleteAll();
     }
+
 }
