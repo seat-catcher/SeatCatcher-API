@@ -24,8 +24,15 @@ public class TrainSeatServiceImpl implements TrainSeatService {
     }
 
     @Override
+    public TrainSeat findById(Long id) {
+        return trainSeatRepository.findById(id)
+                .orElseThrow(()->new EntityNotFoundException("Train seat that id is(" + id + ")does not exist!"));
+    }
+
+    @Override
     public void update(Long id, TrainSeatRequest seatInfo) {
-        TrainSeat item = trainSeatRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Given train seat does not exist!"));
+        TrainSeat item = trainSeatRepository.findById(id)
+                .orElseThrow(()->new EntityNotFoundException("Given train seat does not exist!"));
 
         Integer location = seatInfo.getSeatLocation();
         SeatType seatType = seatInfo.getSeatType();

@@ -2,15 +2,13 @@ package com.sullung2yo.seatcatcher.train.dto.request;
 
 import com.sullung2yo.seatcatcher.train.domain.SeatType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Schema(description = "좌석에 대한 DTO입니다.")
 public class TrainSeatRequest {
 

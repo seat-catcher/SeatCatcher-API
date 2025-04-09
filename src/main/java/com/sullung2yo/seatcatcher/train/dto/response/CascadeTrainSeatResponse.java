@@ -1,6 +1,5 @@
 package com.sullung2yo.seatcatcher.train.dto.response;
 
-import com.sullung2yo.seatcatcher.train.domain.SeatType;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
