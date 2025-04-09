@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import com.sullung2yo.seatcatcher.user.dto.response.UserInformationResponse;
+import com.sullung2yo.seatcatcher.user.service.UserService;
 import com.sullung2yo.seatcatcher.user.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
     @GetMapping("/me")
     public ResponseEntity<UserInformationResponse> getUserInformation(@RequestHeader("Authorization") String bearerToken) {
@@ -37,7 +38,7 @@ public class UserController {
         log.debug("JWT 파싱 성공");
 
         // JWT에서 사용자 정보 추출 및 사용자 정보 반환
-        User user = userServiceImpl.getUserWithToken(token);
+        User user = userService.getUserWithToken(token);
         List<UserTagType> tags = user.getUserTag().stream()
                         .map(userTag -> userTag.getTag().getTagName())
                         .toList();
