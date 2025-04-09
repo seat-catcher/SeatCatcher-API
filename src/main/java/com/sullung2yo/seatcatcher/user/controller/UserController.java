@@ -7,6 +7,11 @@ import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import com.sullung2yo.seatcatcher.user.dto.response.UserInformationResponse;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import com.sullung2yo.seatcatcher.user.service.UserServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,11 +28,23 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@Tag(name = "User API", description = "User APIs")
 public class UserController {
 
     private final UserService userService;
 
     @GetMapping("/me")
+    @Operation(
+            summary = "사용자 정보 조회 API",
+            description = "AccessToken에 담긴 사용자의 정보를 조회합니다.",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "사용자 정보 조회 성공",
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserInformationResponse.class))
+                )
+            }
+    )
     public ResponseEntity<UserInformationResponse> getUserInformation(@RequestHeader("Authorization") String bearerToken) {
         // Bearer 토큰 검증
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
