@@ -3,6 +3,7 @@ package com.sullung2yo.seatcatcher.user.utility;
 import com.sullung2yo.seatcatcher.user.domain.Tag;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class TagInitializer implements CommandLineRunner {
 
@@ -35,6 +37,7 @@ public class TagInitializer implements CommandLineRunner {
             log.info("태그 정보 초기화 완료 : {}", tagCreationList.size());
         } catch (Exception e) {
             log.error("태그 정보 초기화 중 오류 발생: {}", e.getMessage());
+            throw e;
         }
     }
 }

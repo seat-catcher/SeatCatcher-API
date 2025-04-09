@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -64,7 +65,7 @@ class UserControllerTest {
                 .build();
         userRepository.save(user);
 
-        Tag tag = tagRepository.findByTagName(UserTagType.USERTAG_CARRIER);
+        Tag tag = tagRepository.findByTagName(UserTagType.USERTAG_CARRIER).get();
 
         UserTag userTag = UserTag.builder()
                 .user(user)

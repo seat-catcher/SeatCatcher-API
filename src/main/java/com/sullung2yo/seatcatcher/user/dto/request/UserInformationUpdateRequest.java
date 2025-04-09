@@ -3,15 +3,18 @@ package com.sullung2yo.seatcatcher.user.dto.request;
 import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @Setter
 @Builder
+@ToString
 @Schema(description = "사용자 정보 수정 요청 DTO")
 public class UserInformationUpdateRequest {
 
@@ -28,14 +31,7 @@ public class UserInformationUpdateRequest {
     private List<UserTagType> tags;
 
     @Schema(description = "사용자 크레딧", example = "1000")
+    @Min(value = 0, message = "크레딧은 0 이상이어야 합니다.")
     private Long credit;
 
-    public String toString() {
-        return "UserInformationUpdateRequest{" +
-                "name='" + name + '\'' +
-                ", profileImageNum=" + profileImageNum +
-                ", tags=" + tags +
-                ", credit=" + credit +
-                '}';
-    }
 }

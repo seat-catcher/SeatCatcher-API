@@ -6,10 +6,7 @@ import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.config.exception.UserException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
-import com.sullung2yo.seatcatcher.user.domain.Tag;
-import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserTag;
-import com.sullung2yo.seatcatcher.user.domain.UserTagType;
+import com.sullung2yo.seatcatcher.user.domain.*;
 import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
@@ -65,7 +62,10 @@ public class UserServiceImpl implements UserService {
             user.setName(userInformationUpdateRequest.getName());
         }
         if (userInformationUpdateRequest.getProfileImageNum() != null) {
-            log.debug("사용자 프로필 이미지 번호 업데이트: {}", userInformationUpdateRequest.getProfileImageNum());
+            log.debug("사용자 프로필 이미지 업데이트: {}", userInformationUpdateRequest.getProfileImageNum());
+            if (!List.of(ProfileImageNum.values()).contains(userInformationUpdateRequest.getProfileImageNum())) {
+                throw new UserException("올바른 프로필 이미지 번호가 아닙니다.", ErrorCode.INVALID_PROFILE_IMAGE_NUM);
+            }
             user.setProfileImageNum(userInformationUpdateRequest.getProfileImageNum());
         }
         if (userInformationUpdateRequest.getCredit() != null) {
@@ -83,17 +83,17 @@ public class UserServiceImpl implements UserService {
             // 새 태그 관계 설정
             for (UserTagType userTagType : tags) {
                 // 이미 존재하는 태그를 찾거나 새로 생성
-                Tag tag = tagRepository.findByTagName(userTagType);
-                if (tag == null) {
+                Optional<Tag> tag = tagRepository.findByTagName(userTagType);
+                if (tag.isEmpty()) {
                     throw new TagException("해당 태그는 올바른 태그가 아닙니다.", ErrorCode.TAG_NOT_FOUND);
                 }
 
                 // 새 UserTag 생성 및 양방향 관계 설정
                 UserTag userTag = UserTag.builder()
                         .user(user)
-                        .tag(tag)
+                        .tag(tag.get())
                         .build();
-                userTag.setRelationships(user, tag);
+                userTag.setRelationships(user, tag.get());
 
                 // 저장
                 userTagRepository.save(userTag);

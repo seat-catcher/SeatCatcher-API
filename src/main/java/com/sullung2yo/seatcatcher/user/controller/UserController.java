@@ -69,7 +69,7 @@ public class UserController {
 
     @PatchMapping("/me")
     @Operation(
-            summary = "사용자 정보 조회 API",
+            summary = "사용자 정보 업데이트 API",
             description = "AccessToken에 담긴 사용자를 대상으로, 정보를 업데이트합니다.",
             responses = {
                     @ApiResponse(
