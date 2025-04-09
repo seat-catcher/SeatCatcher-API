@@ -8,6 +8,8 @@ import org.hibernate.annotations.Check;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -55,9 +57,9 @@ public class User extends BaseEntity {
     @Column
     private LocalDateTime lastLoginAt; // 마지막 로그인 시간
 
-    @ManyToOne
-    @JoinColumn(name = "tag_id")
-    private UserTag tag; // 사용자 태그
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private Set<UserTag> userTag = new HashSet<>(); // 사용자 태그 (M:N 관계 -> UserTag Entity 참조)
 
     @Column
     @Enumerated(EnumType.STRING)

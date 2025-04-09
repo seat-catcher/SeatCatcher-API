@@ -1,9 +1,13 @@
 package com.sullung2yo.seatcatcher.user.dto.response;
 
 import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
+import com.sullung2yo.seatcatcher.user.domain.UserTag;
+import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,5 +20,5 @@ public class UserInformationResponse {
 
     private Long credit;
 
-    private TagResponse tag;
+    private List<UserTagType> tags;
 }
