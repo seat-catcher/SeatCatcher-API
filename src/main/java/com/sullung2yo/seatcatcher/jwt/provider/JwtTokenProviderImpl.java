@@ -175,7 +175,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
         }
     }
 
-    private String getProviderIdFromToken(String token) {
+    @Override
+    public String getProviderIdFromToken(String token) {
         Claims payload = getPayloadFromToken(token); // JWT
         return payload.getSubject();
     }

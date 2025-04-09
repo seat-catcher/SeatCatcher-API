@@ -19,5 +19,5 @@ public interface TokenProvider {
      */
     public String createToken(String email, Map<String, ?> payload, TokenType tokenType);
     public List<String> refreshToken(String refreshToken);
-
+    public String getProviderIdFromToken(String token);
 }
