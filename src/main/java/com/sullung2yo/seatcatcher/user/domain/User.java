@@ -57,12 +57,10 @@ public class User extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "tag_id")
-    private UserTag tag;
+    private UserTag tag; // 사용자 태그
 
     @Column
-    @Min()
-    private ProfileImageNum profileImageNum;
-
-    @Column
-    private String backgroundColor;
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'IMAGE_1'")
+    private ProfileImageNum profileImageNum; // 프로필 이미지 번호 (이미지 자체는 프론트에서 관리)
 }
