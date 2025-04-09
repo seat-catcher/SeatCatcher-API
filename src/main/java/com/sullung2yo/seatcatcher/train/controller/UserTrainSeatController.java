@@ -1,9 +1,11 @@
 package com.sullung2yo.seatcatcher.train.controller;
 
+import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.dto.response.UserTrainSeatResponse;
-import com.sullung2yo.seatcatcher.train.service.TrainSeatService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
+import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserTrainSeatController {
 
     private final UserTrainSeatService userTrainSeatService;
-    private final TrainSeatService trainSeatService;
+    private final UserService userService;
 
     @GetMapping
     @Operation(
@@ -34,10 +36,9 @@ public class UserTrainSeatController {
                     )
             }
     )
-    public ResponseEntity<UserTrainSeatResponse> getSittingInfo()
+    public ResponseEntity<UserTrainSeatResponse> getSittingInfo(@RequestHeader("Authorization") String bearerToken)
     {
-        // TODO:: 일단 유저 ID를 토큰에서 추출해내야 함.
-        Long uid = 1L; // 일단 임시로 이걸로 하자.
+        Long uid = verifyUserAndGetId(bearerToken);
         return ResponseEntity.ok(new UserTrainSeatResponse(userTrainSeatService.findUserTrainSeatByUserId(uid)));
     }
 
@@ -58,6 +59,7 @@ public class UserTrainSeatController {
             }
     )
     public ResponseEntity<Void> createSittingInfo(
+            @RequestHeader("Authorization") String bearerToken,
             @RequestBody UserTrainSeatRequest userTrainSeatRequest
     )
     {
@@ -76,11 +78,32 @@ public class UserTrainSeatController {
                     )
             }
     )
-    public ResponseEntity<Void> deleteSittingInfo()
+    public ResponseEntity<Void> deleteSittingInfo(@RequestHeader("Authorization") String bearerToken)
     {
-        //TODO:: 일단 유저 ID를 토큰에서 추출해내야 함.
-        Long uid = 1L; // 일단 임시로 이걸로 하자.
+        // Bearer 토큰 검증
+        Long uid = verifyUserAndGetId(bearerToken);
+
         userTrainSeatService.delete(uid);
         return ResponseEntity.ok().build();
+    }
+
+    //TODO :: 지금은 이렇게 만들지만 나중에는 AOT 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.
+    // 혹은 단순하게 AuthService 등에 해당 로직을 옮겨놓는 것도 좋을 듯.
+    private Long verifyUserAndGetId(String bearerToken)
+    {
+        String token = verify(bearerToken);
+        // JWT에서 사용자 정보 추출 및 사용자 정보 반환
+        return userService.getUserWithToken(token).getId();
+    }
+
+    private String verify(String bearerToken)
+    {
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            log.error("올바른 JWT 형식이 아닙니다.");
+            throw new TokenException("올바른 JWT 형식이 아닙니다.", ErrorCode.INVALID_TOKEN);
+        }
+        String token = bearerToken.replace("Bearer ", "");
+        log.debug("JWT 파싱 성공");
+        return token;
     }
 }
