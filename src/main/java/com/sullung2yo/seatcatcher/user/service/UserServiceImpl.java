@@ -70,6 +70,9 @@ public class UserServiceImpl implements UserService {
         }
         if (userInformationUpdateRequest.getCredit() != null) {
             log.debug("사용자 크레딧 업데이트: {}", userInformationUpdateRequest.getCredit());
+            if (userInformationUpdateRequest.getCredit() < 0) {
+                throw new UserException("크레딧은 0보다 작을 수 없습니다.", ErrorCode.INVALID_PROFILE_IMAGE_NUM);
+            }
             user.setCredit(userInformationUpdateRequest.getCredit());
         }
 
