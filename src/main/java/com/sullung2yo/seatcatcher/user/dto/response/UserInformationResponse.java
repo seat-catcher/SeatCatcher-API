@@ -1,7 +1,6 @@
 package com.sullung2yo.seatcatcher.user.dto.response;
 
 import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
-import com.sullung2yo.seatcatcher.user.domain.UserTag;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
