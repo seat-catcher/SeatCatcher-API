@@ -8,6 +8,8 @@ import org.hibernate.annotations.Check;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -55,13 +57,12 @@ public class User extends BaseEntity {
     @Column
     private LocalDateTime lastLoginAt; // 마지막 로그인 시간
 
-    @ManyToOne
-    @JoinColumn(name = "tag_id")
-    private UserTag tag;
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private Set<UserTag> userTag = new HashSet<>(); // 사용자 태그 (M:N 관계 -> UserTag Entity 참조)
 
     @Column
-    private String profileImageUrl;
-
-    @Column
-    private String backgroundColor;
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'IMAGE_1'")
+    private ProfileImageNum profileImageNum; // 프로필 이미지 번호 (이미지 자체는 프론트에서 관리)
 }

@@ -3,7 +3,6 @@ package com.sullung2yo.seatcatcher.user.domain;
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -14,10 +13,19 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name="user_tag")
 public class UserTag extends BaseEntity {
 
-    @Column(name = "type")
-    @Enumerated(EnumType.STRING)
-    @ColumnDefault("'USERTAG_NULL'")
-    @Builder.Default
-    private UserTagType type = UserTagType.USERTAG_NULL;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user; // 사용자
 
+    @ManyToOne
+    @JoinColumn(name = "tag_id")
+    private Tag tag; // 태그
+
+    public void setRelationships(User user, Tag tag) {
+        this.user = user;
+        this.tag = tag;
+
+        user.getUserTag().add(this);
+        tag.getUserTag().add(this);
+    }
 }
