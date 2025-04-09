@@ -60,7 +60,8 @@ public class User extends BaseEntity {
     private UserTag tag;
 
     @Column
-    private String profileImageUrl;
+    @Min()
+    private ProfileImageNum profileImageNum;
 
     @Column
     private String backgroundColor;
