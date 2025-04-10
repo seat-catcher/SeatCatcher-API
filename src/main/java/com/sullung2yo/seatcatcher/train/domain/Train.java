@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.train.domain;
 
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
-import com.sullung2yo.seatcatcher.subway_station.domain.SubwayLine;
+import com.sullung2yo.seatcatcher.subway_station.domain.Line;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,13 +27,13 @@ public class Train extends BaseEntity {
         해당 세 칼럼은 정의하지 않았습니다.
     */
 
-    @ManyToOne
-    @JoinColumn(name = "line_id")
-    private SubwayLine subwayLine;
-
     @OneToMany(mappedBy = "train", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<TrainCar> trainCars = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Line line;
 
     @Column(name="train_code", nullable = false)
     private String trainCode;
