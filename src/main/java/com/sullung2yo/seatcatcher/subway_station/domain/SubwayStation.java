@@ -25,14 +25,11 @@ public class SubwayStation extends BaseEntity{
         해당 세 칼럼은 정의하지 않았습니다.
     */
 
-
-    //양방향 Many To Many 구현을 위해 Mapping Table SubwayStationSubwayLine을 이용
-    @OneToMany(mappedBy = "subwayStation")
-    @Builder.Default
-    private Set<SubwayStationSubwayLine> subwayStationSubwayLines = new HashSet<>();
-
     @Column(name="station_name", nullable = false)
     private String stationName; // 역의 이름입니다. (subway stations name)
+
+    @Column(name="line", nullable = false)
+    private Line line; // 호선 정보입니다.
 
     @Column(name="dist_km", nullable = false)
     private float distance; // 전 역에서 해당 역까지의 거리입니다.
