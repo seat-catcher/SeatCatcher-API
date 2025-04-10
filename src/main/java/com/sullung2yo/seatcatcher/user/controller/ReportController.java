@@ -13,9 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,6 +35,68 @@ public class ReportController {
         List<Report> response = reportService.getAllReports();
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{report_id}")
+    @Operation(
+            summary = "신고 삭제하기 API",
+            description = "접수된 신고를 삭제합니다. reportId로 요청할 수 있습니다.)"
+
+    )
+    public ResponseEntity<?> deleteReport(@PathVariable("report_id") Long reportId) {
+
+//        return ResponseEntity.ok();
+        return null;
+    }
+
+    @PatchMapping("/{report_id}")
+    @Operation(
+            summary = "신고 수정하기 API",
+            description = "접수된 신고 내용을 수정합니다. reportId로 요청할 수 있습니다.)"
+
+    )
+    public ResponseEntity<?> patchReport(@PathVariable("report_id") Long reportId) {
+
+//        return ResponseEntity.ok();
+        return null;
+    }
+
+    @GetMapping("/{report_id}")
+    @Operation(
+            summary = "특정 report 가져오기 API",
+            description = "특정 report를 가져옵니다. reportId로 요청할 수 있습니다.)"
+
+    )
+    public ResponseEntity<?> getReport(@PathVariable("report_id") Long reportId) {
+
+//        return ResponseEntity.ok();
+        return null;
+    }
+
+    @GetMapping("/me")
+    @Operation(
+            summary = "사용자 report 가져오기 API",
+            description = "사용자가 작성한 report를 가져옵니다.)"
+
+    )
+    public ResponseEntity<?> getMyReports() {
+
+//        return ResponseEntity.ok();
+        return null;
+    }
+
+    @PostMapping("/")
+    @Operation(
+            summary = "report 생성하기 API",
+            description = "report를 새롭게 생성합니다.)"
+
+    )
+    public ResponseEntity<?> addReport(@Valid @RequestBody ) {
+
+//        return ResponseEntity.ok();
+        return null;
+    }
+
+
 
 
 }

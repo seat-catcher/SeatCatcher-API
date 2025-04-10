@@ -51,7 +51,7 @@ class ReportServiceImplTest {
         List<Report> result = reportService.getAllReports();
 
         // then
-        assertThat(result).hasSize(1);
+        assertThat(result).hasSize(2);
         assertThat(result).contains(report1, report2);
         verify(reportRepository, times(1)).findAll(); // findAll이 한 번 호출됐는지 검증
     }
