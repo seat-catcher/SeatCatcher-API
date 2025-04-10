@@ -134,13 +134,13 @@ class UserControllerTest {
                 .header("Authorization", "Bearer " + accessToken))
 
         // Then
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
-        // WHen
-        List<UserTag> getUserTag = userTagRepository.findUserTagByUser(user);
-        Optional<User> getUser = userRepository.findByProviderId("testProviderId");
-        assertThat(getUser.isEmpty()).isTrue();
-        assertThat(getUserTag.size()).isEqualTo(0);
+        // When
+        List<UserTag> userTags = userTagRepository.findUserTagByUser(user);
+        Optional<User> foundUser = userRepository.findByProviderId("testProviderId");
+        assertThat(foundUser).isEmpty();
+        assertThat(userTags).isEmpty();
     }
 
     @AfterEach

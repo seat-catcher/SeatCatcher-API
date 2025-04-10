@@ -114,7 +114,7 @@ public class UserController {
             description = "AccessToken에 담긴 사용자를 삭제합니다.",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
+                            responseCode = "204",
                             description = "사용자 정보 삭제 성공"
                     )
             }
@@ -132,6 +132,6 @@ public class UserController {
 
         userService.deleteUser(token);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

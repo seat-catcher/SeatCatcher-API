@@ -109,6 +109,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
     public void deleteUser(String token) throws RuntimeException {
         // 1. 사용자 정보 가져오기
         User user = this.getUserWithToken(token);
