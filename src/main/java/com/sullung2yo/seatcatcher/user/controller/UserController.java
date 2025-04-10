@@ -107,4 +107,31 @@ public class UserController {
         log.debug("사용자 정보 업데이트: {}, {}, {}, {}", user.getName(), user.getCredit(), user.getProfileImageNum(), tags);
         return ResponseEntity.status(HttpStatus.OK).body(userInformationResponse);
     }
+
+    @DeleteMapping("/me")
+    @Operation(
+            summary = "사용자 정보 삭제 API",
+            description = "AccessToken에 담긴 사용자를 삭제합니다.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "사용자 정보 삭제 성공"
+                    )
+            }
+    )
+    public ResponseEntity<?> deleteUser(
+            @RequestHeader("Authorization") String bearerToken
+    ) {
+        // Bearer 토큰 검증
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            log.error("올바른 JWT 형식이 아닙니다.");
+            throw new TokenException("올바른 JWT 형식이 아닙니다.", ErrorCode.INVALID_TOKEN);
+        }
+        String token = bearerToken.replace("Bearer ", "");
+        log.debug("JWT 파싱 성공");
+
+        userService.deleteUser(token);
+
+        return ResponseEntity.ok().build();
+    }
 }
