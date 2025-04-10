@@ -28,6 +28,7 @@ public class SubwayStation extends BaseEntity{
     @Column(name="station_name", nullable = false)
     private String stationName; // 역의 이름입니다. (subway stations name)
 
+    @Enumerated(EnumType.STRING)
     @Column(name="line", nullable = false)
     private Line line; // 호선 정보입니다.
 

@@ -31,6 +31,7 @@ public class Train extends BaseEntity {
     @Builder.Default
     private Set<TrainCar> trainCars = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
     @Column
     private Line line;
 
