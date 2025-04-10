@@ -1,8 +1,6 @@
 package com.sullung2yo.seatcatcher.subway_station.utility;
 
-import com.sullung2yo.seatcatcher.subway_station.domain.SubwayLine;
 import com.sullung2yo.seatcatcher.subway_station.dto.SubwayStationData;
-import com.sullung2yo.seatcatcher.subway_station.repository.SubwayLineRepository;
 import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
 import com.sullung2yo.seatcatcher.subway_station.utility.parser.StationDataParser;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubwayInitializer implements CommandLineRunner {
 
-    private final SubwayLineRepository subwayLineRepository;
     private final StationDataParser stationDataParser;
     private final SubwayStationService subwayStationService;
 
@@ -29,6 +26,10 @@ public class SubwayInitializer implements CommandLineRunner {
         String filePath = "src/main/resources/json/seoul_subway_info.json";
 
         try {
+
+            /*
+
+
             log.info("지하철 역 정보 초기화...");
             // 1 ~ 8호선 노선 정보를 SubwayLine 테이블에 실행 시 저장 또는 업데이트한다 (로컬, 개발 환경)
             for (int lineNum = 1; lineNum <= numberOfLines; lineNum++) {
@@ -43,6 +44,9 @@ public class SubwayInitializer implements CommandLineRunner {
                 }
             }
             log.info("지하철 노선 정보 초기화 완료");
+
+
+             */
 
             // 2. resources/json/seoul_subway_info.json 불러와서 파싱 -> Station 정보 리스트 가져오기
             log.info("지하철 역 정보 JSON 파일 파싱...");
