@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.utility;
+package com.sullung2yo.seatcatcher.user.utility.initializer;
 
 import com.sullung2yo.seatcatcher.user.domain.Tag;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
