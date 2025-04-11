@@ -22,10 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
@@ -53,10 +53,12 @@ class UserControllerTest {
 
     private String accessToken;
 
+    private User user;
+
     @BeforeEach
     void setUp() {
         // 테스트할 사용자 생성
-        User user = User.builder()
+        user = User.builder()
                 .provider(Provider.APPLE)
                 .providerId("testProviderId")
                 .name("testUser")
@@ -119,6 +121,26 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.profileImageNum").exists())
                 .andExpect(jsonPath("$.credit").value(555L))
                 .andExpect(jsonPath("$.tags").exists());
+    }
+
+    @Test
+    void deleteUser() throws Exception {
+        // Given
+        // User given in setUp()
+
+        // When
+        mockMvc.perform(delete("/user/me")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + accessToken))
+
+        // Then
+                .andExpect(status().isNoContent());
+
+        // When
+        List<UserTag> userTags = userTagRepository.findUserTagByUser(user);
+        Optional<User> foundUser = userRepository.findByProviderId("testProviderId");
+        assertThat(foundUser).isEmpty();
+        assertThat(userTags).isEmpty();
     }
 
     @AfterEach

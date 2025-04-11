@@ -108,4 +108,19 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
+
+    @Override
+    public void deleteUser(String token) throws RuntimeException {
+        // 1. 사용자 정보 가져오기
+        User user = this.getUserWithToken(token);
+        log.debug("삭제할 사용자 : {}", user.getProviderId());
+
+        // 2. 사용자-태그 중간 테이블 삭제
+        userTagRepository.deleteAll(user.getUserTag());
+        log.debug("사용자-태그 테이블에 저장된 사용자 관련 정보 삭제");
+
+        // 3. 사용자 정보 삭제
+        userRepository.delete(user);
+        log.debug("사용자 정보 삭제");
+    }
 }

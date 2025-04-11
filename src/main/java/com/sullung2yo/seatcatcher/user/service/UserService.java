@@ -8,4 +8,5 @@ public interface UserService {
 
     User getUserWithToken(String token) throws RuntimeException;
     User updateUser(String token, UserInformationUpdateRequest userInformationUpdateRequest) throws RuntimeException;
+    void deleteUser(String token) throws RuntimeException;
 }
