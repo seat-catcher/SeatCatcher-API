@@ -51,7 +51,7 @@ public class ReportController {
 
     @PatchMapping("/{report_id}")
     @Operation(
-            summary = "[개발중] 신고 수정하기 API",
+            summary = "신고 수정하기 API",
             description = "접수된 신고 내용을 수정합니다. reportId로 요청할 수 있습니다.)"
 
     )
