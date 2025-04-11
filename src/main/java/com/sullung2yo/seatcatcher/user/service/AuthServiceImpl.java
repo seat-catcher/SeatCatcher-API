@@ -18,6 +18,8 @@ import com.sullung2yo.seatcatcher.user.dto.request.AppleAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.KakaoUserDataResponse;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.user.utility.random.NameGenerator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,21 +33,28 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-@Service
 @Slf4j
+@Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final JwtTokenProviderImpl jwtTokenProvider;
     private final WebClient webClient;
+    private final NameGenerator nameGenerator;
 
     @Value("${apple.client.id}")
     private String appleClientId;
 
-    public AuthServiceImpl(UserRepository userRepository, JwtTokenProviderImpl jwtTokenProvider, WebClient.Builder webClientBuilder) {
+    public AuthServiceImpl(
+            UserRepository userRepository,
+            JwtTokenProviderImpl jwtTokenProvider,
+            WebClient.Builder webClientBuilder,
+            NameGenerator nameGenerator
+    ) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.webClient = webClientBuilder.build();
+        this.nameGenerator = nameGenerator;
     }
 
     public List<String> authenticate(Object request, Provider provider) throws Exception {
@@ -130,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (user == null) { // If new user, register
             user = User.builder()
-                    .name("Random Name 123") // TODO: Implement random name generator !!!
+                    .name(nameGenerator.generateRandomName())
                     .providerId(providerId)
                     .provider(Provider.KAKAO)
                     .role(UserRole.ROLE_USER)
@@ -153,7 +162,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByProviderId(providerId).orElse(null);
         if (user == null) { // if new user
             user = User.builder()
-                    .name("Random Name 123") // TODO: Implement random name generator !!!
+                    .name(nameGenerator.generateRandomName())
                     .providerId(providerId)
                     .provider(Provider.APPLE)
                     .role(UserRole.ROLE_USER)

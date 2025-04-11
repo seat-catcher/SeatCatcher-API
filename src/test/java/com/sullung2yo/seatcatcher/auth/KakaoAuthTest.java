@@ -9,6 +9,7 @@ import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.KakaoUserDataResponse;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
+import com.sullung2yo.seatcatcher.user.utility.random.NameGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,9 @@ class KakaoAuthTest {
     @Mock
     private JwtTokenProviderImpl jwtTokenProvider;
     // JWT 발급도 실제 작동할 필요 X -> Mocking
+
+    @Mock
+    private NameGenerator nameGenerator;
 
     @Mock
     private WebClient.Builder webClientBuilder;
@@ -91,7 +95,7 @@ class KakaoAuthTest {
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
         // authService 인스턴스 생성해야 하니까 Mocking WebClient + 필요한 의존성 주입
-        authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder);
+        authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder, nameGenerator);
     }
 
     @Test
