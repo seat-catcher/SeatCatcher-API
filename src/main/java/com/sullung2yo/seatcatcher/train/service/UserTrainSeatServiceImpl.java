@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     private final TrainSeatService trainSeatService;
 
     @Override
+    @Transactional
     public void create(Long userId, Long seatId) {
         User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         TrainSeat seat = trainSeatRepository.findById(seatId).orElseThrow(EntityNotFoundException::new);
@@ -47,6 +49,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         UserTrainSeat item = userTrainSeatRepository.findUserTrainSeatByUserId(id)
                 .orElseThrow(EntityNotFoundException::new);

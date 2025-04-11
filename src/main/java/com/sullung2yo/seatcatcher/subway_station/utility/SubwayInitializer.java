@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.subway_station.utility;
 
 import com.sullung2yo.seatcatcher.subway_station.dto.SubwayStationData;
-import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
+import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationServiceImpl;
 import com.sullung2yo.seatcatcher.subway_station.utility.parser.StationDataParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.List;
 public class SubwayInitializer implements CommandLineRunner {
 
     private final StationDataParser stationDataParser;
-    private final SubwayStationService subwayStationService;
+    private final SubwayStationServiceImpl subwayStationService;
 
     @Override
     public void run(String... args) throws Exception {

@@ -8,6 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class TrainSeatServiceImpl implements TrainSeatService {
     }
 
     @Override
+    @Transactional
     public void update(Long id, TrainSeatRequest seatInfo) {
         TrainSeat item = trainSeatRepository.findById(id)
                 .orElseThrow(()->new EntityNotFoundException("Given train seat does not exist!"));
