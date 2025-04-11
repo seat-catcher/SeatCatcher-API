@@ -160,7 +160,7 @@ public class UserTrainSeatControllerTest {
                 .content(objectMapper.writeValueAsString(request))
                 .header("Authorization", "Bearer " + accessToken))
         //then
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
 
         // When
