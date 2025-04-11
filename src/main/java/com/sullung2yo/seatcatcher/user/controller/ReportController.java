@@ -3,6 +3,7 @@ package com.sullung2yo.seatcatcher.user.controller;
 import com.sullung2yo.seatcatcher.config.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.user.domain.Report;
 import com.sullung2yo.seatcatcher.user.dto.request.ReportRequest;
+import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
 import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
 import com.sullung2yo.seatcatcher.user.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +33,7 @@ public class ReportController {
             description = "신고된 내용을 불러옵니다. Admin만 해당 작업을 수행할 수 있습니다. (현재 관리자 페이지는 디자인된게 없어 Report 도메인 그대로 반환합니다.)"
 
     )
-    public ResponseEntity<?> getReports() {
+    public ResponseEntity<List<Report>> getReports() {
         List<Report> response = reportService.getAllReports();
         return ResponseEntity.ok(response);
     }
@@ -44,14 +45,13 @@ public class ReportController {
 
     )
     public ResponseEntity<?> deleteReport(@PathVariable("report_id") Long reportId) {
-
-//        return ResponseEntity.ok();
-        return null;
+        reportService.deleteReport(reportId);
+        return ResponseEntity.ok("Report가 삭제되었습니다.");
     }
 
     @PatchMapping("/{report_id}")
     @Operation(
-            summary = "신고 수정하기 API",
+            summary = "[개발중] 신고 수정하기 API",
             description = "접수된 신고 내용을 수정합니다. reportId로 요청할 수 있습니다.)"
 
     )
@@ -67,10 +67,9 @@ public class ReportController {
             description = "특정 report를 가져옵니다. reportId로 요청할 수 있습니다.)"
 
     )
-    public ResponseEntity<?> getReport(@PathVariable("report_id") Long reportId) {
-
-//        return ResponseEntity.ok();
-        return null;
+    public ResponseEntity<ReportResponse> getReport(@PathVariable("report_id") Long reportId) {
+        ReportResponse response = reportService.getReportById(reportId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me")
@@ -79,10 +78,9 @@ public class ReportController {
             description = "사용자가 작성한 report를 가져옵니다.)"
 
     )
-    public ResponseEntity<?> getMyReports() {
-
-//        return ResponseEntity.ok();
-        return null;
+    public ResponseEntity<List<ReportResponse>> getMyReports() {
+        List<ReportResponse> responses = reportService.getMyReport();
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping("/")
@@ -92,9 +90,8 @@ public class ReportController {
 
     )
     public ResponseEntity<?> addReport(@Valid @RequestBody ReportRequest request) {
-
-//        return ResponseEntity.ok();
-        return null;
+        reportService.createReport(request);
+        return ResponseEntity.ok("Report가 생성되었습니다.");
     }
 
 
