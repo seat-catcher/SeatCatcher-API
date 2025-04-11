@@ -22,15 +22,11 @@ class NameGeneratorTest {
     private NameGenerator nameGenerator;
     private static final String originalName = "originalName";
 
-    @BeforeEach
-    void setUp() {
-    }
-
     @Test
     void testGenerateRandomName() {
         // Given, When
         String randomName = nameGenerator.generateRandomName();
-        log.debug(randomName);
+        log.debug("testGenerateRandomName: {}", randomName);
 
         // Then
         assertNotNull(randomName);
@@ -40,20 +36,20 @@ class NameGeneratorTest {
     @Test
     void testGenerateRealUser() {
         // Given
+        String randomName = nameGenerator.generateRandomName();
         User user = User.builder()
                 .provider(Provider.KAKAO)
                 .providerId("testProviderId")
-                .name(nameGenerator.generateRandomName())
+                .name(originalName)
                 .build();
         userRepository.save(user);
-        String originUserName = user.getName();
 
         // When
-        user.setName(nameGenerator.generateRandomName());
+        user.setName(randomName);
         userRepository.save(user);
 
         // Then
-        assertNotEquals(originUserName, user.getName());
+        assertNotEquals(originalName, user.getName());
         userRepository.deleteAll();
     }
 }
