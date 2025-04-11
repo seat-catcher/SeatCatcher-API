@@ -50,13 +50,13 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
     @Override
     @Transactional
-    public void delete(Long id) {
-        UserTrainSeat item = userTrainSeatRepository.findUserTrainSeatByUserId(id)
+    public void delete(Long userId) {
+        UserTrainSeat item = userTrainSeatRepository.findUserTrainSeatByUserId(userId)
                 .orElseThrow(EntityNotFoundException::new);
 
         // 착석 정보를 제거했다면 당연히 좌석에 대한 찜 수라던가도 초기화가 진행되어야 함.
         trainSeatService.update(item.getTrainSeat().getId(), TrainSeatRequest.builder().jjimCount(0).build());
 
-        userTrainSeatRepository.deleteById(id);
+        userTrainSeatRepository.deleteUserTrainSeatByUserId(userId);
     }
 }

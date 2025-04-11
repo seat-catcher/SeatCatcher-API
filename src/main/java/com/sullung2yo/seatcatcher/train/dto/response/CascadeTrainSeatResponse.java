@@ -20,7 +20,7 @@ public class CascadeTrainSeatResponse extends TrainSeatResponse {
     /*
 
     @Schema(description = "자리에 앉은 유저가 현재 사용중인 경로 정보에 대한 DTO입니다.")
-    private UserResponse user;
+    private PathHistoryResponse path;
 
     */ //TODO :: PathHistoryDTO 가 정의되면 들어가야 합니다.
 
