@@ -1,11 +1,10 @@
 package com.sullung2yo.seatcatcher.user.dto.request;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class ReportRequest {
     @NonNull
     private Long reportUserId;
