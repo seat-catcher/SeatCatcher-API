@@ -2,15 +2,11 @@ package com.sullung2yo.seatcatcher.train.dto.response;
 
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Schema(description = "어떤 그룹에 속한 좌석들에 대한 기본 정보, 거기에 앉은 유저 정보, 유저의 현재 이용중인 경로까지 다 담고 있을 DTO입니다.")
 public class CascadeTrainSeatResponse extends TrainSeatResponse {
 

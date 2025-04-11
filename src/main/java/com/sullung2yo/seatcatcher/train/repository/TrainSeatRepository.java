@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TrainSeatRepository extends JpaRepository<TrainSeat, Long> {
-    List<TrainSeat> findAllBySeatGroupId(Long id);
+    List<TrainSeat> findAllByTrainSeatGroupId(Long id);
 }

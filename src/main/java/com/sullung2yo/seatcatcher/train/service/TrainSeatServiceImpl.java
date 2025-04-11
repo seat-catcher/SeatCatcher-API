@@ -21,7 +21,7 @@ public class TrainSeatServiceImpl implements TrainSeatService {
 
     @Override
     public List<TrainSeat> findAllBySeatGroupId(Long id) {
-        return trainSeatRepository.findAllBySeatGroupId(id);
+        return trainSeatRepository.findAllByTrainSeatGroupId(id);
     }
 
     @Override
