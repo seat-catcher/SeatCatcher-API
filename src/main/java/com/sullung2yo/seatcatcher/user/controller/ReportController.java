@@ -55,10 +55,9 @@ public class ReportController {
             description = "접수된 신고 내용을 수정합니다. reportId로 요청할 수 있습니다.)"
 
     )
-    public ResponseEntity<?> patchReport(@PathVariable("report_id") Long reportId) {
-
-//        return ResponseEntity.ok();
-        return null;
+    public ResponseEntity<ReportResponse> patchReport(@PathVariable("report_id") Long reportId, @RequestBody ReportRequest request) {
+        ReportResponse response = reportService.updateReport(reportId, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{report_id}")

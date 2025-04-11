@@ -11,7 +11,7 @@ public interface ReportService {
     public void deleteReport(Long reportId);
 
 
-//    public ReportResponse updateReport(Long reportId, ReportUpdateRequest request);
+    public ReportResponse updateReport(Long reportId, ReportRequest request);
 
     public List<ReportResponse> getMyReport();
     public ReportResponse getReportById(Long reportId);

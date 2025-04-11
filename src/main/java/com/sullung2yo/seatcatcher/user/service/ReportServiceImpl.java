@@ -38,6 +38,29 @@ public class ReportServiceImpl implements ReportService{
     }
 
     @Override
+    public ReportResponse updateReport(Long reportId, ReportRequest request) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(()-> new IllegalArgumentException("id : " + reportId + "report를 찾을 수 없습니다."));
+
+        if(request.getReportUserId() != null){
+            User reportUser = userRepository.findById(request.getReportUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+            report.setReportUser(reportUser);
+        }
+        if(request.getReportedUserId() != null){
+            User reportedUser = userRepository.findById(request.getReportedUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+            report.setReportedUser(reportedUser);
+        }
+        if(request.getReason() != null){
+            report.setReason(request.getReason());
+        }
+
+        ReportResponse response = reportConverter.toReportResponse(report);
+        return response;
+    }
+
+    @Override
     public List<ReportResponse> getMyReport() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();
