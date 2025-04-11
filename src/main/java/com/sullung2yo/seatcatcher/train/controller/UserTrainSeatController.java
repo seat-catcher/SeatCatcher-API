@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.train.controller;
 
 import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.config.exception.TokenException;
+import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.dto.response.UserTrainSeatResponse;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +35,26 @@ public class UserTrainSeatController {
                             responseCode = "200",
                             description = "성공적으로 착석 정보를 조회했습니다.",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserTrainSeatResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "해당 유저는 착석 정보가 없습니다."
                     )
             }
     )
     public ResponseEntity<UserTrainSeatResponse> getSittingInfo(@RequestHeader("Authorization") String bearerToken)
     {
         Long uid = verifyUserAndGetId(bearerToken);
-        return ResponseEntity.ok(new UserTrainSeatResponse(userTrainSeatService.findUserTrainSeatByUserId(uid)));
+
+        try
+        {
+            UserTrainSeat record = userTrainSeatService.findUserTrainSeatByUserId(uid);
+            return ResponseEntity.ok(new UserTrainSeatResponse(record));
+        }
+        catch(EntityNotFoundException e)
+        {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     @PostMapping
@@ -55,6 +70,10 @@ public class UserTrainSeatController {
                     @ApiResponse(
                             responseCode = "201",
                             description = "성공적으로 생성 완료"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "해당 유저, 혹은 좌석 ID를 찾을 수 없음"
                     )
             }
     )
@@ -63,8 +82,15 @@ public class UserTrainSeatController {
             @RequestBody UserTrainSeatRequest userTrainSeatRequest
     )
     {
-        userTrainSeatService.create(userTrainSeatRequest.getUserId(), userTrainSeatRequest.getSeatId());
-        return ResponseEntity.ok().build();
+        try
+        {
+            userTrainSeatService.create(userTrainSeatRequest.getUserId(), userTrainSeatRequest.getSeatId());
+            return ResponseEntity.ok().build();
+        }
+        catch(EntityNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping
@@ -75,6 +101,10 @@ public class UserTrainSeatController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "성공적으로 제거 완료"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "해당 유저에 대한 착석 정보를 찾을 수 없음"
                     )
             }
     )
@@ -83,8 +113,14 @@ public class UserTrainSeatController {
         // Bearer 토큰 검증
         Long uid = verifyUserAndGetId(bearerToken);
 
-        userTrainSeatService.delete(uid);
-        return ResponseEntity.ok().build();
+        try{
+            userTrainSeatService.delete(uid);
+            return ResponseEntity.ok().build();
+        }
+        catch(EntityNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     //TODO :: 지금은 이렇게 만들지만 나중에는 AOT 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.

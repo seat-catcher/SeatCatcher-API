@@ -1,5 +1,7 @@
 package com.sullung2yo.seatcatcher.subway_station.controller;
 
+import com.sullung2yo.seatcatcher.config.exception.SubwayLineNotFoundException;
+import com.sullung2yo.seatcatcher.subway_station.domain.Line;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.SubwayStationResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationServiceImpl;
@@ -8,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,26 +37,50 @@ public class SubwayStationController {
                         responseCode = "200",
                         description = "성공적으로 역 정보들 반환 완료",
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = SubwayStationResponse.class))
+                ),
+                @ApiResponse(
+                        responseCode = "204",
+                        description = "조건을 만족하는 역이 없음"
+                ),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "잘못된 요청"
                 )
             }
     )
     public ResponseEntity<List<SubwayStationResponse>> getStations(
         @RequestParam(required = false) String keyword,
-        @RequestParam(required = false) String line,
-        @RequestParam(required = false) String order
+        @RequestParam(required = false) String line, // 유저측에서는 1, 2 이런 식으로 입력함.
+        @RequestParam(defaultValue = "up") String order
     )
     {
-        List<SubwayStationResponse> responses = new ArrayList<>();
-
-        List<SubwayStation> records = subwayStationService.findWith(keyword, line, order);
-        for(SubwayStation record : records)
+        try
         {
-            responses.add(new SubwayStationResponse(record));
+
+            Line lineToSearch = null;
+            if(line != null) lineToSearch = Line.findByName(line);
+
+            List<SubwayStationResponse> responses = new ArrayList<>();
+
+            List<SubwayStation> records = subwayStationService.findWith(keyword, lineToSearch, order);
+
+            if(records == null || records.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            for(SubwayStation record : records)
+            {
+                responses.add(new SubwayStationResponse(record));
+            }
+            return ResponseEntity.ok(responses);
         }
-        return ResponseEntity.ok(responses);
+        catch (SubwayLineNotFoundException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @GetMapping("/{station_id}")
+    @GetMapping("/{stationId}")
     @Operation(
             summary = "단일 역 조회 API",
             description = "지하철 역의 id를 이용하여 특정 역 하나를 검색합니다.",
@@ -62,6 +89,10 @@ public class SubwayStationController {
                             responseCode = "200",
                             description = "성공적으로 역 정보 반환 완료",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = SubwayStationResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "해당 ID를 가진 역을 찾을 수 없음"
                     )
             }
     )
@@ -69,8 +100,15 @@ public class SubwayStationController {
             @PathVariable Long stationId
     )
     {
-        return ResponseEntity.ok(
-                new SubwayStationResponse(subwayStationService.findById(stationId))
-        );
+        try
+        {
+            return ResponseEntity.ok(
+                    new SubwayStationResponse(subwayStationService.findById(stationId))
+            );
+        }
+        catch(EntityNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

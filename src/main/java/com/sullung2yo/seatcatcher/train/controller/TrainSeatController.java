@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,10 @@ public class TrainSeatController {
                         responseCode = "200",
                         description = "성공적으로 TrainSeat들 Cascade하게 반환 완료",
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = CascadeTrainSeatResponse.class))
+                ),
+                @ApiResponse(
+                        responseCode = "204",
+                        description = "그룹에 속한 좌석이 없음."
                 )
         }
     )
@@ -45,19 +50,25 @@ public class TrainSeatController {
     {
         List<CascadeTrainSeatResponse> responses = new ArrayList<>();
 
-        List<TrainSeat> records = trainSeatService.findAllBySeatGroupId(seatGroupId);
-        for(TrainSeat record : records) {
-           responses.add(new CascadeTrainSeatResponse(record));
-        }
+        try
+        {
+            List<TrainSeat> records = trainSeatService.findAllBySeatGroupId(seatGroupId);
+            for(TrainSeat record : records) {
+                responses.add(new CascadeTrainSeatResponse(record));
+            }
 
-        for(CascadeTrainSeatResponse response : responses) {
-            //UserTrainSeatService 에 서비스를 요청해서 좌석에 앉아 있는 유저가 있는지 확인하고
-            //만약 존재한다면
+            for(CascadeTrainSeatResponse response : responses) {
+                //UserTrainSeatService 에 서비스를 요청해서 좌석에 앉아 있는 유저가 있는지 확인하고
+                //만약 존재한다면
                 // UserService 에 서비스를 요청해서 해당 유저를 id 를 통해 검색해서 필요한 내용 채워 넣을 것.
                 // PathHistory 에 서비스를 요청해서 해당 유저 id 를 통해 modified_at 이 제일 최근인걸 가져와서 필요한 내용 채워 넣을 것.
-        }
+            }
 
-        return ResponseEntity.ok(responses);
+            return ResponseEntity.ok(responses);
+        }
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     @PatchMapping("/{seatId}")
@@ -93,7 +104,14 @@ public class TrainSeatController {
             @RequestBody TrainSeatRequest trainSeatRequest
     )
     {
-        trainSeatService.update(seatId, trainSeatRequest);
-        return ResponseEntity.ok().build();
+        try
+        {
+            trainSeatService.update(seatId, trainSeatRequest);
+            return ResponseEntity.ok().build();
+        }
+        catch(EntityNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

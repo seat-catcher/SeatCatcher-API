@@ -62,7 +62,8 @@ public class SubwayStationServiceImpl implements SubwayStationService {
     }
 
     @Override
-    public List<SubwayStation> findWith(String keyword, String line, String order) {
+    public List<SubwayStation> findWith(String keyword, Line line, String order) {
+
         return subwayStationRepository.findBy(keyword, line, order);
     }
 

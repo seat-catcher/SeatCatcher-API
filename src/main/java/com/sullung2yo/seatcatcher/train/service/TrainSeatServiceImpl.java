@@ -21,7 +21,11 @@ public class TrainSeatServiceImpl implements TrainSeatService {
 
     @Override
     public List<TrainSeat> findAllBySeatGroupId(Long id) {
-        return trainSeatRepository.findAllByTrainSeatGroupId(id);
+        List<TrainSeat> result = trainSeatRepository.findAllByTrainSeatGroupId(id);
+        if(result == null || result.isEmpty()) {
+            throw new EntityNotFoundException("TrainSeat not found");
+        }
+        return result;
     }
 
     @Override

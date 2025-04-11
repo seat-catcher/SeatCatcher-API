@@ -22,7 +22,7 @@ public class SubwayStationResponse {
     private String name;
 
     @Schema(description = "호선 이름입니다.")
-    private Line line;
+    private String line;
 
     @Schema(description = "전 역에서 해당 역까지 오는 데에 걸리는 시간입니다.")
     private String timeMinSec;
@@ -39,7 +39,7 @@ public class SubwayStationResponse {
     public SubwayStationResponse(SubwayStation subwayStation) {
         this.id = subwayStation.getId();
         this.name = subwayStation.getStationName();
-        this.line = subwayStation.getLine();
+        this.line = subwayStation.getLine().getName();
         this.timeMinSec = subwayStation.getTimeMinSec();
         this.acmlTime = subwayStation.getAccumulateTime();
         this.distKm = subwayStation.getDistance();
