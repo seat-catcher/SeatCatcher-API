@@ -10,9 +10,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
 
 @Slf4j
 @RestController
@@ -35,6 +40,14 @@ public class HealthCheckController {
     public ResponseEntity<String> healthCheck() {
         log.info("Health check request received");
         return ResponseEntity.ok("ok");
+    }
+
+    @MessageMapping("/hello")
+    @SendTo("/topic/hello")
+    public String handleHello(String message, Principal principal) throws Exception {
+        // principal.getName() : WebSocket 연결 시 전달된 인증 정보 (providerId)
+        log.info("Received message from: {}, {}", principal.getName(), message);
+        return "Hello, " + message + "!, from server";
     }
 
 }

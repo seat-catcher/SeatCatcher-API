@@ -201,8 +201,15 @@ public class JwtTokenProviderImpl implements TokenProvider {
         }
 
         // 권한 정보가 있다면 포함
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.ROLE_USER.name()));
-
+        User user = optionalUser.get();
+        List<GrantedAuthority> authorities = null;
+        if (user.getRole().equals(UserRole.ROLE_ADMIN)) {
+            log.debug("관리자 권한 부여");
+            authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.ROLE_ADMIN.name()));
+        } else {
+            log.debug("일반 사용자 권한 부여");
+            authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.ROLE_USER.name()));
+        }
         UserDetails principal = new org.springframework.security.core.userdetails.User(providerId, "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);

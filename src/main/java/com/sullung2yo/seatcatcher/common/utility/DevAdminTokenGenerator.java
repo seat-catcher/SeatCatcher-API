@@ -60,7 +60,7 @@ public class DevAdminTokenGenerator {
                 TokenType.REFRESH
         );
 
-        log.debug("Access token for development : {}", adminAccessToken);
-        log.debug("Refresh token for development : {}", adminRefreshToken);
+        log.debug("\u001B[32mAccess token for development : {}\u001B[0m", adminAccessToken);
+        log.debug("\u001B[34mRefresh token for development : {}\u001B[0m", adminRefreshToken);
     }
 }
