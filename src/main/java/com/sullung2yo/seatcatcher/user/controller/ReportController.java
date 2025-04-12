@@ -53,9 +53,12 @@ public class ReportController {
     @Operation(
             summary = "신고 수정하기 API",
             description = "접수된 신고 내용을 수정합니다. reportId로 요청할 수 있습니다.)"
-
     )
-    public ResponseEntity<ReportResponse> patchReport(@PathVariable("report_id") Long reportId, @RequestBody ReportRequest request) {
+    @ApiResponse(responseCode = "200", description = "신고 수정 성공")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "신고를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public ResponseEntity<ReportResponse> patchReport(@PathVariable("report_id") Long reportId, @Valid @RequestBody ReportRequest request) {
         ReportResponse response = reportService.updateReport(reportId, request);
         return ResponseEntity.ok(response);
     }
