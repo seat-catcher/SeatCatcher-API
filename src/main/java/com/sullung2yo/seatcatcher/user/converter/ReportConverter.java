@@ -6,6 +6,6 @@ import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
 import java.util.List;
 
 public interface ReportConverter {
-    public ReportResponse toReportResponse(Report report);
-    public List<ReportResponse> toResponseList(List<Report> reports);
+    ReportResponse toReportResponse(Report report);
+    List<ReportResponse> toResponseList(List<Report> reports);
 }

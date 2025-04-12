@@ -7,7 +7,7 @@ import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
 import java.util.List;
 
 public interface ReportService {
-    public List<Report> getAllReports();
+    public List<ReportResponse> getAllReports();
     public void deleteReport(Long reportId);
 
 

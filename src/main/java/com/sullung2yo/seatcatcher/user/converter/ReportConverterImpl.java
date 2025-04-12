@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 public class ReportConverterImpl implements ReportConverter{
     @Override
     public ReportResponse toReportResponse(Report report) {
+        if (report.getReportUser() == null || report.getReportedUser() == null) {
+            throw new IllegalArgumentException("신고자 혹은 피신고자 정보가 누락되었습니다.");
+        }
         return ReportResponse.builder()
                 .reportUserId(report.getReportUser().getId())
                 .reportUserName(report.getReportUser().getName())

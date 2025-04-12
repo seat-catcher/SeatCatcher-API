@@ -1,5 +1,7 @@
 package com.sullung2yo.seatcatcher.user.service;
 
+import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.config.exception.UserException;
 import com.sullung2yo.seatcatcher.user.converter.ReportConverter;
 import com.sullung2yo.seatcatcher.user.domain.Report;
 import com.sullung2yo.seatcatcher.user.domain.User;
@@ -24,9 +26,10 @@ public class ReportServiceImpl implements ReportService{
     private final ReportConverter reportConverter;
 
     @Override
-    public List<Report> getAllReports() {
+    public List<ReportResponse> getAllReports() {
         List<Report> reports = reportRepository.findAll();
-        return reports;
+        List<ReportResponse> responses = reportConverter.toResponseList(reports);
+        return responses;
     }
 
     @Override
@@ -44,12 +47,12 @@ public class ReportServiceImpl implements ReportService{
 
         if(request.getReportUserId() != null){
             User reportUser = userRepository.findById(request.getReportUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                    .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + request.getReportUserId(), ErrorCode.USER_NOT_FOUND));
             report.setReportUser(reportUser);
         }
         if(request.getReportedUserId() != null){
             User reportedUser = userRepository.findById(request.getReportedUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                    .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + request.getReportedUserId(), ErrorCode.USER_NOT_FOUND));
             report.setReportedUser(reportedUser);
         }
         if(request.getReason() != null){
@@ -65,7 +68,7 @@ public class ReportServiceImpl implements ReportService{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();
         User user = userRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. providerId : " + providerId, ErrorCode.USER_NOT_FOUND));
 
         List<Report> reports = reportRepository.findAllByReportUser(user);
         return reportConverter.toResponseList(reports);
@@ -84,10 +87,10 @@ public class ReportServiceImpl implements ReportService{
     public void createReport(ReportRequest request) {
 
         User reportUser = userRepository.findById(request.getReportUserId())
-                .orElseThrow(() -> new IllegalArgumentException("id : "+ request.getReportUserId() + "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + request.getReportUserId(), ErrorCode.USER_NOT_FOUND));
 
         User reportedUser = userRepository.findById(request.getReportedUserId())
-                .orElseThrow(() -> new IllegalArgumentException("id : "+ request.getReportUserId() + "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + request.getReportedUserId(), ErrorCode.USER_NOT_FOUND));
 
         Report report = Report.builder()
                 .reportUser(reportUser)
