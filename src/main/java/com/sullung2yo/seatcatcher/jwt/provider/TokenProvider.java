@@ -1,6 +1,7 @@
 package com.sullung2yo.seatcatcher.jwt.provider;
 
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Map;
@@ -20,4 +21,5 @@ public interface TokenProvider {
     public String createToken(String subject, Map<String, ?> payload, TokenType tokenType);
     public List<String> refreshToken(String refreshToken);
     public String getProviderIdFromToken(String token);
+    Authentication getAuthenticationForWebSocket(String token);
 }

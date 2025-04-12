@@ -1,6 +1,8 @@
 package com.sullung2yo.seatcatcher.config;
 
 
+import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
@@ -14,6 +16,8 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -60,29 +64,26 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                 // CONNECT (WebSocket 연결 요청) 인지 확인
                 assert accessor != null;
+                log.debug("WebSocket {} 요청", accessor.getCommand());
+
+                // STOMP 헤더에서 Authorization 헤더 가져오기
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    log.debug("WebSocket CONNECT 요청");
-                    // STOMP 헤더에서 Authorization 헤더 가져오기
                     String authorizationHeader = accessor.getFirstNativeHeader("Authorization");
                     log.debug("Authorization Header: {}", authorizationHeader);
                     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                         // Bearer 떼기
                         String token = authorizationHeader.substring(7);
 
-                        // JWT 토큰 검증
-                        String providerId = tokenProvider.getProviderIdFromToken(token);
-                        log.debug("providerId: {}", providerId);
-
-                        // 사용자 조회
-                        Optional<User> optionalUser = userRepository.findByProviderId(providerId);
-                        if (optionalUser.isPresent()) {
+                        // 토큰 유효성 검사 및 인증 세션 생성
+                        Authentication authentication = tokenProvider.getAuthenticationForWebSocket(token);
+                        if (authentication != null) {
                             log.debug("WebSocket 인증 성공");
-                            accessor.addNativeHeader("ProviderId", providerId);
+                            accessor.setUser(authentication);
                         } else {
-                            throw new IllegalArgumentException("올바르지 않은 인증 정보입니다.");
+                            throw new TokenException("올바르지 않은 인증 정보입니다.", ErrorCode.INVALID_TOKEN);
                         }
                     } else {
-                        throw new IllegalArgumentException("올바르지 않은 인증 정보입니다.");
+                        throw new TokenException("올바르지 않은 인증 정보입니다.", ErrorCode.INVALID_TOKEN);
                     }
                 }
                 return message;

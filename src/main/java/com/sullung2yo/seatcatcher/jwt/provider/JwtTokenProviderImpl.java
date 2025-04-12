@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.user.domain.RefreshToken;
 import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.repository.RefreshTokenRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -16,6 +17,11 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -179,6 +185,27 @@ public class JwtTokenProviderImpl implements TokenProvider {
     public String getProviderIdFromToken(String token) {
         Claims payload = getPayloadFromToken(token); // JWT
         return payload.getSubject();
+    }
+
+    @Override
+    public Authentication getAuthenticationForWebSocket(String token) {
+        // JWT 토큰 검증
+        String providerId = this.getProviderIdFromToken(token);
+        log.debug("providerId: {}", providerId);
+
+        // 사용자 조회
+        Optional<User> optionalUser = userRepository.findByProviderId(providerId);
+        if (optionalUser.isEmpty()) {
+            log.error("{}에 해당하는 사용자를 찾을 수 없습니다.", providerId);
+            throw new TokenException("토큰에 담긴 사용자 정보가 유효하지 않습니다.", ErrorCode.USER_NOT_FOUND);
+        }
+
+        // 권한 정보가 있다면 포함
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.ROLE_USER.name()));
+
+        UserDetails principal = new org.springframework.security.core.userdetails.User(providerId, "", authorities);
+
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
     /**
