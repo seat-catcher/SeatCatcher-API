@@ -35,6 +35,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String name; // 사용자 이름 -> Random Nickname
 
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Provider provider; // 인증 제공자 (Enum)
