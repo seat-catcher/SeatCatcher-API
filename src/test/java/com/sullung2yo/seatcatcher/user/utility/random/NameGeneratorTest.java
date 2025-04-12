@@ -4,7 +4,6 @@ import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,6 +49,6 @@ class NameGeneratorTest {
 
         // Then
         assertNotEquals(originalName, user.getName());
-        userRepository.deleteAll();
+        userRepository.delete(user);
     }
 }

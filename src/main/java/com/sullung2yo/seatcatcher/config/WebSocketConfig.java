@@ -42,8 +42,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws") // WebSocket 기본 엔드포인트 (HTTP Request로 Websocket Handshake 진행하는 경로)
-                .setAllowedOriginPatterns("*"); // CORS 설정
+        registry.addEndpoint("/ws") // WebSocket Handshake 엔드포인트 (HTTP Request로 Websocket Handshake 진행하는 경로)
+                .setAllowedOriginPatterns("*"); // CORS 허용 (모든 도메인 허용)
     }
 
     @Override

@@ -49,7 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/health").permitAll() // 헬스체크 용 API 엔드포인트
                         .requestMatchers("/h2-console/**").permitAll() // h2-console 접근 허용
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/ws", "/queue/**", "/live/**").permitAll() // WebSocket 엔드포인트 접근 허용
+                        .requestMatchers("/ws/**").permitAll() // WebSocket 엔드포인트 접근 허용
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
