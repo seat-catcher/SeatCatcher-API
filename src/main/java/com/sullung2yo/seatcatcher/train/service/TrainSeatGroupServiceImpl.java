@@ -6,6 +6,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
     private final TrainSeatGroupRepository trainSeatGroupRepository;
 
     @Override
+    @Transactional
     public TrainSeatGroup create(TrainCar car, SeatGroupType groupType){
 
         TrainSeatGroup trainSeatGroup = TrainSeatGroup.builder()
@@ -67,12 +69,14 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
     }
 
     @Override
+    @Transactional
     public void update(TrainSeatGroup trainSeatGroup) {
         throw new UnsupportedOperationException("Not supported yet.");
         // 우선순위가 높지 않으므로 일단 미구현
     }
 
     @Override
+    @Transactional
     public void delete(TrainSeatGroup trainSeatGroup) {
         throw new UnsupportedOperationException("Not supported yet.");
         // 우선순위가 높지 않으므로 일단 미구현
