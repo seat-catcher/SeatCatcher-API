@@ -2,9 +2,11 @@ package com.sullung2yo.seatcatcher.user.service;
 
 import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.config.exception.UserException;
+import com.sullung2yo.seatcatcher.user.converter.ReportConverter;
 import com.sullung2yo.seatcatcher.user.domain.Report;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.dto.request.ReportRequest;
+import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
 import com.sullung2yo.seatcatcher.user.repository.ReportRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,12 +33,16 @@ class ReportServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ReportConverter reportConverter;
 
     @InjectMocks
     private ReportServiceImpl reportService; // 위의 Mock이 주입될 실제 테스트 대상
 
     private Report report1;
     private Report report2;
+    private ReportResponse response1;
+    private ReportResponse response2;
     private User userA;
     private User userB;
 
@@ -45,30 +51,60 @@ class ReportServiceImplTest {
     @BeforeEach
     void setUp() {
         //임이의 유저 생성
-        userA = new User(null, null, null, null, null, null, null, null, null, null,null);
-        userB = new User(null, null, null, null, null, null, null, null, null, null,null);
+        userA = User.builder()
+                .name("유저1")
+                .build();
+        userB = User.builder()
+                .name("유저2")
+                .build();
 
-        report1 = new Report(userA, userB, "유저 A가 B를 신고");
-        report2 = new Report(userB, userA, "유저 B가 A를 신고");
+        report1 = Report.builder()
+                .reportUser(userA)
+                .reportedUser(userB)
+                .reason("유저 A가 B를 신고")
+                .build();
+        report2 = Report.builder()
+                .reportUser(userB)
+                .reportedUser(userA)
+                .reason("유저 B가 A를 신고")
+                .build();
+
+        response1 = ReportResponse.builder()
+                .reportUserId(1L)
+                .reportedUserId(2L)
+                .reportUserName("유저1")
+                .reportedUserName("유저2")
+                .reason("유저 A가 B를 신고")
+                .build();
+
+        response2 = ReportResponse.builder()
+                .reportUserId(2L)
+                .reportedUserId(1L)
+                .reportUserName("유저2")
+                .reportedUserName("유저1")
+                .reason("유저 B가 A를 신고")
+                .build();
+
 
         //report 생성
         request = new ReportRequest(1L, 2L, "욕설 신고");
     }
 
-//    @Test
-//    void getAllReports() {
-//        // given
-//        List<Report> mockReports = Arrays.asList(report1, report2);
-//        when(reportRepository.findAll()).thenReturn(mockReports); // Mock 객체의 동작 지정
-//
-//        // when
-//        List<ReportResponse> result = reportService.getAllReports();
-//
-//        // then
-//        assertThat(result).hasSize(2);
-//        assertThat(result).contains(report1, report2);
-//        verify(reportRepository, times(1)).findAll(); // findAll이 한 번 호출됐는지 검증
-//    }
+    @Test
+    void getAllReports() {
+        // given
+        List<Report> mockReports = Arrays.asList(report1, report2);
+        when(reportRepository.findAll()).thenReturn(mockReports); // Mock 객체의 동작 지정
+
+        // when
+        when(reportConverter.toResponseList(mockReports)).thenReturn(List.of(response1, response2));
+        List<ReportResponse> result = reportService.getAllReports();
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result).contains(response1, response2);
+        verify(reportRepository, times(1)).findAll(); // findAll이 한 번 호출됐는지 검증
+    }
 
     // TODO :: TEST 코드 작성 중
 
