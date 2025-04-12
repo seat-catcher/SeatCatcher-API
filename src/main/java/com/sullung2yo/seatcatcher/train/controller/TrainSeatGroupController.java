@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/trains/{trainId}/cars/{carId}/seat-groups")
+@Tag(name = "좌석 그룹 API", description = "좌석 그룹 관련 API")
 public class TrainSeatGroupController {
 
     private final TrainSeatGroupService trainSeatGroupService;

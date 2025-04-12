@@ -42,6 +42,15 @@ public enum Line {
     private final String name;
 
     public static Line findByName(String name) {
+        try
+        {
+            return Line.valueOf(name);
+        }
+        catch (IllegalArgumentException e)
+        {
+            // 무시하고 다음 로직 수행.
+        }
+
         for (Line line : Line.values()) {
             if (line.getName().equals(name)) {
                 return line;
