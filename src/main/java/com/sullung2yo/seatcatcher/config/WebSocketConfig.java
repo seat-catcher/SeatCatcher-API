@@ -1,40 +1,111 @@
 package com.sullung2yo.seatcatcher.config;
 
 
-import com.sullung2yo.seatcatcher.jwt.filter.JwtChannelInterceptor;
+import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
+import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
+import java.util.Optional;
+
+@Slf4j
 @Configuration
 @EnableWebSocketMessageBroker // WebSocket Broker 활성화 (SpringBoot가 WebSocket을 지원하도록 활성화)
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtChannelInterceptor jwtChannelInterceptor;
+    private final TokenProvider tokenProvider;
+    private final UserRepository userRepository;
 
-    public WebSocketConfig(JwtChannelInterceptor jwtChannelInterceptor) {
-        this.jwtChannelInterceptor = jwtChannelInterceptor;
+    public WebSocketConfig(TokenProvider tokenProvider, UserRepository userRepository) {
+        this.tokenProvider = tokenProvider;
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        registry.setMessageSizeLimit(4 * 8192); // 메세지 크기 제한 (4KB)
+        registry.setTimeToFirstMessage(30000); // 클라이언트가 서버에 연결할 때, 첫 메세지를 보내기까지의 시간 제한 (30초)
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws") // WebSocket 기본 엔드포인트 (HTTP Request로 Handshake 진행하는 경로)
-                .setAllowedOrigins("*"); // CORS 설정
+        registry.addEndpoint("/ws") // WebSocket 기본 엔드포인트 (HTTP Request로 Websocket Handshake 진행하는 경로)
+                .setAllowedOriginPatterns("*"); // CORS 설정
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(jwtChannelInterceptor);
+        registration.interceptors(new ChannelInterceptor() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                // STOMP 헤더 정보 가져오기
+                log.debug("WebSocket preSend 호출");
+                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(
+                        message, StompHeaderAccessor.class
+                );
+                log.debug("WebSocket preSend accessor: {}", accessor);
+
+                // CONNECT (WebSocket 연결 요청) 인지 확인
+                assert accessor != null;
+                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                    log.debug("WebSocket CONNECT 요청");
+                    // STOMP 헤더에서 Authorization 헤더 가져오기
+                    String authorizationHeader = accessor.getFirstNativeHeader("Authorization");
+                    log.debug("Authorization Header: {}", authorizationHeader);
+                    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                        // Bearer 떼기
+                        String token = authorizationHeader.substring(7);
+
+                        // JWT 토큰 검증
+                        String providerId = tokenProvider.getProviderIdFromToken(token);
+                        log.debug("providerId: {}", providerId);
+
+                        // 사용자 조회
+                        Optional<User> optionalUser = userRepository.findByProviderId(providerId);
+                        if (optionalUser.isPresent()) {
+                            log.debug("WebSocket 인증 성공");
+                            accessor.addNativeHeader("ProviderId", providerId);
+                        } else {
+                            throw new IllegalArgumentException("올바르지 않은 인증 정보입니다.");
+                        }
+                    } else {
+                        throw new IllegalArgumentException("올바르지 않은 인증 정보입니다.");
+                    }
+                }
+                return message;
+            }
+        });
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/sub"); // 구독 요청
-        config.setApplicationDestinationPrefixes("/pub"); // 발행
-    }
+        /*
+        Enable Simple Broker (브로커 경로 설정 - 구독 경로)
+        - 내장 메세지 브로커를 활성화
+         */
+        config.enableSimpleBroker("/topic");
 
+        /*
+        - 클라이언트가 서버로 메세지 보낼 때 사용할 접두사 -> /app (destination: /app/...)
+        - 클라이언트에서 /app/** 경로로 메세지를 보내면, 해당 메세지가 @MessageMapping 어노테이션이 붙은 메소드로 전달된다.
+        - 예를 들어, /ws으로 WebSocket 연결된 상태에서, /pub/hello 경로로 메세지를 전달하면
+        - @MessageMapping("/hello") 어노테이션이 붙은 메소드로 전달된다.
+        - 서버는 내부 로직 처리 후에, /topic/... 이나 /queue/... 경로로 메세지를 전달한다.
+         */
+        config.setApplicationDestinationPrefixes("/app");
+    }
 
 }
