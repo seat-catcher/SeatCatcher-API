@@ -5,20 +5,27 @@ import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @Slf4j
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class NameGeneratorTest {
 
-    @Autowired
+    @Mock
     private UserRepository userRepository;
 
-    @Autowired
+    @InjectMocks
     private NameGenerator nameGenerator;
+
     private static final String originalName = "originalName";
 
     @Test
@@ -41,7 +48,7 @@ class NameGeneratorTest {
                 .providerId("testProviderId")
                 .name(originalName)
                 .build();
-        userRepository.save(user);
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // When
         user.setName(randomName);
@@ -49,6 +56,6 @@ class NameGeneratorTest {
 
         // Then
         assertNotEquals(originalName, user.getName());
-        userRepository.delete(user);
+        verify(userRepository, times(1)).save(any(User.class)); // userRepository.save() 메서드가 한 번 호출되었는지 검증
     }
 }
