@@ -85,7 +85,7 @@ public class TrainSeatController {
             ),
             responses = {
                     @ApiResponse(
-                            responseCode = "201",
+                            responseCode = "200",
                             description = "성공적으로 변경 완료"
                     ),
                     @ApiResponse(
