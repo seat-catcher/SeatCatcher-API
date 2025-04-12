@@ -1,8 +1,10 @@
 package com.sullung2yo.seatcatcher.train.service;
 
-import com.sullung2yo.seatcatcher.train.dto.response.TrainLocationResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.LiveTrainLocationResponse;
+
+import java.util.List;
 
 public interface TrainService {
-    TrainLocationResponse getLocationForLine(String lineNumber);
-    TrainLocationResponse filterTrainByTrainNumber(TrainLocationResponse response, String trainNumber);
+    List<LiveTrainLocationResponse> fetchLiveTrainLocation(String lineNumber);
+    void saveLiveTrainLocation();
 }
