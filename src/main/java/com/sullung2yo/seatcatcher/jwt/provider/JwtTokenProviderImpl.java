@@ -89,7 +89,7 @@ public class JwtTokenProviderImpl implements TokenProvider {
                         .build();
                 refreshTokenRepository.save(refreshToken);
             } else {
-                log.error("User with id {} not found", providerId);
+                log.error("{}인 사용자를 찾을 수 없습니다.", providerId);
                 throw new TokenException("토큰에 담긴 사용자 정보가 유효하지 않습니다.", ErrorCode.USER_NOT_FOUND);
             }
         }
@@ -175,7 +175,8 @@ public class JwtTokenProviderImpl implements TokenProvider {
         }
     }
 
-    private String getProviderIdFromToken(String token) {
+    @Override
+    public String getProviderIdFromToken(String token) {
         Claims payload = getPayloadFromToken(token); // JWT
         return payload.getSubject();
     }

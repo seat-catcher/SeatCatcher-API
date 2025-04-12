@@ -8,6 +8,7 @@ import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.dto.request.AppleAuthRequest;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
+import com.sullung2yo.seatcatcher.user.utility.random.NameGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,9 @@ class AppleAuthTest {
     private JwtTokenProviderImpl jwtTokenProvider; // jwtTokenProvider 의존 Mocking
 
     @Mock
+    private NameGenerator nameGenerator; // 랜덤 이름 생성기 Mocking
+
+    @Mock
     private WebClient.Builder webClientBuilder; // webClient 사용해서 apple 서버와 통신, 테스트 환경에서는 불가 -> Mocking
 
     @Mock
@@ -44,7 +48,7 @@ class AppleAuthTest {
     @BeforeEach
     void setUp() {
         when(webClientBuilder.build()).thenReturn(webClient); // webClientBuilder.build() 호출 시 Mocked webClient 반환하도록 설정
-        authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder); // 테스트 대상 인스턴스 생성
+        authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder, nameGenerator); // 테스트 대상 인스턴스 생성
         ReflectionTestUtils.setField(authService, "appleClientId", "com.example.app"); // 테스트 appleClientId 설정
     }
 
