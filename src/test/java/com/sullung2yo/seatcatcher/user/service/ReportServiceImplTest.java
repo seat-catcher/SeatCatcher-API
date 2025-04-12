@@ -1,5 +1,7 @@
 package com.sullung2yo.seatcatcher.user.service;
 
+import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.config.exception.UserException;
 import com.sullung2yo.seatcatcher.user.domain.Report;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.dto.request.ReportRequest;
@@ -18,8 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class) // JUnit 5에서 Mockito 사용을 위한 설정
@@ -61,7 +62,7 @@ class ReportServiceImplTest {
 //        when(reportRepository.findAll()).thenReturn(mockReports); // Mock 객체의 동작 지정
 //
 //        // when
-////        List<Report> result = reportService.getAllReports();
+//        List<ReportResponse> result = reportService.getAllReports();
 //
 //        // then
 //        assertThat(result).hasSize(2);
@@ -91,11 +92,14 @@ class ReportServiceImplTest {
         // given
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
+
         // when & then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        UserException exception = assertThrows(UserException.class,
                 () -> reportService.createReport(request));
 
-        assertTrue(exception.getMessage().contains("사용자를 찾을 수 없습니다."));
+        assertTrue(exception.getMessage().contains("해당 id를 가진 사용자를 찾을 수 없습니다."));
+        assertTrue(exception.getMessage().contains("id : 1"));
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode()); // ErrorCode 검증
     }
 
     @Test
@@ -106,9 +110,11 @@ class ReportServiceImplTest {
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
         // when & then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        UserException exception = assertThrows(UserException.class,
                 () -> reportService.createReport(request));
 
-        assertTrue(exception.getMessage().contains("사용자를 찾을 수 없습니다."));
+        assertTrue(exception.getMessage().contains("해당 id를 가진 사용자를 찾을 수 없습니다."));
+        assertTrue(exception.getMessage().contains("id : 2"));
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode()); // ErrorCode 검증
     }
 }
