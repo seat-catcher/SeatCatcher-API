@@ -152,7 +152,6 @@ public class UserTrainSeatControllerTest {
         //Given
         UserTrainSeatRequest request = UserTrainSeatRequest.builder()
                 .seatId(seat.getId())
-                .userId(user.getId())
                 .build();
         //When
         mockMvc.perform(post("/user/seats")
@@ -178,7 +177,6 @@ public class UserTrainSeatControllerTest {
         //Given
         UserTrainSeatRequest request = UserTrainSeatRequest.builder()
                 .seatId(seat.getId())
-                .userId(user.getId())
                 .build();
 
         mockMvc.perform(post("/user/seats")

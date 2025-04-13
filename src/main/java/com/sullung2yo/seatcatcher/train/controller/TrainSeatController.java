@@ -69,7 +69,7 @@ public class TrainSeatController {
             return ResponseEntity.ok(responses);
         }
         catch (EntityNotFoundException e) {
-            log.error("그룹에 속한 좌석이 없음.");
+            log.info("그룹에 속한 좌석이 없음.");
             return ResponseEntity.noContent().build();
         }
     }

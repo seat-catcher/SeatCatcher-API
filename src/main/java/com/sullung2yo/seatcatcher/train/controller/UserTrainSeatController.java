@@ -57,7 +57,7 @@ public class UserTrainSeatController {
         }
         catch(EntityNotFoundException e)
         {
-            log.error("해당 유저는 착석 정보가 없습니다.");
+            log.info("해당 유저는 착석 정보가 없습니다.");
             return ResponseEntity.noContent().build();
         }
     }
@@ -97,7 +97,7 @@ public class UserTrainSeatController {
         }
         catch(EntityNotFoundException e)
         {
-            log.error("해당 좌석 ID를 찾을 수 없음");
+            log.error("해당 좌석 ID({})를 찾을 수 없음", userTrainSeatRequest.getSeatId());
             return ResponseEntity.notFound().build();
         }
     }

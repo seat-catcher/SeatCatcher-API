@@ -54,7 +54,7 @@ public class TrainSeatGroupController {
         }
 
         if(responses.isEmpty()) {
-            log.error("해당 차량 ID를 찾을 수 없음");
+            log.error("해당 차량 ID({})를 찾을 수 없음", carId);
             return ResponseEntity.notFound().build();
         }
 
