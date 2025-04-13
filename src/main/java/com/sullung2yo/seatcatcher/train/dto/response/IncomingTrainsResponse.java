@@ -16,11 +16,11 @@ import lombok.ToString;
 public class IncomingTrainsResponse {
 
     @JsonProperty("ordkey")
-    @Schema(description = "도착 예정 열차 순번", example = "1")
+    @Schema(description = "도착 예정 열차 순번", example = "11002온수0 -> 상하행코드1자리, 순번1자리, 현재역3자리, 목적지정류장, 급행코드1자리\n 12004석남0 -> 하행/두번째열차/002번역/석남행/급행아님")
     private String arrivalTrainOrder; // ordkey
 
     @JsonProperty("barvlDt")
-    @Schema(description = "도착 예정 시간", example = "2023-10-01T12:00:00")
+    @Schema(description = "도착 예정 시간", example = "180(초)")
     private String arrivalTime; // barvlDt
 
     @JsonProperty("bstatnNm")

@@ -4,9 +4,14 @@ import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.config.exception.SubwayException;
 import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
+import com.sullung2yo.seatcatcher.subway_station.dto.response.SubwayStationResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
 import com.sullung2yo.seatcatcher.subway_station.utility.StationNameMapper;
 import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +32,33 @@ public class TrainController {
     private final SubwayStationService subwayStationService;
 
     @GetMapping("/incomings")
+    @Operation(
+            summary = "실시간 지하철 도착 정보 반환 API",
+            description = "쿼리 파라미터에 전달된 노선 번호와 출발역을 기준으로 실시간 지하철 도착 정보를 반환합니다.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 접근 열차 정보 반환",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SubwayStationResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "접근하는 열차가 없는 경우"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "잘못된 요청"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "인증 실패"
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "서버 오류"
+                    )
+            }
+    )
     public ResponseEntity<List<IncomingTrainsResponse>> getIncomingTrains(
             @NonNull @RequestParam String lineNumber, // 노선번호 (1, 2, 3, 4, 5, 6, 7, 8, 9)
             @NonNull @RequestParam String dep, // 출발역
