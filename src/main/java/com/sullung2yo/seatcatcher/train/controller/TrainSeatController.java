@@ -65,10 +65,11 @@ public class TrainSeatController {
                 // UserService 에 서비스를 요청해서 해당 유저를 id 를 통해 검색해서 필요한 내용 채워 넣을 것.
                 // PathHistory 에 서비스를 요청해서 해당 유저 id 를 통해 modified_at 이 제일 최근인걸 가져와서 필요한 내용 채워 넣을 것.
             }
-
+            log.debug("성공적으로 TrainSeat들 Cascade하게 반환 완료");
             return ResponseEntity.ok(responses);
         }
         catch (EntityNotFoundException e) {
+            log.error("그룹에 속한 좌석이 없음.");
             return ResponseEntity.noContent().build();
         }
     }
@@ -109,11 +110,18 @@ public class TrainSeatController {
         try
         {
             trainSeatService.update(seatId, trainSeatRequest);
+            log.debug("성공적으로 변경 완료");
             return ResponseEntity.ok().build();
         }
         catch(EntityNotFoundException e)
         {
+            log.error("해당 좌석을 찾을 수 없음");
             return ResponseEntity.notFound().build();
+        }
+        catch (Exception e)
+        {
+            log.error("잘못된 요청 데이터");
+            return ResponseEntity.badRequest().build();
         }
     }
 }

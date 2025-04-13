@@ -65,6 +65,7 @@ public class SubwayStationController {
             List<SubwayStation> records = subwayStationService.findWith(keyword, lineToSearch, order);
 
             if(records == null || records.isEmpty()) {
+                log.error("조건을 만족하는 역이 없음");
                 return ResponseEntity.noContent().build();
             }
 
@@ -72,10 +73,12 @@ public class SubwayStationController {
             {
                 responses.add(new SubwayStationResponse(record));
             }
+            log.debug("성공적으로 역 정보들 반환 완료");
             return ResponseEntity.ok(responses);
         }
-        catch (SubwayLineNotFoundException e)
+        catch (Exception e)
         {
+            log.error("잘못된 요청");
             return ResponseEntity.badRequest().build();
         }
     }
@@ -102,12 +105,14 @@ public class SubwayStationController {
     {
         try
         {
+            log.debug("성공적으로 역 정보 반환 완료");
             return ResponseEntity.ok(
                     new SubwayStationResponse(subwayStationService.findById(stationId))
             );
         }
         catch(EntityNotFoundException e)
         {
+            log.error("해당 ID를 가진 역을 찾을 수 없음");
             return ResponseEntity.notFound().build();
         }
     }

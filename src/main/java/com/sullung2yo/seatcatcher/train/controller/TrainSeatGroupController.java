@@ -34,6 +34,10 @@ public class TrainSeatGroupController {
                             responseCode = "200",
                             description = "성공적으로 TrainSeatGroup들 반환",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = TrainSeatGroupResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "해당 차량 ID를 찾을 수 없음"
                     )
             }
     )
@@ -49,6 +53,12 @@ public class TrainSeatGroupController {
             responses.add(new TrainSeatGroupResponse(record));
         }
 
+        if(responses.isEmpty()) {
+            log.error("해당 차량 ID를 찾을 수 없음");
+            return ResponseEntity.notFound().build();
+        }
+
+        log.debug("성공적으로 TrainSeatGroup들 반환");
         return ResponseEntity.ok(responses);
     }
 
