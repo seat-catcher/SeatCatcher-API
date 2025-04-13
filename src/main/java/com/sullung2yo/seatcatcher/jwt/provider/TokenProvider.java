@@ -21,5 +21,13 @@ public interface TokenProvider {
     public String createToken(String subject, Map<String, ?> payload, TokenType tokenType);
     public List<String> refreshToken(String refreshToken);
     public String getProviderIdFromToken(String token);
+
+    /**
+     * WebSocket 연결 시 주어진 토큰을 검증하고,
+     * 유효한 경우에는 해당 토큰에 포함된 사용자 정보를 기반으로 Authentication 객체를 반환하는 함수
+     * 반환한 Authentication 객체는 WebSocket 세션 인증에 사용됩니다.
+     * @param token 검증할 Access Token
+     * @return 유효한 토큰에 대한 Authentication 객체
+     */
     Authentication getAuthenticationForWebSocket(String token);
 }

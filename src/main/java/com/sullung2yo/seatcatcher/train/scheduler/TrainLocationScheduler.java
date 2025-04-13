@@ -21,19 +21,25 @@ import java.util.List;
 public class TrainLocationScheduler {
 
     private final TrainService trainService;
+    private static final List<String> lineNumbers = List.of("2호선", "7호선");
 
     @Scheduled(fixedRate = 10000) // 10초마다 실행
     public void fetchAndStoreTrainLocation() {
         // 서울시 지하철 실시간 도착 정보 조회
         log.debug("서울시 전체 지하철 실시간 열차 위치 정보 수집 작업 시작");
-        List<LiveTrainLocationResponse> result = trainService.fetchLiveTrainLocation("2호선");
-        for (LiveTrainLocationResponse response : result) {
-            log.debug("{}, {}, {}", response.getTrainNumber(), response.getTrainStatus(), response);
+        for (String lineNumber : lineNumbers) {
+            log.debug("지하철 {} 실시간 열차 위치 정보 수집 시작", lineNumber);
+            List<LiveTrainLocationResponse> result = trainService.fetchLiveTrainLocation(lineNumber).block();
+            if (result == null) {
+                log.error("{} 실시간 열차 위치 정보 수집 작업 실패", lineNumber);
+            } // null이 아니고, result가 Empty인 경우에는 정상 처리 => 새벽 시간대에는 아무 열차가 없으니까 정상 상태라고 보면 됨
+            else {
+                for (LiveTrainLocationResponse response : result) {
+                    log.debug("{}, {}, {}", response.getTrainNumber(), response.getTrainStatus(), response);
+                    // TODO : 여기에다가 DB에 저장하는 로직을 추가해야함
+                }
+            }
         }
-
-        log.debug("가져온 데이터 저장 작업 시작");
-        trainService.saveLiveTrainLocation();
-        log.debug("가져온 데이터 저장 작업 완료");
     }
 
 }
