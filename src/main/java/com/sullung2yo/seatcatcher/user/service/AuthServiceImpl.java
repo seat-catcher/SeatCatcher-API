@@ -126,6 +126,7 @@ public class AuthServiceImpl implements AuthService {
                 .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                 .retrieve()
                 .bodyToMono(KakaoUserDataResponse.class)
+                .doOnError(throwable -> log.error(throwable.getMessage(), throwable))
                 .block();
 
         if (response == null) {

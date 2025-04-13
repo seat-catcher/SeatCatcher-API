@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 @Slf4j
 @Service
 public class TrainServiceImpl implements TrainService {
@@ -41,22 +42,16 @@ public class TrainServiceImpl implements TrainService {
 
     @Override
     public Mono<List<LiveTrainLocationResponse>> fetchLiveTrainLocation(String lineNumber) {
-        try {
-            String LIVE_TRAIN_LOCATION_API_URL = "http://swopenAPI.seoul.go.kr/api/subway/" + liveApiKey + "/json/realtimePosition/0/100/";
-            log.debug("실시간 열차 위치 정보 API 호출");
-            return webClient.get()
-                    .uri(LIVE_TRAIN_LOCATION_API_URL + lineNumber)
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .flatMap(response -> Mono.just(parseResponse(response)))
-                    .onErrorReturn(Collections.emptyList());
-
-        } catch (RuntimeException e) {
-            log.error("실시간 열차 위치 정보 API 호출 작업 중, 에러 발생 : {}", e.getMessage());
-            return Mono.empty(); // API 호출 실패 시 빈 리스트 반환
-        } finally {
-            log.debug("실시간 열차 위치 정보 API 호출 완료");
-        }
+        String LIVE_TRAIN_LOCATION_API_URL = "http://swopenAPI.seoul.go.kr/api/subway/" + liveApiKey + "/json/realtimePosition/0/100/";
+        log.debug("실시간 열차 위치 정보 API 호출");
+        return webClient.get()
+                .uri(LIVE_TRAIN_LOCATION_API_URL + lineNumber)
+                .retrieve()
+                .bodyToMono(String.class)
+                .flatMap(response -> Mono.just(parseResponse(response)))
+                .doOnError(e -> log.error("API 호출 중 오류 발생", e))
+                .doFinally(signal -> log.debug("실시간 열차 위치 정보 API 호출 완료")) // Reactive 방식에서는 try-catch를 사용하지 않고, 이런식으로 처리
+                .onErrorReturn(Collections.emptyList());
     }
 
     @Override
