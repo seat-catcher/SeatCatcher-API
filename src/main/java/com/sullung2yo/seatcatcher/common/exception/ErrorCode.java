@@ -16,7 +16,10 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
     SUBWAY_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철을 찾을 수 없습니다."),
     SUBWAY_STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철 역을 찾을 수 없습니다."),
-    PATH_HISTORY_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 이력에 접근할 수 없습니다.");
+    PATH_HISTORY_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 이력에 접근할 수 없습니다."),
+    SUBWAY_LINE_MISMATCH(HttpStatus.BAD_REQUEST, "출발역과 도착역의 노선이 다릅니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    SUBWAY_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

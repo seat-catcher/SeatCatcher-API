@@ -23,6 +23,7 @@ public class IncomingTrainsResponse {
 
     @JsonProperty("barvlDt")
     @Schema(description = "도착 예정 시간", example = "180(초)")
+
     private String arrivalTime; // barvlDt
 
     @JsonProperty("bstatnNm")
