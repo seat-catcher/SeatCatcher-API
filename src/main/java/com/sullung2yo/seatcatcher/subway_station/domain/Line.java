@@ -20,24 +20,14 @@ public enum Line {
     LINE_8("8"),
     LINE_9("9"),
 
-    BUNDANG("분당선"),
-    SUIN("수인선"),
-    SUIN_BUNDANG("수인·분당선"),
-    GYEONGUI("경의선"),
-    GYEONGCHUN("경춘선"),
-    GYEONGWON("경원선"),
-    GYEONGBU("경부선"),
-    JUNGANG("중앙선"),
-    AIRPORT("공항철도"),
-    SHINBUNDANG("신분당선"),
-    UI_LINE("의정부경전철"),
-    EVERLINE("용인경전철"),
-    UI_SINSEOL("우이신설선"),
-    SEOHAE("서해선"),
-    INCHEON_LINE_1("인천1호선"),
-    INCHEON_LINE_2("인천2호선"),
-    GIMPO_GOLDLINE("김포골드라인"),
-    SILLIM("신림선");
+    SUIN_BUNDANG("75"),
+    GYEONGUI("63"),
+    GYEONGCHUN("67"),
+    JUNGANG("61"),
+    AIRPORT("65"),
+    SHINBUNDANG("77"),
+    UI_SINSEOL("92"),
+    SEOHAE("93");
 
     private final String name;
 
@@ -57,5 +47,13 @@ public enum Line {
             }
         }
         throw new SubwayLineNotFoundException("지하철 노선 정보를 찾을 수 없습니다. : " + name, ErrorCode.SUBWAY_LINE_NOT_FOUND);
+    }
+
+    public static String convertForIncomingTrains(String name) {
+        try {
+            return String.valueOf(Long.parseLong(name) + 1000);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("노선 번호를 4자리 정수로 변환 중 오류가 발생했습니다. : {}", e);
+        }
     }
 }

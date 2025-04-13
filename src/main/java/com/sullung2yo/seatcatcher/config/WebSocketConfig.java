@@ -4,8 +4,6 @@ package com.sullung2yo.seatcatcher.config;
 import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
-import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -29,11 +27,9 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TokenProvider tokenProvider;
-    private final UserRepository userRepository;
 
-    public WebSocketConfig(TokenProvider tokenProvider, UserRepository userRepository) {
+    public WebSocketConfig(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
-        this.userRepository = userRepository;
     }
 
     @Override
