@@ -34,10 +34,7 @@ public class TrainLocationScheduler {
                 log.error("{} 실시간 열차 위치 정보 수집 작업 실패", lineNumber);
             } // null이 아니고, result가 Empty인 경우에는 정상 처리 => 새벽 시간대에는 아무 열차가 없으니까 정상 상태라고 보면 됨
             else {
-                for (LiveTrainLocationResponse response : result) {
-                    log.debug("{}, {}, {}", response.getTrainNumber(), response.getTrainStatus(), response);
-                    // TODO : 여기에다가 DB에 저장하는 로직을 추가해야함
-                }
+                trainService.saveLiveTrainLocation(result);
             }
         }
     }

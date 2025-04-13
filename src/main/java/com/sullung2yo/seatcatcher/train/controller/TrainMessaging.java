@@ -15,7 +15,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class TrainMessaging {
 
-    // private final TrainService trainService;
+    private final TrainService trainService;
     private final SimpMessagingTemplate messagingTemplate;
 
 

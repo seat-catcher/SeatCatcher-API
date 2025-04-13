@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.train.dto.response.LiveTrainLocationResponse;
 import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
 import jakarta.transaction.Transactional;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class TrainServiceImpl implements TrainService {
     }
 
     @Override
-    public Mono<List<LiveTrainLocationResponse>> fetchLiveTrainLocation(String lineNumber) {
+    public Mono<List<LiveTrainLocationResponse>> fetchLiveTrainLocation(@NonNull String lineNumber) {
         String LIVE_TRAIN_LOCATION_API_URL = "http://swopenAPI.seoul.go.kr/api/subway/" + liveApiKey + "/json/realtimePosition/0/100/";
         log.debug("실시간 열차 위치 정보 API 호출");
         return webClient.get()
@@ -56,7 +57,15 @@ public class TrainServiceImpl implements TrainService {
 
     @Override
     @Transactional
-    public void saveLiveTrainLocation() {
+    public void saveLiveTrainLocation(@NonNull List<LiveTrainLocationResponse> liveTrainLocationResponse) {
+        if (liveTrainLocationResponse.isEmpty()) {
+            log.info("저장할 데이터가 없습니다.");
+            return;
+        }
+
+        log.debug("실시간 열차 위치 정보 DB 저장");
+        // DB가 아니라 Redis에 저장하는게 더 좋을 것 같음..
+
     }
 
     private List<LiveTrainLocationResponse> parseResponse(String liveTrainLocation) {
