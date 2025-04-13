@@ -49,9 +49,12 @@ public class TrainServiceImpl implements TrainService {
                 .uri(LIVE_TRAIN_LOCATION_API_URL + lineNumber)
                 .retrieve()
                 .bodyToMono(String.class)
-                .flatMap(response -> Mono.just(parseResponse(response)))
+                .flatMap(response -> {
+                    log.debug("API 응답: {}", response);
+                    return Mono.just(parseResponse(response));
+                })
                 .doOnError(e -> log.error("API 호출 중 오류 발생", e))
-                .doFinally(signal -> log.debug("실시간 열차 위치 정보 API 호출 완료")) // Reactive 방식에서는 try-catch를 사용하지 않고, 이런식으로 처리
+                .doFinally(signal -> log.debug("실시간 열차 위치 정보 API 호출 완료"))
                 .onErrorReturn(Collections.emptyList());
     }
 
@@ -78,8 +81,9 @@ public class TrainServiceImpl implements TrainService {
             JsonNode rootNode = objectMapper.readTree(liveTrainLocation);
             JsonNode errorMessage = rootNode.path("errorMessage");
             String code = errorMessage.path("code").asText();
+            log.debug("API 응답 코드: {}", code);
 
-            if (!code.equals("INFO-000") && !code.equals("INFO-200")) {
+            if (code.isEmpty() || (!code.equals("INFO-000") && !code.equals("INFO-200"))) {
                 log.warn("API 응답 코드가 유효하지 않음: {}", code);
                 return Collections.emptyList(); // 유효하지 않은 코드인 경우 빈 리스트 반환
             }
