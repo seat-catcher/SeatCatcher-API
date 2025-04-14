@@ -1,5 +1,16 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.SubwayStationException;
+import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.subway_station.converter.PathHistoryConverter;
+import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
+import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
+import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
+import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
+import com.sullung2yo.seatcatcher.subway_station.repository.SubwayStationRepository;
+import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,4 +19,27 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PathHistoryServiceImpl implements PathHistoryService{
+
+    private final UserRepository userRepository;
+    private final PathHistoryRepository pathHistoryRepository;
+    private final SubwayStationRepository subwayStationRepository;
+    private final PathHistoryConverter pathHistoryConverter;
+
+    @Override
+    public void addPathHistory(PathHistoryRequest request) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + request.getUserId(), ErrorCode.USER_NOT_FOUND));
+
+        SubwayStation startStation = subwayStationRepository.findById(request.getStartStationId())
+                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없스니다. : "+request.getStartStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+
+        SubwayStation endStation = subwayStationRepository.findById(request.getEndStationId())
+                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없스니다. : "+request.getEndStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+
+
+        PathHistory newPathHistory = pathHistoryConverter.toPathHistory(user, startStation, endStation);
+        newPathHistory.calculateExpectedArrivalTime(startStation,endStation);
+
+        pathHistoryRepository.save(newPathHistory);
+    }
 }

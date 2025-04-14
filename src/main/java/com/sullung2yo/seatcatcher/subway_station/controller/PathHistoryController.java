@@ -1,12 +1,14 @@
 package com.sullung2yo.seatcatcher.subway_station.controller;
 
-import com.sullung2yo.seatcatcher.config.exception.dto.ErrorResponse;
-import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
+import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
+import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
+import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "과거 경로 API", description = "과거 경로 API")
 public class PathHistoryController {
 
+    private final PathHistoryService pathHistoryService;
+
     @PostMapping("/")
     @Operation(
             summary = "path history 생성 API",
@@ -26,10 +30,9 @@ public class PathHistoryController {
 
     )
     @ApiResponse(responseCode = "200", description = "path history 생성 성공")
-    public ResponseEntity<?> postPathHistory() {
-
-//        return ResponseEntity.ok(response);
-        return null;
+    public ResponseEntity<?> postPathHistory(@Valid @RequestBody PathHistoryRequest request) {
+        pathHistoryService.addPathHistory(request);
+        return ResponseEntity.ok("pathHistory가 생성되었습니다.");
     }
     @GetMapping("/")
     @Operation(
@@ -50,7 +53,7 @@ public class PathHistoryController {
             description = "특정 path history를 가져옵니다..)"
 
     )
-    @ApiResponse(responseCode = "200", description = "path history 생성 성공")
+    @ApiResponse(responseCode = "200", description = "특정 path history 가져오기 성공")
     public ResponseEntity<?> getPathHistory(@PathVariable("path_id") Long pathId) {
 
 //        return ResponseEntity.ok(response);
