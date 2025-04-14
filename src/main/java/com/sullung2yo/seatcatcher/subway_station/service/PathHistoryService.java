@@ -5,5 +5,9 @@ import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryRespons
 
 public interface PathHistoryService {
     void addPathHistory(PathHistoryRequest request);
-    PathHistoryResponse getPathHistory(Long pathId);
+    PathHistoryResponse.PathHistoryInfoResponse getPathHistory(Long pathId);
+
+    PathHistoryResponse.PathHistoryList getAllPathHistory(int size, Long pathId);
+
+    void deletPathHistory(Long pathId);
 }

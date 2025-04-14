@@ -3,10 +3,12 @@ package com.sullung2yo.seatcatcher.subway_station.converter;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
+import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Component
 public class PathHistoryConverterImpl implements PathHistoryConverter{
@@ -23,8 +25,8 @@ public class PathHistoryConverterImpl implements PathHistoryConverter{
     }
 
     @Override
-    public PathHistoryResponse toResponse(PathHistory pathHistory) {
-        return PathHistoryResponse.builder()
+    public PathHistoryResponse.PathHistoryInfoResponse toResponse(PathHistory pathHistory) {
+        return PathHistoryResponse.PathHistoryInfoResponse.builder()
                 .id(pathHistory.getId())
                 .startStationId(pathHistory.getStartStation().getId())
                 .startStationName(pathHistory.getStartStation().getStationName())
@@ -32,6 +34,15 @@ public class PathHistoryConverterImpl implements PathHistoryConverter{
                 .endStationName(pathHistory.getEndStation().getStationName())
                 .expectedArrivalTime(pathHistory.getExpectedArrivalTime())
                 .createdDate(pathHistory.getCreatedAt().format(DATE_FORMATTER))
+                .build();
+    }
+
+    @Override
+    public PathHistoryResponse.PathHistoryList toResponseList(ScrollPaginationCollection<PathHistory> pathHistoriesCursor, List<PathHistoryResponse.PathHistoryInfoResponse> pathHistoryList) {
+        return PathHistoryResponse.PathHistoryList.builder()
+                .pathHistoryInfoList(pathHistoryList)
+                .nextCursor(pathHistoriesCursor.getNextCursor().getId())
+                .isLast(pathHistoriesCursor.isLastScroll())
                 .build();
     }
 }

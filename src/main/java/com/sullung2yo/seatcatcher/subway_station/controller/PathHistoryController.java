@@ -38,14 +38,13 @@ public class PathHistoryController {
     @GetMapping("/")
     @Operation(
             summary = "All path history 가져오기 API",
-            description = "모든 path history를 가져옵니다..)"
+            description = "무한 스크롤 기반으로 모든 path history를 가져옵니다.)"
 
     )
     @ApiResponse(responseCode = "200", description = "All path history 가져오기 성공")
-    public ResponseEntity<?> getAllPathHistory() {
-
-//        return ResponseEntity.ok(response);
-        return null;
+    public ResponseEntity<PathHistoryResponse.PathHistoryList> getAllPathHistory(@RequestParam(defaultValue = "10") int size, @RequestParam(required = false) Long cursor) {
+        PathHistoryResponse.PathHistoryList response = pathHistoryService.getAllPathHistory(size, cursor);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{path_id}")
@@ -57,9 +56,23 @@ public class PathHistoryController {
     @ApiResponse(responseCode = "200", description = "특정 path history 가져오기 성공")
     @ApiResponse(responseCode = "403", description = "user가 pathHistory에 접근할 권한이 없음")
     @ApiResponse(responseCode = "404", description = "user/pathHistory를 찾을 수 없음")
-    public ResponseEntity<PathHistoryResponse> getPathHistory(@PathVariable("path_id") Long pathId) {
-        PathHistoryResponse response = pathHistoryService.getPathHistory(pathId);
+    public ResponseEntity<PathHistoryResponse.PathHistoryInfoResponse> getPathHistory(@PathVariable("path_id") Long pathId) {
+        PathHistoryResponse.PathHistoryInfoResponse response = pathHistoryService.getPathHistory(pathId);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{path_id}")
+    @Operation(
+            summary = "path history 삭제 API",
+            description = "특정 path history를 삭제합니다. pathId로 요청할 수 있습니다.)"
+
+    )
+    @ApiResponse(responseCode = "200", description = "path history 삭제 성공")
+    @ApiResponse(responseCode = "404", description = "path history를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "user가 pathHistory에 접근할 권한이 없음")
+    public ResponseEntity<?> deletPathHistory(@PathVariable("path_id") Long pathtId) {
+
+        return ResponseEntity.ok("해당 pathHistory를 삭제했습니다.");
     }
 
     @PatchMapping("/{path_id}")
