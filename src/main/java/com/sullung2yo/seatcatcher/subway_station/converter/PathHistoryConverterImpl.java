@@ -2,7 +2,6 @@ package com.sullung2yo.seatcatcher.subway_station.converter;
 
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
-<<<<<<< HEAD
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
 import com.sullung2yo.seatcatcher.user.domain.User;
@@ -16,13 +15,6 @@ public class PathHistoryConverterImpl implements PathHistoryConverter{
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM.dd");
 
-=======
-import com.sullung2yo.seatcatcher.user.domain.User;
-import org.springframework.stereotype.Component;
-
-@Component
-public class PathHistoryConverterImpl implements PathHistoryConverter{
->>>>>>> e10e7d2 ([FEAT] pathHistory 생성 api 구현)
     @Override
     public PathHistory toPathHistory(User user, SubwayStation startStation, SubwayStation endStation) {
         return PathHistory.builder()
@@ -31,7 +23,6 @@ public class PathHistoryConverterImpl implements PathHistoryConverter{
                 .endStation(endStation)
                 .build();
     }
-<<<<<<< HEAD
 
     @Override
     public PathHistoryResponse.PathHistoryInfoResponse toResponse(PathHistory pathHistory) {
@@ -54,6 +45,4 @@ public class PathHistoryConverterImpl implements PathHistoryConverter{
                 .isLast(pathHistoriesCursor.isLastScroll())
                 .build();
     }
-=======
->>>>>>> e10e7d2 ([FEAT] pathHistory 생성 api 구현)
 }

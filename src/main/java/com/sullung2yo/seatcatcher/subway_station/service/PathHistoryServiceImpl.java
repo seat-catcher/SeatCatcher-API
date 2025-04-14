@@ -7,15 +7,10 @@ import com.sullung2yo.seatcatcher.subway_station.converter.PathHistoryConverter;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
-<<<<<<< HEAD
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.subway_station.repository.SubwayStationRepository;
 import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
-=======
-import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
-import com.sullung2yo.seatcatcher.subway_station.repository.SubwayStationRepository;
->>>>>>> e10e7d2 ([FEAT] pathHistory 생성 api 구현)
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +38,6 @@ public class PathHistoryServiceImpl implements PathHistoryService{
                 .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + request.getUserId(), ErrorCode.USER_NOT_FOUND));
 
         SubwayStation startStation = subwayStationRepository.findById(request.getStartStationId())
-<<<<<<< HEAD
                 .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없습니다. : "+request.getStartStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
 
         SubwayStation endStation = subwayStationRepository.findById(request.getEndStationId())
@@ -53,20 +47,10 @@ public class PathHistoryServiceImpl implements PathHistoryService{
         PathHistory newPathHistory = pathHistoryConverter.toPathHistory(user, startStation, endStation);
         pathHistoryRepository.save(newPathHistory);
 
-=======
-                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없스니다. : "+request.getStartStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
-
-        SubwayStation endStation = subwayStationRepository.findById(request.getEndStationId())
-                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없스니다. : "+request.getEndStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
-
-
-        PathHistory newPathHistory = pathHistoryConverter.toPathHistory(user, startStation, endStation);
->>>>>>> e10e7d2 ([FEAT] pathHistory 생성 api 구현)
         newPathHistory.calculateExpectedArrivalTime(startStation,endStation);
 
         pathHistoryRepository.save(newPathHistory);
     }
-<<<<<<< HEAD
 
     @Override
     public PathHistoryResponse.PathHistoryInfoResponse getPathHistory(Long pathId) {
@@ -97,8 +81,8 @@ public class PathHistoryServiceImpl implements PathHistoryService{
         ScrollPaginationCollection<PathHistory> pathHistoriesCursor = ScrollPaginationCollection.of(pathHistories, size);
 
         List<PathHistoryResponse.PathHistoryInfoResponse> pathHistoryList = pathHistoriesCursor.getCurrentScrollItems().stream()
-                        .map(pathHistoryConverter::toResponse)
-                        .toList();
+                .map(pathHistoryConverter::toResponse)
+                .toList();
 
         PathHistoryResponse.PathHistoryList response = pathHistoryConverter.toResponseList(pathHistoriesCursor,pathHistoryList);
 
@@ -121,6 +105,4 @@ public class PathHistoryServiceImpl implements PathHistoryService{
 
         pathHistoryRepository.delete(pathHistory);
     }
-=======
->>>>>>> e10e7d2 ([FEAT] pathHistory 생성 api 구현)
 }

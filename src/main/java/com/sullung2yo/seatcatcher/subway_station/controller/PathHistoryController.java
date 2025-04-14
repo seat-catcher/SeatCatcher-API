@@ -2,10 +2,8 @@ package com.sullung2yo.seatcatcher.subway_station.controller;
 
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
-<<<<<<< HEAD
+
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
-=======
->>>>>>> e10e7d2 ([FEAT] pathHistory 생성 api 구현)
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -57,16 +55,12 @@ public class PathHistoryController {
 
     )
     @ApiResponse(responseCode = "200", description = "특정 path history 가져오기 성공")
-<<<<<<< HEAD
     @ApiResponse(responseCode = "403", description = "user가 pathHistory에 접근할 권한이 없음")
     @ApiResponse(responseCode = "404", description = "user/pathHistory를 찾을 수 없음")
     public ResponseEntity<PathHistoryResponse.PathHistoryInfoResponse> getPathHistory(@PathVariable("path_id") Long pathId) {
         PathHistoryResponse.PathHistoryInfoResponse response = pathHistoryService.getPathHistory(pathId);
         return ResponseEntity.ok(response);
     }
-=======
-    public ResponseEntity<?> getPathHistory(@PathVariable("path_id") Long pathId) {
->>>>>>> e10e7d2 ([FEAT] pathHistory 생성 api 구현)
 
     @DeleteMapping("/{path_id}")
     @Operation(
