@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.subway_station.controller;
 
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
+import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -50,14 +51,15 @@ public class PathHistoryController {
     @GetMapping("/{path_id}")
     @Operation(
             summary = "특정 path history 가져오기 API",
-            description = "특정 path history를 가져옵니다..)"
+            description = "특정 path history를 가져옵니다.)"
 
     )
     @ApiResponse(responseCode = "200", description = "특정 path history 가져오기 성공")
-    public ResponseEntity<?> getPathHistory(@PathVariable("path_id") Long pathId) {
-
-//        return ResponseEntity.ok(response);
-        return null;
+    @ApiResponse(responseCode = "403", description = "user가 pathHistory에 접근할 권한이 없음")
+    @ApiResponse(responseCode = "404", description = "user/pathHistory를 찾을 수 없음")
+    public ResponseEntity<PathHistoryResponse> getPathHistory(@PathVariable("path_id") Long pathId) {
+        PathHistoryResponse response = pathHistoryService.getPathHistory(pathId);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{path_id}")
