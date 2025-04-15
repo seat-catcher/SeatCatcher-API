@@ -15,7 +15,7 @@ public interface SubwayStationRepository extends JpaRepository<SubwayStation, Lo
 
     @Query(
             "SELECT s FROM SubwayStation s " +
-                    "WHERE (:keyword IS NULL OR s.stationName LIKE CONCAT('%', :keyword, '%')) " +
+                    "WHERE (:keyword IS NULL OR s.stationName LIKE CONCAT('%', :keyword, '%')) " + //TODO :: Query DSL 검색해보면 Improve 힌트가 될 것.
                     "AND (:line IS NULL OR s.line = :line) " +
                     "ORDER BY " +
                     "CASE WHEN :order = 'up' THEN s.accumulateDistance " +

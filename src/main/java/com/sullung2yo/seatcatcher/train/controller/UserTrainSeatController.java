@@ -52,10 +52,12 @@ public class UserTrainSeatController {
         try
         {
             UserTrainSeat record = userTrainSeatService.findUserTrainSeatByUserId(uid);
+            log.debug("성공적으로 착석 정보를 조회했습니다.");
             return ResponseEntity.ok(new UserTrainSeatResponse(record));
         }
         catch(EntityNotFoundException e)
         {
+            log.info("해당 유저는 착석 정보가 없습니다.");
             return ResponseEntity.noContent().build();
         }
     }
@@ -85,13 +87,17 @@ public class UserTrainSeatController {
             @RequestBody UserTrainSeatRequest userTrainSeatRequest
     )
     {
+        Long uid = verifyUserAndGetId(bearerToken);
+
         try
         {
-            userTrainSeatService.create(userTrainSeatRequest.getUserId(), userTrainSeatRequest.getSeatId());
+            userTrainSeatService.create(uid, userTrainSeatRequest.getSeatId());
+            log.debug("성공적으로 생성 완료");
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         catch(EntityNotFoundException e)
         {
+            log.error("해당 좌석 ID({})를 찾을 수 없음", userTrainSeatRequest.getSeatId());
             return ResponseEntity.notFound().build();
         }
     }
@@ -118,11 +124,13 @@ public class UserTrainSeatController {
 
         try{
             userTrainSeatService.delete(uid);
+            log.debug("성공적으로 제거 완료");
             return ResponseEntity.ok().build();
         }
         catch(EntityNotFoundException e)
         {
-            return ResponseEntity.notFound().build();
+            log.error("해당 유저에 대한 착석 정보를 찾을 수 없음");
+            return ResponseEntity.notFound().build(); // TODO :: Description 에 있는 에러 메시지도 같이 보내주기
         }
     }
 
