@@ -53,7 +53,7 @@ public enum Line {
         try {
             return String.valueOf(Long.parseLong(name) + 1000);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("노선 번호를 4자리 정수로 변환 중 오류가 발생했습니다. : {}", e);
+            throw new IllegalArgumentException("노선 번호를 4자리 정수로 변환 중 오류가 발생했습니다. : " + name, e);
         }
     }
 }
