@@ -4,8 +4,6 @@ package com.sullung2yo.seatcatcher.config;
 import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.config.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
-import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -16,14 +14,12 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
-import java.util.Optional;
 
 @Slf4j
 @Configuration
@@ -31,11 +27,9 @@ import java.util.Optional;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TokenProvider tokenProvider;
-    private final UserRepository userRepository;
 
-    public WebSocketConfig(TokenProvider tokenProvider, UserRepository userRepository) {
+    public WebSocketConfig(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
-        this.userRepository = userRepository;
     }
 
     @Override
