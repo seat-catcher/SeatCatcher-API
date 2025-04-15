@@ -15,13 +15,11 @@ import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
@@ -47,6 +45,8 @@ public class PathHistoryServiceImpl implements PathHistoryService{
 
 
         PathHistory newPathHistory = pathHistoryConverter.toPathHistory(user, startStation, endStation);
+        pathHistoryRepository.save(newPathHistory);
+
         newPathHistory.calculateExpectedArrivalTime(startStation,endStation);
 
         pathHistoryRepository.save(newPathHistory);
