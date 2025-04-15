@@ -2,16 +2,16 @@ package com.sullung2yo.seatcatcher.subway_station.repository;
 
 import com.sullung2yo.seatcatcher.subway_station.domain.Line;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
-import com.sullung2yo.seatcatcher.subway_station.dto.SubwayStationData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface SubwayStationRepository extends JpaRepository<SubwayStation, Long> {
-    public List<SubwayStation> findByStationNameContaining(String name);
+    List<SubwayStation> findByStationNameContaining(String name);
+
+    SubwayStation findByStationNameAndLine(String stationName, Line line);
 
     @Query(
             "SELECT s FROM SubwayStation s " +

@@ -11,7 +11,10 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
     SUBWAY_LINE_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철 노선을 찾을 수 없습니다."),
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "태그를 찾을 수 없습니다."),
-    INVALID_PROFILE_IMAGE_NUM(HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 이미지 번호입니다.");
+    INVALID_PROFILE_IMAGE_NUM(HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 이미지 번호입니다."),
+    SUBWAY_LINE_MISMATCH(HttpStatus.BAD_REQUEST, "출발역과 도착역의 노선이 다릅니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    SUBWAY_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
