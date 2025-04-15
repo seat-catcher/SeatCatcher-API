@@ -27,6 +27,9 @@ public class ScrollPaginationCollection<T> {
     }
 
     public T getNextCursor() {
+        if (isLastScroll()) {
+            return null; // 더 이상 다음 커서가 없을 경우 null 반환
+        }
         return itemsWithNextCursor.get(countPerScroll - 1);
     }
 

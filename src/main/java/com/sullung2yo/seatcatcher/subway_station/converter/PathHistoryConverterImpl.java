@@ -41,7 +41,7 @@ public class PathHistoryConverterImpl implements PathHistoryConverter{
     public PathHistoryResponse.PathHistoryList toResponseList(ScrollPaginationCollection<PathHistory> pathHistoriesCursor, List<PathHistoryResponse.PathHistoryInfoResponse> pathHistoryList) {
         return PathHistoryResponse.PathHistoryList.builder()
                 .pathHistoryInfoList(pathHistoryList)
-                .nextCursor(pathHistoriesCursor.getNextCursor().getId())
+                .nextCursor(pathHistoriesCursor.getNextCursor() != null ? pathHistoriesCursor.getNextCursor().getId():-1L)
                 .isLast(pathHistoriesCursor.isLastScroll())
                 .build();
     }

@@ -14,6 +14,7 @@ public class PathHistoryResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class PathHistoryList {
         private List<PathHistoryInfoResponse> pathHistoryInfoList;
         private Long nextCursor; // 다음 커서 값
@@ -24,6 +25,7 @@ public class PathHistoryResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class PathHistoryInfoResponse{
 
         @Schema(description = "PathHistoryId 입니다.")
