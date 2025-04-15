@@ -11,7 +11,6 @@ import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import jakarta.validation.constraints.Null;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
