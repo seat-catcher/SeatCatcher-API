@@ -2,11 +2,12 @@ package com.sullung2yo.seatcatcher.subway_station.controller;
 
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
-
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,8 +29,20 @@ public class PathHistoryController {
     @PostMapping("/")
     @Operation(
             summary = "path history 생성 API",
-            description = "특정 path history를 생성합니다.)"
-
+            description = "특정 path history를 생성합니다.)",
+            requestBody = @RequestBody(
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(
+                                    name = "PathHistory 생성 예시",
+                                    summary = "기본 요청 예시",
+                                    value = "{ \"userId\": 1, \"startStationId\": 10, \"endStationId\": 20 }"
+                            )
+                    }
+            )
+            )
     )
     @ApiResponse(responseCode = "200", description = "path history 생성 성공")
     public ResponseEntity<?> postPathHistory(@Valid @RequestBody PathHistoryRequest request) {
@@ -52,7 +65,6 @@ public class PathHistoryController {
     @Operation(
             summary = "특정 path history 가져오기 API",
             description = "특정 path history를 가져옵니다.)"
-
     )
     @ApiResponse(responseCode = "200", description = "특정 path history 가져오기 성공")
     @ApiResponse(responseCode = "403", description = "user가 pathHistory에 접근할 권한이 없음")

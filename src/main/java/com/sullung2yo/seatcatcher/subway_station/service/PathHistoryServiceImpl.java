@@ -56,11 +56,12 @@ public class PathHistoryServiceImpl implements PathHistoryService{
     public PathHistoryResponse.PathHistoryInfoResponse getPathHistory(Long pathId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();
+
         User user = userRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. providerId : " + providerId, ErrorCode.USER_NOT_FOUND));
 
         PathHistory pathHistory = pathHistoryRepository.findById(pathId)
-                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없습니다. : "+pathId,ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없습니다. : " + pathId, ErrorCode.SUBWAY_STATION_NOT_FOUND ));
 
         if(!pathHistory.getUser().equals(user))
             throw new SubwayStationException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
