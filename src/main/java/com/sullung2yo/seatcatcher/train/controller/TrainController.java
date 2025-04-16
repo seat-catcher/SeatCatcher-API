@@ -4,7 +4,6 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
-<<<<<<< HEAD
 import com.sullung2yo.seatcatcher.subway_station.dto.response.SubwayStationResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
 import com.sullung2yo.seatcatcher.subway_station.utility.StationNameMapper;
@@ -13,11 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-=======
-import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
-import com.sullung2yo.seatcatcher.subway_station.utility.StationNameMapper;
-import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
->>>>>>> b32c0b6 (Implemented incoming trains API based on start station and end station, using Third-party API)
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
