@@ -37,6 +37,7 @@ public class GlobalExceptionHandler {
         /*
             401 Unauthorized, 404 Not found 처리 메서드 (토큰 관련 ExceptionHandler)
          */
+        log.error("TokenException", ex);
         if (ex.getErrorCode() == ErrorCode.INVALID_TOKEN) {
             return createErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid Token", ex.getMessage());
         }
@@ -56,6 +57,7 @@ public class GlobalExceptionHandler {
         /*
           404 Not Found 처리 메서드 (태그 관련 ExceptionHandler)
          */
+        log.error("TagException", ex);
         return createErrorResponse(HttpStatus.NOT_FOUND, "Tag Not Found", ex.getMessage());
     }
 
@@ -64,6 +66,7 @@ public class GlobalExceptionHandler {
         /*
           지하철 관련 ExceptionHandler
          */
+        log.error("SubwayException", ex);
         if (ex.getErrorCode() == ErrorCode.SUBWAY_NOT_FOUND) {
             return createErrorResponse(HttpStatus.NOT_FOUND, "Subway Not Found", ex.getMessage());
         }
@@ -80,6 +83,7 @@ public class GlobalExceptionHandler {
         /*
           유저 관련 ExceptionHandler
          */
+        log.error("UserException", ex);
         if (ex.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
             return createErrorResponse(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage());
         }
@@ -96,6 +100,7 @@ public class GlobalExceptionHandler {
         /*
           500 Internal Server Error 처리 메서드
          */
+        log.error("Exception", ex);
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage());
     }
 
