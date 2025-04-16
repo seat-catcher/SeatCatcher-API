@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.subway_station.domain;
 
-import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.config.exception.SubwayException;
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

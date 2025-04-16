@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.jwt.provider;
 
-import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.config.exception.TokenException;
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.user.domain.RefreshToken;
 import com.sullung2yo.seatcatcher.user.domain.User;
@@ -25,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 

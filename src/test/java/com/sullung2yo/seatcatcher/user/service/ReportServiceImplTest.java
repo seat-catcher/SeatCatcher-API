@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.user.service;
 
-import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.config.exception.UserException;
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.user.converter.ReportConverter;
 import com.sullung2yo.seatcatcher.user.domain.Report;
 import com.sullung2yo.seatcatcher.user.domain.User;

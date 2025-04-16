@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.user.service;
 
-import com.sullung2yo.seatcatcher.config.exception.TagException;
+import com.sullung2yo.seatcatcher.common.exception.TagException;
 import com.sullung2yo.seatcatcher.user.domain.Tag;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;

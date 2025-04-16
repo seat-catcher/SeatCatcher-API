@@ -1,8 +1,8 @@
 package com.sullung2yo.seatcatcher.train.controller;
 
-import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.config.exception.SubwayException;
-import com.sullung2yo.seatcatcher.config.exception.TokenException;
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.SubwayException;
+import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.SubwayStationResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Slf4j

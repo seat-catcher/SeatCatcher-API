@@ -1,8 +1,8 @@
 package com.sullung2yo.seatcatcher.config;
 
 
-import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.config.exception.TokenException;
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;

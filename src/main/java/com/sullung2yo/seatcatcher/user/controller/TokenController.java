@@ -1,8 +1,7 @@
 package com.sullung2yo.seatcatcher.user.controller;
 
 
-import com.sullung2yo.seatcatcher.config.exception.GlobalExceptionHandler;
-import com.sullung2yo.seatcatcher.config.exception.dto.ErrorResponse;
+import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.user.dto.request.TokenRefreshRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
 import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;

@@ -4,8 +4,8 @@ package com.sullung2yo.seatcatcher.subway_station.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.config.exception.SubwayException;
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.subway_station.domain.Line;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.dto.SubwayStationData;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.*;
 

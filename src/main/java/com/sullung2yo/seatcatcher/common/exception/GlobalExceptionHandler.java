@@ -1,6 +1,6 @@
-package com.sullung2yo.seatcatcher.config.exception;
+package com.sullung2yo.seatcatcher.common.exception;
 
-import com.sullung2yo.seatcatcher.config.exception.dto.ErrorResponse;
+import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -8,9 +8,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

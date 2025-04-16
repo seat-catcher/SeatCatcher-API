@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.config.exception;
+package com.sullung2yo.seatcatcher.common.exception;
 
 import lombok.Getter;
 
