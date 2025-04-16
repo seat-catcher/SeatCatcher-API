@@ -57,6 +57,93 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(TagException.class)
+    public ResponseEntity<?> handleTagNotFoundException(TagException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(
+                    ErrorResponse.builder()
+                            .error("Tag Not Found")
+                            .message(ex.getMessage())
+                            .build()
+                );
+    }
+
+    @ExceptionHandler(SubwayException.class)
+    public ResponseEntity<?> handleSubwayException(SubwayException ex) {
+        if (ex.getErrorCode() == ErrorCode.SUBWAY_NOT_FOUND) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            ErrorResponse.builder()
+                                    .error("Subway Not Found")
+                                    .message(ex.getMessage())
+                                    .build()
+                    );
+        }
+        else if (ex.getErrorCode() == ErrorCode.SUBWAY_LINE_NOT_FOUND) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            ErrorResponse.builder()
+                                    .error("Subway Line Not Found")
+                                    .message(ex.getMessage())
+                                    .build()
+                    );
+        }
+        else {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            ErrorResponse.builder()
+                                    .error("Subway Internal Server Error")
+                                    .message(ex.getMessage())
+                                    .build()
+                    );
+        }
+    }
+
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<?> handleUserException(UserException ex) {
+        if (ex.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            ErrorResponse.builder()
+                                    .error("User Not Found")
+                                    .message(ex.getMessage())
+                                    .build()
+                    );
+        }
+        else if (ex.getErrorCode() == ErrorCode.INVALID_PROFILE_IMAGE_NUM) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            ErrorResponse.builder()
+                                    .error("Invalid Profile Image Number")
+                                    .message(ex.getMessage())
+                                    .build()
+                    );
+        }
+        else {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            ErrorResponse.builder()
+                                    .error("User Internal Server Error")
+                                    .message(ex.getMessage())
+                                    .build()
+                    );
+        }
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
         /*

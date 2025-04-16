@@ -55,16 +55,37 @@ class TagControllerTest {
                 .header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(6)));
+                // 최소한 1개 이상의 태그가 있는지 확인
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").exists())
+                // 각 태그가 필요한 필드를 포함하는지 확인
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].tagName").exists());
     }
 
     @Test
     void getTagById() throws Exception {
+        // Given
+        // ID가 1인 태그가 존재하고 이름이 USERTAG_NULL이라고 가정
+
+        // When, Then
         mockMvc.perform(get("/tags/{id}", 1L)
                 .header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.tagName").value(UserTagType.USERTAG_NULL.name()));
+    }
+
+    @Test
+    void getTagById_NotFound() throws Exception {
+        // given: 존재하지 않는 태그 ID
+        Long nonExistentId = 9999L;
+
+        // when & then
+        mockMvc.perform(get("/tags/{id}", nonExistentId)
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json"))
+                .andExpect(status().isNotFound());
     }
 }

@@ -39,7 +39,7 @@ public class TagController {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "204",
+                            responseCode = "404",
                             description = "태그가 하나도 없음"
                     )
             }
