@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.config.exception.dto;
+package com.sullung2yo.seatcatcher.common.exception.dto;
 
 import lombok.*;
 

@@ -1,10 +1,8 @@
 package com.sullung2yo.seatcatcher.user.controller;
 
-import com.sullung2yo.seatcatcher.config.exception.dto.ErrorResponse;
-import com.sullung2yo.seatcatcher.user.domain.Report;
+import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.user.dto.request.ReportRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
-import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
 import com.sullung2yo.seatcatcher.user.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

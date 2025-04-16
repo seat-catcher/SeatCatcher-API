@@ -3,6 +3,7 @@ package com.sullung2yo.seatcatcher.train.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
@@ -13,6 +14,7 @@ import lombok.ToString;
 )
 @Tag(name="Train API", description = "열차 관련 API")
 @ToString
+@Builder
 public class IncomingTrainsResponse {
 
     @JsonProperty("ordkey")

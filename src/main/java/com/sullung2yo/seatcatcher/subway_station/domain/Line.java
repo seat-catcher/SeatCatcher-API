@@ -1,10 +1,9 @@
 package com.sullung2yo.seatcatcher.subway_station.domain;
 
-import com.sullung2yo.seatcatcher.config.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.config.exception.SubwayLineNotFoundException;
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 @AllArgsConstructor
@@ -46,7 +45,7 @@ public enum Line {
                 return line;
             }
         }
-        throw new SubwayLineNotFoundException("지하철 노선 정보를 찾을 수 없습니다. : " + name, ErrorCode.SUBWAY_LINE_NOT_FOUND);
+        throw new SubwayException("지하철 노선 정보를 찾을 수 없습니다. : " + name, ErrorCode.SUBWAY_LINE_NOT_FOUND);
     }
 
     public static String convertForIncomingTrains(String name) {

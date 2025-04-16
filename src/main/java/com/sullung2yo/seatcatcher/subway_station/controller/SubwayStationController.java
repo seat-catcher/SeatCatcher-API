@@ -1,6 +1,5 @@
 package com.sullung2yo.seatcatcher.subway_station.controller;
 
-import com.sullung2yo.seatcatcher.config.exception.SubwayLineNotFoundException;
 import com.sullung2yo.seatcatcher.subway_station.domain.Line;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.SubwayStationResponse;

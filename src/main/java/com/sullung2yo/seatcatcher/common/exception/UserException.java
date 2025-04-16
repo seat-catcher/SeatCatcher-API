@@ -1,5 +1,9 @@
-package com.sullung2yo.seatcatcher.config.exception;
+package com.sullung2yo.seatcatcher.common.exception;
 
+
+import lombok.Getter;
+
+@Getter
 public class UserException extends RuntimeException{
 
     private final ErrorCode errorCode;
@@ -9,7 +13,4 @@ public class UserException extends RuntimeException{
         this.errorCode = errorCode;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
 }
