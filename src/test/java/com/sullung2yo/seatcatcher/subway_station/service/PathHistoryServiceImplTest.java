@@ -166,14 +166,14 @@ public class PathHistoryServiceImplTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // when & then
-        com.sullung2yo.seatcatcher.config.exception.SubwayStationException exception =
+        com.sullung2yo.seatcatcher.common.exception.SubwayStationException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
-                        com.sullung2yo.seatcatcher.config.exception.SubwayStationException.class,
+                        com.sullung2yo.seatcatcher.common.exception.SubwayStationException.class,
                         () -> pathHistoryService.getPathHistory(pathHistory.getId())
                 );
 
         assertThat(exception.getErrorCode()).isEqualTo(
-                com.sullung2yo.seatcatcher.config.exception.ErrorCode.PATH_HISTORY_FORBIDDEN
+                com.sullung2yo.seatcatcher.common.exception.ErrorCode.PATH_HISTORY_FORBIDDEN
         );
         assertThat(exception.getMessage()).contains("해당 경로 이력에 접근할 권한이 없습니다.");
     }
