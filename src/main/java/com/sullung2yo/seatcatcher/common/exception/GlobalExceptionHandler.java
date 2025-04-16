@@ -1,6 +1,7 @@
 package com.sullung2yo.seatcatcher.common.exception;
 
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -17,13 +19,8 @@ public class GlobalExceptionHandler {
         /*
           400 Bad Request 처리 메서드
          */
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorResponse.builder()
-                        .error("Bad Request")
-                        .message(ex.getMessage())
-                        .build());
+        log.error("HttpMessageNotReadableException", ex);
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -31,13 +28,8 @@ public class GlobalExceptionHandler {
         /*
           405 Method Not Allowed 처리 메서드
          */
-        return ResponseEntity
-                .status(HttpStatus.METHOD_NOT_ALLOWED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorResponse.builder()
-                        .error("Method Not Allowed")
-                        .message(ex.getMessage())
-                        .build());
+        log.error("HttpRequestMethodNotSupportedException", ex);
+        return createErrorResponse(HttpStatus.METHOD_NOT_ALLOWED, "Method Not Allowed", ex.getMessage());
     }
 
     @ExceptionHandler(TokenException.class)
@@ -61,11 +53,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TagException.class)
     public ResponseEntity<ErrorResponse> handleTagException(TagException ex) {
+        /*
+          404 Not Found 처리 메서드 (태그 관련 ExceptionHandler)
+         */
         return createErrorResponse(HttpStatus.NOT_FOUND, "Tag Not Found", ex.getMessage());
     }
 
     @ExceptionHandler(SubwayException.class)
     public ResponseEntity<ErrorResponse> handleSubwayException(SubwayException ex) {
+        /*
+          지하철 관련 ExceptionHandler
+         */
         if (ex.getErrorCode() == ErrorCode.SUBWAY_NOT_FOUND) {
             return createErrorResponse(HttpStatus.NOT_FOUND, "Subway Not Found", ex.getMessage());
         }
@@ -79,6 +77,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<ErrorResponse> handleUserException(UserException ex) {
+        /*
+          유저 관련 ExceptionHandler
+         */
         if (ex.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
             return createErrorResponse(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage());
         }
