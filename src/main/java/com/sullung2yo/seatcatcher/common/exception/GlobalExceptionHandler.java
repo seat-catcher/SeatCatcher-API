@@ -45,99 +45,48 @@ public class GlobalExceptionHandler {
         /*
             401 Unauthorized, 404 Not found 처리 메서드 (토큰 관련 ExceptionHandler)
          */
-        return ResponseEntity
-                .status(ex.getErrorCode().getHttpStatus())
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorResponse.builder()
-                        .error(String.valueOf(ex.getErrorCode().getHttpStatus()))
-                        .message(ex.getMessage())
-                        .build());
+        if (ex.getErrorCode() == ErrorCode.INVALID_TOKEN) {
+            return createErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid Token", ex.getMessage());
+        }
+        else if (ex.getErrorCode() == ErrorCode.TOKEN_NOT_FOUND){
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Token Not Found", ex.getMessage());
+        }
+        else if (ex.getErrorCode() == ErrorCode.EXPIRED_TOKEN) {
+            return createErrorResponse(HttpStatus.UNAUTHORIZED, "Expired Token", ex.getMessage());
+        }
+        else {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Token Internal Server Error", ex.getMessage());
+        }
     }
 
     @ExceptionHandler(TagException.class)
-    public ResponseEntity<?> handleTagNotFoundException(TagException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(
-                    ErrorResponse.builder()
-                            .error("Tag Not Found")
-                            .message(ex.getMessage())
-                            .build()
-                );
+    public ResponseEntity<ErrorResponse> handleTagException(TagException ex) {
+        return createErrorResponse(HttpStatus.NOT_FOUND, "Tag Not Found", ex.getMessage());
     }
 
     @ExceptionHandler(SubwayException.class)
-    public ResponseEntity<?> handleSubwayException(SubwayException ex) {
+    public ResponseEntity<ErrorResponse> handleSubwayException(SubwayException ex) {
         if (ex.getErrorCode() == ErrorCode.SUBWAY_NOT_FOUND) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(
-                            ErrorResponse.builder()
-                                    .error("Subway Not Found")
-                                    .message(ex.getMessage())
-                                    .build()
-                    );
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Subway Not Found", ex.getMessage());
         }
         else if (ex.getErrorCode() == ErrorCode.SUBWAY_LINE_NOT_FOUND) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(
-                            ErrorResponse.builder()
-                                    .error("Subway Line Not Found")
-                                    .message(ex.getMessage())
-                                    .build()
-                    );
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Subway Line Not Found", ex.getMessage());
         }
         else {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(
-                            ErrorResponse.builder()
-                                    .error("Subway Internal Server Error")
-                                    .message(ex.getMessage())
-                                    .build()
-                    );
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Subway Internal Server Error", ex.getMessage());
         }
     }
 
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<?> handleUserException(UserException ex) {
+    public ResponseEntity<ErrorResponse> handleUserException(UserException ex) {
         if (ex.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(
-                            ErrorResponse.builder()
-                                    .error("User Not Found")
-                                    .message(ex.getMessage())
-                                    .build()
-                    );
+            return createErrorResponse(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage());
         }
         else if (ex.getErrorCode() == ErrorCode.INVALID_PROFILE_IMAGE_NUM) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(
-                            ErrorResponse.builder()
-                                    .error("Invalid Profile Image Number")
-                                    .message(ex.getMessage())
-                                    .build()
-                    );
+            return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid Profile Image Number", ex.getMessage());
         }
         else {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(
-                            ErrorResponse.builder()
-                                    .error("User Internal Server Error")
-                                    .message(ex.getMessage())
-                                    .build()
-                    );
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "User Internal Server Error", ex.getMessage());
         }
     }
 
@@ -146,12 +95,16 @@ public class GlobalExceptionHandler {
         /*
           500 Internal Server Error 처리 메서드
          */
+        return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage());
+    }
+
+    private ResponseEntity<ErrorResponse> createErrorResponse(HttpStatus status, String errorTitle, String errorMessage) {
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(status)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .error("Internal Server Error")
-                        .message(ex.getMessage())
+                        .error(errorTitle)
+                        .message(errorMessage)
                         .build());
     }
 }
