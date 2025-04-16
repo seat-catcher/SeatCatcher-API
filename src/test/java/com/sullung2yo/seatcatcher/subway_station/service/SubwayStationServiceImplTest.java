@@ -256,7 +256,7 @@ class SubwayStationServiceImplTest {
                 .arrivalTime("300")
                 .build();
         when(objectMapper.readTree(fakeResponse)).thenReturn(fakeTree);
-        when(objectMapper.treeToValue(any(JsonNode.class), eq(IncomingTrainsResponse.class)))
+        when(objectMapper.treeToValue(any(JsonNode.class), eq(IncomingTrainsResponse.class))) // 딱 두번만 호출되어야 정상
                 .thenAnswer(invocation -> incomingTrainsResponse1)
                 .thenAnswer(invocation -> incomingTrainsResponse2);
 
