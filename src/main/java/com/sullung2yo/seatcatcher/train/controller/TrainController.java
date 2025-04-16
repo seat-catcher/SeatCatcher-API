@@ -18,8 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -82,19 +84,29 @@ public class TrainController {
                     dest, lineNumber
             );
             if (departure.getLine().equals(destination.getLine())) {
-                // 실시간 도착 정보 API 호출
+                // 현재는 출발역과 도착역 노선이 동일한 경우에만 처리
+                // TODO : 출발역과 도착역 노선이 다른 경우 처리 로직 추가 필요 (다익스트라 알고리즘 등...)
+
+                // 1. 실시간 도착 정보 API 호출
                 Optional<String> response = subwayStationService.fetchIncomingTrains(lineNumber, stationNameMapper.mapToApiName(departure.getStationName()));
 
-                // API 응답 파싱
+                // 2. API 응답 파싱
                 if (response.isPresent()) {
                     List<IncomingTrainsResponse> incomingTrains = subwayStationService.parseIncomingResponse(
                             lineNumber, // 노선번호
                             departure, // 출발역 객체
                             destination, // 도착역 객체
                             response.get() // API 응답 Optional 해제
-                    );
+                    ).stream() // 3. 정렬 로직
+                            .sorted( // 정렬 기준 : 도착 예정 시간 (bravlDt)
+                                    Comparator.comparing(incomingTrain -> Integer.parseInt(incomingTrain.getArrivalTime()))
+                            )
+                            .toList();
+
+                    // 4. 정렬된 열차 정보 반환
                     return ResponseEntity.ok().body(incomingTrains);
                 } else {
+                    log.info("{}으로 접근하는 열차가 없습니다.", departure.getStationName());
                     return ResponseEntity.noContent().build();
                 }
             } else {

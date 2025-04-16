@@ -112,7 +112,7 @@ class SubwayStationServiceImplTest {
         List<SubwayStation> foundStations = subwayStationService.findWithKeyword(stationName);
         assertEquals(1, foundStations.size());
     }
-
+//
 //    @Test
 //    void testFindWithAscendingOrder() {
 //        // Given
@@ -201,18 +201,21 @@ class SubwayStationServiceImplTest {
 
     @Test
     void parseIncomingDownDirectionResponse_ShouldReturnParsedList() throws JsonProcessingException {
-        // 하행 방향 도착 정보 테스트
+        // 하행 방향으로 운행중인 열차 정보만 가져오는지 테스트
+        // 즉, ordkey가 1로 시작해야 함
         // Given
         String lineNumber = "7";
 
+        // 사용자의 출발지 (상도역이 서울역에 더 가깝다고 가정)
         SubwayStation departure = new SubwayStation();
         departure.setStationName("상도");
-        departure.setAccumulateDistance(987.65f);
+        departure.setAccumulateDistance(123.45f);
         departure.setLine(Line.LINE_7);
 
+        // 사용자 도착지 (숭실대입구역은 상도역보다 멀리 있으니까)
         SubwayStation destination = new SubwayStation();
         destination.setStationName("숭실대입구");
-        destination.setAccumulateDistance(678.90f);
+        destination.setAccumulateDistance(234.56f);
         destination.setLine(Line.LINE_7);
 
         String fakeResponse = """
@@ -223,19 +226,19 @@ class SubwayStationServiceImplTest {
                   "subwayId": "1007",
                   "bstatnNm": "7호선",
                   "barvlDt": "180",
-                  "ordkey": "11002온수0"
+                  "ordkey": "11002테스트0"
                 },
                 {
                   "subwayId": "1007",
                   "bstatnNm": "7호선",
                   "barvlDt": "120",
-                  "ordkey": "01002숭실대입구0"
+                  "ordkey": "01002테스트0"
                 },
                 {
                   "subwayId": "1007",
                   "subwayName": "7호선",
                   "arrivalTime": "300",
-                  "ordkey": "12004석남0"
+                  "ordkey": "12004테스트0"
                 }
               ]
             }
@@ -243,20 +246,19 @@ class SubwayStationServiceImplTest {
 
         JsonNode fakeTree = new ObjectMapper().readTree(fakeResponse);
 
-        IncomingTrainsResponse res1 = new IncomingTrainsResponse();
-        res1.setArrivalTime("180");
-        res1.setArrivalTrainOrder("11002온수0");
-        res1.setDestinationStationName("온수");
-
-        IncomingTrainsResponse res2 = new IncomingTrainsResponse();
-        res2.setArrivalTime("300");
-        res2.setArrivalTrainOrder("12004석남0");
-        res2.setDestinationStationName("석남");
-
         // Mock
+        IncomingTrainsResponse incomingTrainsResponse1 = IncomingTrainsResponse.builder()
+                .arrivalTrainOrder("11002테스트0")
+                .arrivalTime("180")
+                .build();
+        IncomingTrainsResponse incomingTrainsResponse2 = IncomingTrainsResponse.builder()
+                .arrivalTrainOrder("12004테스트0")
+                .arrivalTime("300")
+                .build();
         when(objectMapper.readTree(fakeResponse)).thenReturn(fakeTree);
-        when(objectMapper.treeToValue(any(), eq(IncomingTrainsResponse.class)))
-                .thenReturn(res1, res2); // 순차 반환
+        when(objectMapper.treeToValue(any(JsonNode.class), eq(IncomingTrainsResponse.class)))
+                .thenAnswer(invocation -> incomingTrainsResponse1)
+                .thenAnswer(invocation -> incomingTrainsResponse2);
 
         // When
         List<IncomingTrainsResponse> result = subwayStationService.parseIncomingResponse(lineNumber, departure, destination, fakeResponse);
@@ -264,6 +266,8 @@ class SubwayStationServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
+        assertTrue(result.get(0).getArrivalTrainOrder().startsWith("1"));
+        assertTrue(result.get(1).getArrivalTrainOrder().startsWith("1"));
     }
 
     @AfterEach

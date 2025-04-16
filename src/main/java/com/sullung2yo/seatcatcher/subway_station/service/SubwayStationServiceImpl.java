@@ -166,18 +166,15 @@ public class SubwayStationServiceImpl implements SubwayStationService {
      * 상행선과 하행선을 계산하는 메서드
      * getAccumulateDistance() 기준으로 start역의 누적거리가 end역의 누적거리보다 작으면 상행선
      * getAccumulateDistance() 기준으로 start역의 누적거리가 end역의 누적거리보다 크면 하행선
-     * @param start
-     * @param end
-     * @return
+     * @param start 출발역 객체
+     * @param end 도착역 객체
+     * @return 상행선(0) 또는 하행선(1)
      */
     private String calculateUpDown(SubwayStation start, SubwayStation end) {
-        if (start.getAccumulateDistance() < end.getAccumulateDistance()) {
+        if (start.getAccumulateDistance() - end.getAccumulateDistance() > 0) {
             return "0"; // 상행선
-        } else if (start.getAccumulateDistance() > end.getAccumulateDistance()) {
-            return "1"; // 하행선
         } else {
-            log.warn("상행선과 하행선이 동일한 거리입니다.");
-            return "1"; // 동일한 거리인 경우 기본값으로 하행선으로 설정
+            return "1"; // 하행선
         }
     }
 
