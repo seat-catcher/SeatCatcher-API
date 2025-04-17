@@ -26,4 +26,7 @@ public class UserInformationResponse {
 
     @Schema(description = "사용자 태그 목록")
     private List<UserTagType> tags;
+
+    @Schema(description = "온보딩 진행 여부", example = "false, true")
+    private Boolean hasOnBoarded; // 온보딩 진행 여부
 }

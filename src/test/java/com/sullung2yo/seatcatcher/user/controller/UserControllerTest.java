@@ -105,8 +105,10 @@ class UserControllerTest {
     void updateUserInformation() throws Exception{
         // Given
         UserInformationUpdateRequest userInformationUpdateRequest = UserInformationUpdateRequest.builder()
-                .credit(555L)
-                .tags(List.of(UserTagType.USERTAG_NULL, UserTagType.USERTAG_LONGDISTANCE))
+                .profileImageNum(ProfileImageNum.IMAGE_2) // IMAGE_1 -> IMAGE_2
+                .credit(555L) // 123 -> 555
+                .tags(List.of(UserTagType.USERTAG_NULL, UserTagType.USERTAG_LONGDISTANCE)) // USERTAG_CARRIER -> USERTAG_NULL, USERTAG_LONGDISTANCE
+                .hasOnBoarded(true) // 최초 사용자 생성 시 false이므로 true로 변경 시도
                 .build();
 
         // When
@@ -114,13 +116,17 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userInformationUpdateRequest))
                 .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk());
 
         // Then
+        mockMvc.perform(get("/user/me")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").exists())
-                .andExpect(jsonPath("$.profileImageNum").exists())
-                .andExpect(jsonPath("$.credit").value(555L))
-                .andExpect(jsonPath("$.tags").exists());
+                .andExpect(jsonPath("$.profileImageNum").value(userInformationUpdateRequest.getProfileImageNum().name()))
+                .andExpect(jsonPath("$.credit").value(userInformationUpdateRequest.getCredit()))
+                .andExpect(jsonPath("$.tags").isArray())
+                .andExpect(jsonPath("$.hasOnBoarded").value(userInformationUpdateRequest.getHasOnBoarded()));
     }
 
     @Test
