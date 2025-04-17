@@ -8,18 +8,18 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/trains/{trainId}/cars/{carId}/seat-groups")
+@RequestMapping("/trains/{trainCode}/cars/{carCode}/seat-groups")
 @Tag(name = "좌석 그룹 API", description = "좌석 그룹 관련 API")
 public class TrainSeatGroupController {
 
@@ -28,38 +28,49 @@ public class TrainSeatGroupController {
     @GetMapping
     @Operation(
             summary = "량에 속한 모든 TrainSeatGroup들을 가져오는 API",
-            description = "열차 id와 량 id를 이용하여 해당 량에 속한 모든 TrainSeatGroup 들을 가져옵니다.",
+            description = "열차 번호와 차량 번호를 이용하여 해당 차량에 속한 모든 TrainSeatGroup 들을 가져옵니다.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "성공적으로 TrainSeatGroup들 반환",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TrainSeatGroupResponse.class))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TrainSeatGroupResponse.ResponseList.class))
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "해당 차량 ID를 찾을 수 없음"
+                            responseCode = "201",
+                            description = "성공적으로 TrainSeatGroup들을 생성, 반환 완료",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TrainSeatGroupResponse.ResponseList.class))
                     )
             }
     )
-    public ResponseEntity<List<TrainSeatGroupResponse>> getGroups(
-            @PathVariable Long trainId,
-            @PathVariable Long carId
+    public ResponseEntity<TrainSeatGroupResponse.ResponseList> getGroups(
+            @PathVariable String trainCode,
+            @PathVariable String carCode
     )
     {
-        List<TrainSeatGroupResponse> responses = new ArrayList<>();
+        TrainSeatGroupResponse.ResponseList responses = new TrainSeatGroupResponse.ResponseList();
 
-        List<TrainSeatGroup> records = trainSeatGroupService.findAllByTrainCarId(carId);
-        for(TrainSeatGroup record : records) {
-            responses.add(new TrainSeatGroupResponse(record));
+        try
+        {
+            List<TrainSeatGroup> records = trainSeatGroupService.findByTrainCodeAndCarCode(trainCode, carCode);
+
+            for(TrainSeatGroup record : records) {
+                responses.getItems().add(new TrainSeatGroupResponse.SingleResponse(record));
+            }
+
+            log.debug("성공적으로 TrainSeatGroup들 반환");
+            return ResponseEntity.ok(responses);
         }
+        catch(EntityNotFoundException e)
+        {
+            // 엔티티가 없는 경우. 에러를 뿌리는게 아니라 새로 생성해줘야 함.
+            List<TrainSeatGroup> records = trainSeatGroupService.createGroupsOf(trainCode, carCode);
+            for(TrainSeatGroup record : records) {
+                responses.getItems().add(new TrainSeatGroupResponse.SingleResponse(record));
+            }
 
-        if(responses.isEmpty()) {
-            log.error("해당 차량 ID({})를 찾을 수 없음", carId);
-            return ResponseEntity.notFound().build();
+            log.debug("성공적으로 TrainSeatGroup들을 생성, 반환 완료");
+            return ResponseEntity.status(HttpStatus.CREATED).body(responses);
         }
-
-        log.debug("성공적으로 TrainSeatGroup들 반환");
-        return ResponseEntity.ok(responses);
     }
 
 

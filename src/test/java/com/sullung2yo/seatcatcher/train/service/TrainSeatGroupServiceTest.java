@@ -30,19 +30,13 @@ public class TrainSeatGroupServiceTest {
     @DisplayName("Normal A, B, C 중 하나로 그룹을 만들었을 경우를 테스트")
     void testCreateGroup_normal()
     {
-        //given
-        TrainCar dummyCar = TrainCar.builder()
-                .trainSeatGroups(new HashSet<>())
-                .carCode("7208")
-                .train(null)
-                .build();
-
         //when
-        TrainSeatGroup group = service.create(dummyCar, SeatGroupType.NORMAL_A_14);
+        TrainSeatGroup group = service.create("2204","2111", SeatGroupType.NORMAL_A_14);
 
         //then
         Assertions.assertNotNull(group);
-        Assertions.assertEquals(dummyCar, group.getTrainCar());
+        Assertions.assertEquals("2204", group.getTrainCode());
+        Assertions.assertEquals("2111", group.getCarCode());
         Assertions.assertEquals(SeatGroupType.NORMAL_A_14, group.getType());
 
         List<TrainSeat> seats = group.getTrainSeats();
@@ -63,19 +57,13 @@ public class TrainSeatGroupServiceTest {
     @DisplayName("Elderly A, B 중 하나로 그룹을 만들었을 경우를 테스트")
     void testCreateGroup_elderly()
     {
-        //given
-        TrainCar dummyCar = TrainCar.builder()
-                .trainSeatGroups(new HashSet<>())
-                .carCode("7208")
-                .train(null)
-                .build();
-
         //when
-        TrainSeatGroup group = service.create(dummyCar, SeatGroupType.ELDERLY_A);
+        TrainSeatGroup group = service.create("2204","2111", SeatGroupType.ELDERLY_A);
 
         //then
         Assertions.assertNotNull(group);
-        Assertions.assertEquals(dummyCar, group.getTrainCar());
+        Assertions.assertEquals("2204", group.getTrainCode());
+        Assertions.assertEquals("2111", group.getCarCode());
         Assertions.assertEquals(SeatGroupType.ELDERLY_A, group.getType());
 
         List<TrainSeat> seats = group.getTrainSeats();

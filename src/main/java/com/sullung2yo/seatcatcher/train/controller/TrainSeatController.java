@@ -3,7 +3,6 @@ package com.sullung2yo.seatcatcher.train.controller;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.request.TrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.dto.response.CascadeTrainSeatResponse;
-import com.sullung2yo.seatcatcher.train.dto.response.TrainSeatResponse;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,7 +21,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/trains/{trainId}/cars/{carId}/seat-groups/{seatGroupId}/seats")
+@RequestMapping("/trains/{trainCode}/cars/{carCode}/seat-groups/{seatGroupId}/seats")
 @Tag(name = "좌석 API", description = "좌석 관련 API")
 public class TrainSeatController {
 
@@ -45,8 +44,8 @@ public class TrainSeatController {
         }
     )
     public ResponseEntity<List<CascadeTrainSeatResponse>> getSeatsCascade(
-            @PathVariable Long trainId,
-            @PathVariable Long carId,
+            @PathVariable String trainCode,
+            @PathVariable String carCode,
             @PathVariable Long seatGroupId
     )
     {
@@ -100,8 +99,8 @@ public class TrainSeatController {
             }
     )
     public ResponseEntity<Void> updateSeat(
-            @PathVariable Long trainId,
-            @PathVariable Long carId,
+            @PathVariable String trainCode,
+            @PathVariable String carCode,
             @PathVariable Long seatGroupId,
             @PathVariable Long seatId,
             @RequestBody TrainSeatRequest trainSeatRequest
