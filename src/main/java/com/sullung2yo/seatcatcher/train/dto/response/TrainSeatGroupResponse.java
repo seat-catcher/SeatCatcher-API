@@ -23,18 +23,18 @@ public class TrainSeatGroupResponse {
         private Long id;
 
         @Schema(description = "Seat Group이 속한 열차의 번호입니다.")
-        private String TrainCode;
+        private String trainCode;
 
         @Schema(description = "Seat Group이 속한 차량의 번호입니다.")
-        private String CarCode;
+        private String carCode;
 
         @Schema(description = "Seat Group의 타입입니다.")
         private SeatGroupType groupType;
 
         public SingleResponse(TrainSeatGroup record) {
             this.id = record.getId();
-            this.TrainCode = record.getTrainCode();
-            this.CarCode = record.getCarCode();
+            this.trainCode = record.getTrainCode();
+            this.carCode = record.getCarCode();
             this.groupType = record.getType();
         }
     }
