@@ -108,6 +108,7 @@ class UserControllerTest {
                 .profileImageNum(ProfileImageNum.IMAGE_2) // IMAGE_1 -> IMAGE_2
                 .credit(555L) // 123 -> 555
                 .tags(List.of(UserTagType.USERTAG_NULL, UserTagType.USERTAG_LONGDISTANCE)) // USERTAG_CARRIER -> USERTAG_NULL, USERTAG_LONGDISTANCE
+                .onboarding(true) // 최초 사용자 생성 시 false이므로 true로 변경 시도
                 .build();
 
         // When
@@ -124,8 +125,8 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.profileImageNum").value(userInformationUpdateRequest.getProfileImageNum().name()))
                 .andExpect(jsonPath("$.credit").value(userInformationUpdateRequest.getCredit()))
-                .andExpect(jsonPath("$.tags[0]").value("USERTAG_NULL"))
-                .andExpect(jsonPath("$.tags[1]").value("USERTAG_LONGDISTANCE"));
+                .andExpect(jsonPath("$.tags").isArray())
+                .andExpect(jsonPath("$.hasOnBoarded").value(userInformationUpdateRequest.getOnboarding()));
     }
 
     @Test

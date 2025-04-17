@@ -52,19 +52,7 @@ public class UserController {
 
         // JWT에서 사용자 정보 추출 및 사용자 정보 반환
         User user = userService.getUserWithToken(token);
-        List<UserTagType> tags = user.getUserTag().stream()
-                        .map(userTag -> userTag.getTag().getTagName())
-                        .toList();
-
-        log.debug("사용자 정보: {}, {}, {}, {}", user.getName(), user.getCredit(), user.getProfileImageNum(), tags);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                UserInformationResponse.builder()
-                        .name(user.getName())
-                        .profileImageNum(user.getProfileImageNum())
-                        .credit(user.getCredit())
-                        .tags(tags)
-                        .build()
-        );
+        return getUserInformationResponseResponseEntity(user);
     }
 
     @PatchMapping("/me")
@@ -95,17 +83,7 @@ public class UserController {
         User user = userService.updateUser(token, userInformationUpdateRequest);
         log.debug("사용자 정보 업데이트 성공");
 
-        List<UserTagType> tags = user.getUserTag().stream()
-                .map(userTag -> userTag.getTag().getTagName())
-                .toList();
-        UserInformationResponse userInformationResponse = UserInformationResponse.builder()
-                .name(user.getName())
-                .profileImageNum(user.getProfileImageNum())
-                .credit(user.getCredit())
-                .tags(tags)
-                .build();
-        log.debug("사용자 정보 업데이트: {}, {}, {}, {}", user.getName(), user.getCredit(), user.getProfileImageNum(), tags);
-        return ResponseEntity.status(HttpStatus.OK).body(userInformationResponse);
+        return getUserInformationResponseResponseEntity(user);
     }
 
     @DeleteMapping("/me")
@@ -133,5 +111,22 @@ public class UserController {
         userService.deleteUser(token);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private ResponseEntity<UserInformationResponse> getUserInformationResponseResponseEntity(User user) {
+        List<UserTagType> tags = user.getUserTag().stream()
+                .map(userTag -> userTag.getTag().getTagName())
+                .toList();
+
+        log.debug("사용자 정보: {}, {}, {}, {}", user.getName(), user.getCredit(), user.getProfileImageNum(), tags);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                UserInformationResponse.builder()
+                        .name(user.getName())
+                        .profileImageNum(user.getProfileImageNum())
+                        .credit(user.getCredit())
+                        .tags(tags)
+                        .hasOnBoarded(user.getHasOnBoarded())
+                        .build()
+        );
     }
 }

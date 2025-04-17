@@ -34,4 +34,7 @@ public class UserInformationUpdateRequest {
     @Min(value = 0, message = "크레딧은 0 이상이어야 합니다.")
     private Long credit;
 
+    @Schema(description = "온보딩 진행 여부", example = "false, true")
+    private Boolean onboarding; // 온보딩 진행 여부
+
 }

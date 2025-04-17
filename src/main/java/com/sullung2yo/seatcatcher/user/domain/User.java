@@ -66,4 +66,9 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'IMAGE_1'")
     private ProfileImageNum profileImageNum; // 프로필 이미지 번호 (이미지 자체는 프론트에서 관리)
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    @Builder.Default
+    Boolean hasOnBoarded = false; // 온보딩 진행 여부 (true: 온보딩 완료, false: 온보딩 미진행)
 }

@@ -109,6 +109,13 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        // 온보딩 진행 여부 업데이트
+        Boolean hasOnBoarded = userInformationUpdateRequest.getOnboarding();
+        if (hasOnBoarded != null) {
+            log.debug("온보딩 진행 여부 업데이트: {}", hasOnBoarded);
+            user.setHasOnBoarded(hasOnBoarded);
+        }
+
         // 2. DB에 업데이트된 사용자 정보 저장
         userRepository.save(user);
 
