@@ -55,6 +55,14 @@ public class UserServiceImpl implements UserService {
         // 1. 사용자 정보 업데이트
         log.debug("사용자 정보 업데이트 요청: {}", userInformationUpdateRequest.toString());
         User user = this.getUserWithToken(token);
+        log.debug(
+                "업데이트할 사용자 : {}, {}, {}, {}, {}",
+                user.getProviderId(),
+                user.getName(),
+                user.getCredit(),
+                user.getProfileImageNum(),
+                user.getUserTag().stream().map(userTag -> userTag.getTag().getTagName()).toList()
+        );
 
         // 기본 정보 업데이트
         if (userInformationUpdateRequest.getName() != null) {
@@ -77,12 +85,10 @@ public class UserServiceImpl implements UserService {
         }
 
         // 태그 정보 업데이트
-        log.debug("사용자 태그 업데이트: {}", userInformationUpdateRequest.getTags());
         List<UserTagType> tags = userInformationUpdateRequest.getTags();
+        user.getUserTag().clear(); // 기존 태그 관계 제거 -> 새로 생성
         if (tags != null) {
-            // 기존 태그 관계 제거
-            user.getUserTag().clear();
-
+            log.debug("사용자 태그 업데이트 개수: {}", tags.size());
             // 새 태그 관계 설정
             for (UserTagType userTagType : tags) {
                 // 이미 존재하는 태그를 찾거나 새로 생성
