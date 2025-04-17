@@ -35,6 +35,6 @@ public class UserInformationUpdateRequest {
     private Long credit;
 
     @Schema(description = "온보딩 진행 여부", example = "false, true")
-    private Boolean onboarding; // 온보딩 진행 여부
+    private Boolean hasOnBoarded; // 온보딩 진행 여부
 
 }

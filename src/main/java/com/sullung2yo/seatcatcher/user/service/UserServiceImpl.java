@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 온보딩 진행 여부 업데이트
-        Boolean hasOnBoarded = userInformationUpdateRequest.getOnboarding();
+        Boolean hasOnBoarded = userInformationUpdateRequest.getHasOnBoarded();
         if (hasOnBoarded != null) {
             log.debug("온보딩 진행 여부 업데이트: {}", hasOnBoarded);
             user.setHasOnBoarded(hasOnBoarded);
