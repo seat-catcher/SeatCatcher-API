@@ -58,7 +58,7 @@ public class User extends BaseEntity {
     @Column
     private LocalDateTime lastLoginAt; // 마지막 로그인 시간
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     @Builder.Default
     private Set<UserTag> userTag = new HashSet<>(); // 사용자 태그 (M:N 관계 -> UserTag Entity 참조)
 

@@ -86,7 +86,11 @@ public class UserServiceImpl implements UserService {
 
         // 태그 정보 업데이트
         List<UserTagType> tags = userInformationUpdateRequest.getTags();
-        user.getUserTag().clear(); // 기존 태그 관계 제거 -> 새로 생성
+
+        // 기존 태그 관계 제거 -> 새로 생성
+        userTagRepository.deleteAll(user.getUserTag());
+        user.getUserTag().clear();
+
         if (tags != null) {
             log.debug("사용자 태그 업데이트 개수: {}", tags.size());
             // 새 태그 관계 설정
