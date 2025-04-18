@@ -2,7 +2,6 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
-import com.sullung2yo.seatcatcher.train.dto.request.TrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
 import com.sullung2yo.seatcatcher.user.domain.User;
@@ -21,8 +20,6 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     private final UserTrainSeatRepository userTrainSeatRepository;
     private final TrainSeatRepository trainSeatRepository;
     private final UserRepository userRepository;
-
-    private final TrainSeatService trainSeatService;
 
     @Override
     @Transactional
@@ -53,9 +50,6 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     public void delete(Long userId) {
         UserTrainSeat item = userTrainSeatRepository.findUserTrainSeatByUserId(userId)
                 .orElseThrow(EntityNotFoundException::new);
-
-        // 착석 정보를 제거했다면 당연히 좌석에 대한 찜 수라던가도 초기화가 진행되어야 함.
-        trainSeatService.update(item.getTrainSeat().getId(), TrainSeatRequest.builder().jjimCount(0).build());
 
         userTrainSeatRepository.deleteUserTrainSeatByUserId(userId);
     }

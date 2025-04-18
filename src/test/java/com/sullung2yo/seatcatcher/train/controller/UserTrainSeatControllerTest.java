@@ -3,14 +3,8 @@ package com.sullung2yo.seatcatcher.train.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
-import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
-import com.sullung2yo.seatcatcher.train.domain.Train;
-import com.sullung2yo.seatcatcher.train.domain.TrainCar;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
-import com.sullung2yo.seatcatcher.train.repository.TrainCarRepository;
-import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
-import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.domain.*;
@@ -32,8 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.HashSet;
 
 @Slf4j
 @AutoConfigureMockMvc
@@ -59,12 +51,6 @@ public class UserTrainSeatControllerTest {
 
     @Autowired
     private UserTagRepository userTagRepository;
-
-    @Autowired
-    private TrainRepository trainRepository;
-
-    @Autowired
-    private TrainCarRepository trainCarRepository;
 
     @Autowired
     private TrainSeatGroupService trainSeatGroupService;
@@ -101,27 +87,9 @@ public class UserTrainSeatControllerTest {
         accessToken = jwtTokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
 
         //테스트할 좌석 생성
-        Train sampleTrain = Train.builder()
-                .trainCode("test")
-                .carCount(1)
-                .build();
-        trainRepository.save(sampleTrain);
-
-        TrainCar sampleCar = TrainCar.builder()
-                .carCode("test")
-                .train(sampleTrain)
-                .build();
-        sampleCar.setTrain(sampleTrain);
-
-        sampleCar.setTrainSeatGroups(new HashSet<>());
-
-        sampleCar.getTrainSeatGroups().add(trainSeatGroupService.create(sampleCar, SeatGroupType.NORMAL_A_14));
-
-        trainCarRepository.save(sampleCar); // cascade 로 좌석까지 모두 한꺼번에 저장됨.
-
-        seat = sampleCar.getTrainSeatGroups().stream().findFirst()
+        seat = trainSeatGroupService.createGroupsOf("2222", "2222").stream().findFirst()
                 .orElseThrow(EntityNotFoundException::new)
-                .getTrainSeats().get(0);
+                .getTrainSeats().get(0);;
     }
 
     @Test

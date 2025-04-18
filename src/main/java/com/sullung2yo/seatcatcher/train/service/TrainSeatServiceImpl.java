@@ -42,11 +42,9 @@ public class TrainSeatServiceImpl implements TrainSeatService {
 
         Integer location = seatInfo.getSeatLocation();
         SeatType seatType = seatInfo.getSeatType();
-        Integer jjimCount = seatInfo.getJjimCount();
 
         if(location != null) item.setSeatLocation(location);
         if(seatType != null) item.setSeatType(seatType);
-        if(jjimCount != null) item.setJjimCount(jjimCount);
 
         trainSeatRepository.save(item);
     }

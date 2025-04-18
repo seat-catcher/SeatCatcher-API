@@ -6,7 +6,6 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -17,21 +16,22 @@ import java.util.Set;
 @Table(name="train_seat_groups")
 public class TrainSeatGroup extends BaseEntity {
 
-    /*
-        BaseEntity 를 상속받아
-        id   ::   id 는 지하철 역에 대한 고유 식별자로써, 인덱싱 역할을 수행합니다.
-        created_at    ::    데이터베이스에 저장된 날짜입니다.
-        modified_at    ::    데이터베이스에서 수정된 날짜입니다.
-        해당 세 칼럼은 정의하지 않았습니다.
-    */
-
+/*
+    // Old
     @ManyToOne
     @JoinColumn(name = "train_car_id", nullable = false)
     private TrainCar trainCar;
+ */
 
     @OneToMany(mappedBy = "trainSeatGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("seatLocation asc")
     private List<TrainSeat> trainSeats;
+
+    @Column(name = "train_code")
+    private String trainCode;
+
+    @Column(name = "car_code")
+    private String carCode;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
