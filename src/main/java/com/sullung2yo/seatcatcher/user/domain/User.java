@@ -51,7 +51,7 @@ public class User extends BaseEntity {
     @Builder.Default
     private UserRole role = UserRole.ROLE_USER; // 권한 레벨
 
-    @Enumerated(EnumType.STRING)
+
     private String fcmToken; // 기기별 고유의 fcm 토큰입니다.
 
     @Column(nullable = false)
