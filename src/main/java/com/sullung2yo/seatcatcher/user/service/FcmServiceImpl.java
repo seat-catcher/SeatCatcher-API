@@ -76,8 +76,6 @@ public class FcmServiceImpl implements FcmService {
         user.setFcmToken(request.getToken());
     }
 
-
-    //메시지 만듬
     private String makeMessage(String targetToken, String title, String body) throws com.fasterxml.jackson.core.JsonProcessingException { // JsonParseException, JsonProcessingException
         FcmMessage fcmMessage = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
