@@ -5,14 +5,19 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.FcmException;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
+import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.dto.request.FcmMessage;
 import com.sullung2yo.seatcatcher.user.dto.request.FcmRequest;
+import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -27,6 +32,8 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RequiredArgsConstructor
 public class FcmServiceImpl implements FcmService {
 
+    private final UserService userService;
+    private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
     @Value("${fcm.url}")
@@ -40,7 +47,7 @@ public class FcmServiceImpl implements FcmService {
 
 
     @Override
-    public void sendMessageTo(FcmRequest request) throws IOException {
+    public void sendMessageTo(FcmRequest.Notification request) throws IOException {
         RestClient restClient = RestClient.create();
         restClient.post()
                 .uri(FCM_API_URL)
@@ -59,6 +66,18 @@ public class FcmServiceImpl implements FcmService {
 
     }
 
+    @Override
+    public void saveToken(FcmRequest.Token request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String providerId = authentication.getName();
+        User user = userRepository.findByProviderId(providerId)
+                .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. providerId : " + providerId, ErrorCode.USER_NOT_FOUND));
+
+        user.setFcmToken(request.getToken());
+    }
+
+
+    //메시지 만듬
     private String makeMessage(String targetToken, String title, String body) throws com.fasterxml.jackson.core.JsonProcessingException { // JsonParseException, JsonProcessingException
         FcmMessage fcmMessage = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
@@ -72,7 +91,7 @@ public class FcmServiceImpl implements FcmService {
         return objectMapper.writeValueAsString(fcmMessage);
     }
 
-    // Firebase Admin SDK의 비공개 키를 참조하여 Bearer 토큰을 발급 받는다.
+    // Firebase Admin SDK의 비공개 키를 통한 accessToken발급
     private String getAccessToken() throws IOException {
 
         try {
