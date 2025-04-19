@@ -2,6 +2,10 @@ package com.sullung2yo.seatcatcher.user.controller;
 
 import com.sullung2yo.seatcatcher.user.dto.request.FcmRequest;
 import com.sullung2yo.seatcatcher.user.service.FcmService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +27,38 @@ public class FcmController {
 
 
     @PostMapping("/token")
+    @Operation(
+            summary = "fcm 기기별 toekn 저장 API",
+            description = "각 기기마다의 fcm token을 user 칼럼에 저장합니다. 아래의 경우 저장이 필요합니다." +
+                    "- 앱이 인스턴스 ID를 삭제한 경우\n" +
+                    "- 앱이 새 기기에서 복원된 경우\n" +
+                    "- 사용자가 앱을 제거하거나 재설치한 경우\n" +
+                    "- 사용자가 앱 데이터를 지운 경우",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "fcmToken 저장 예시",
+                                            summary = "기본 요청 예시",
+                                            value = "{ \"token\": q3498fhiudhf0a9s}"
+                                    )
+                            }
+                    )
+            )
+    )
+    @ApiResponse(responseCode = "200", description = "token 저장 성공")
+    @ApiResponse(responseCode = "404", description = "user를 찾을 수 없습니다.")
     public ResponseEntity<String> saveFcmToken(@RequestBody FcmRequest.Token request) {
-
         fcmService.saveToken(request);
-
         return ResponseEntity.ok("token을 저장하였습니다.");
     }
 
     @PostMapping("/pushMessage")
+    @Operation(
+            summary = "[수정필요] FCM 알람 요청 API"
+    )
     public ResponseEntity<String> pushMessage(@RequestBody FcmRequest.Notification request)  throws IOException {
         fcmService.sendMessageTo(request);
         return ResponseEntity.ok("알람을 성공적으로 전송하였습니다.");
