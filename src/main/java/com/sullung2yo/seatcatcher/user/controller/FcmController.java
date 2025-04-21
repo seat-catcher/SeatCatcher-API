@@ -24,8 +24,6 @@ import java.io.IOException;
 public class FcmController {
     private final FcmService fcmService;
 
-
-
     @PostMapping("/token")
     @Operation(
             summary = "fcm 기기별 toekn 저장 API",
