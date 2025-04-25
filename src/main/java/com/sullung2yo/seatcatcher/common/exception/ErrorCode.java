@@ -20,7 +20,8 @@ public enum ErrorCode {
     SEAT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 좌석을 찾을 수 없습니다."),
     SEAT_ALREADY_RESERVED(HttpStatus.BAD_REQUEST, "해당 좌석은 이미 점유중입니다."),
     USER_NOT_RESERVED(HttpStatus.BAD_REQUEST, "해당 사용자는 좌석을 점유중이지 않습니다."),
-    USER_ALREADY_RESERVED(HttpStatus.BAD_REQUEST, "이미 다른 좌석을 예약한 사용자입니다."),;
+    USER_ALREADY_RESERVED(HttpStatus.BAD_REQUEST, "이미 다른 좌석을 예약한 사용자입니다."),
+    TRAIN_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 열차를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

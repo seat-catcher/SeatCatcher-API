@@ -4,6 +4,7 @@ import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter

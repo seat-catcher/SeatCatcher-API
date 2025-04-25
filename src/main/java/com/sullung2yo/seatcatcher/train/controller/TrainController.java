@@ -82,7 +82,7 @@ public class TrainController {
             SubwayStation destination = subwayStationService.findByStationNameAndLine(
                     dest, lineNumber
             );
-            if (departure.getLine().equals(destination.getLine())) {
+            if (departure.getLine().equals(destination.getLine())) { // TODO : 이부분 따로 서비스에서 처리하거나 private 메서드로 분리해야 깔끔할 것 같음
                 // 현재는 출발역과 도착역 노선이 동일한 경우에만 처리
                 // TODO : 출발역과 도착역 노선이 다른 경우 처리 로직 추가 필요 (다익스트라 알고리즘 등...)
 

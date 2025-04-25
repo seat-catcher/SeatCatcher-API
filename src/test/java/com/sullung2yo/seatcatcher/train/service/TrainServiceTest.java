@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
-import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
+import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,11 +18,11 @@ public class TrainServiceTest {
     private TrainSeatGroupService service;
 
     @Mock
-    private TrainSeatGroupRepository trainSeatGroupRepository;
+    private TrainRepository trainRepository;
 
     @BeforeEach
     void setUp() {
-        service = new TrainSeatGroupServiceImpl(trainSeatGroupRepository);
+        service = new TrainSeatGroupServiceImpl(trainRepository);
     }
 
     @Test

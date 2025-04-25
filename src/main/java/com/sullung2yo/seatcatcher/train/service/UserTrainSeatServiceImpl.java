@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.common.exception.SeatException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
+import com.sullung2yo.seatcatcher.train.dto.event.SeatEvent;
 import com.sullung2yo.seatcatcher.train.event_handler.SeatEventAssembler;
 import com.sullung2yo.seatcatcher.train.event_handler.SeatEventPublisher;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -64,9 +66,8 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         userTrainSeatRepository.save(userSeat);
 
         // 좌석 예약 이벤트 발행
-        // 1. 업데이트 된 SeatEvent 객체 생성
-
-        // seatEventPublisher.publish(seatEvent); // RabbitMQ에 발행
+        SeatEvent event = seatEventAssembler.assembleSeatEvents(seatId);
+        seatEventPublisher.publish(event); // RabbitMQ에 발행
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
-import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
+import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +16,12 @@ import java.util.List;
 @Slf4j // 이걸 추가하면 로깅을 마음껏 쓸 수 있음.
 public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
-    private final TrainSeatGroupRepository trainSeatGroupRepository;
+    private final TrainRepository trainRepository;
 
 
     @Override
     public List<Train> findByTrainCodeAndCarCode(String trainCode, String carCode) {
-        List<Train> result = trainSeatGroupRepository.findAllByTrainCodeAndCarCode(trainCode, carCode);
+        List<Train> result = trainRepository.findAllByTrainCodeAndCarCode(trainCode, carCode);
 
         if(result.isEmpty())
         {
@@ -53,7 +53,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         groups.add(create(trainCode, carCode, SeatGroupType.ELDERLY_B));
  */
 
-        trainSeatGroupRepository.saveAll(groups);
+        trainRepository.saveAll(groups);
 
         return groups;
     }
