@@ -1,0 +1,31 @@
+version: '3.8'
+# Local Development Environment only (Not for dev in AWS and prod)
+
+services:
+
+  # Spring Boot Application Container
+  backend:
+    image: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+    networks:
+      - dev-network
+
+  # RabbitMQ Container
+  rabbitmq:
+    image: rabbitmq:4.1.0-management-alpine
+    ports:
+      - "5672:5672" # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=test
+      - RABBITMQ_DEFAULT_PASS=test123
+      - RABBITMQ_DEFAULT_VHOST=seatcatcher_local
+    networks:
+        - dev-network
+
+networks:
+  dev-network:
+    driver: bridge
