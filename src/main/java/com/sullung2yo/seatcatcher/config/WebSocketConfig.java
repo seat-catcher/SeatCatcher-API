@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -15,6 +16,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -100,7 +102,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         - 2. 아래 한줄로 설정 끝 (간편함)
          */
         config.enableSimpleBroker("/topic")
-                .setHeartbeatValue(new long[]{10000, 10000}); // Server->Client, Client->Server의 heartbeat 주기 설정
+                .setHeartbeatValue(new long[]{10000, 10000})
+                .setTaskScheduler(brokerTaskScheduler()); // Server->Client, Client->Server의 heartbeat 주기 설정
 
         // Heart-Beat : 클라이언트와 서버가 서로 연결이 살아있는지 확인하는 주기
         // 우리가 개발해야하는 모바일 서비스로 Wifi연결이나 셀룰러 연결이 불안정해서 웹소켓이 끊기는 경우가 있음
@@ -115,4 +118,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app");
     }
 
+    @Bean
+    public ThreadPoolTaskScheduler brokerTaskScheduler() {
+        /*
+         * Heartbeat을 위한 ThreadPoolTaskScheduler Bean 등록
+         */
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(10); // 스레드 풀 사이즈 설정
+        threadPoolTaskScheduler.setThreadNamePrefix("WebSocket-HeartBeat-");
+        threadPoolTaskScheduler.initialize(); // 스레드 풀 초기화
+        return threadPoolTaskScheduler;
+    }
 }

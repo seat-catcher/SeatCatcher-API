@@ -89,7 +89,7 @@ public class UserTrainSeatControllerTest {
         //테스트할 좌석 생성
         seat = trainSeatGroupService.createGroupsOf("2222", "2222").stream().findFirst()
                 .orElseThrow(EntityNotFoundException::new)
-                .getTrainSeats().get(0);;
+                .getTrainSeat().get(0);;
     }
 
     @Test
@@ -103,7 +103,7 @@ public class UserTrainSeatControllerTest {
                 .andExpect(status().isNoContent());
 
         // Given
-        userTrainSeatService.create(user.getId(), seat.getId());
+        userTrainSeatService.reserveSeat(user.getId(), seat.getId());
 
         // When
         mockMvc.perform(get("/user/seats")

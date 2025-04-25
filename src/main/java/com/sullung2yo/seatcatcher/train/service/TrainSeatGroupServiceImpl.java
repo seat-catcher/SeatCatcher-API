@@ -65,7 +65,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         Train train = Train.builder()
                 .trainCode(trainCode)
                 .carCode(carCode)
-                .trainSeats(new ArrayList<>())
+                .trainSeat(new ArrayList<>())
                 .type(groupType)
                 .build();
 
@@ -83,7 +83,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
                     .seatLocation(i)
                     .seatType(seatType)
                     .build();
-            train.getTrainSeats().add(trainSeat);
+            train.getTrainSeat().add(trainSeat);
         }
 
         return train;

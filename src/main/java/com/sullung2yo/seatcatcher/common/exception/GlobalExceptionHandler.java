@@ -95,6 +95,43 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler(SeatException.class)
+    public ResponseEntity<ErrorResponse> handleSeatException(SeatException ex) {
+        /*
+          유저 관련 ExceptionHandler
+         */
+        log.error("SeatException", ex);
+        if (ex.getErrorCode() == ErrorCode.SEAT_ALREADY_RESERVED) {
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Seat already reserved", ex.getMessage());
+        }
+        else if (ex.getErrorCode() == ErrorCode.SEAT_NOT_FOUND) {
+            return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid Profile Image Number", ex.getMessage());
+        }
+        else if (ex.getErrorCode() == ErrorCode.USER_ALREADY_RESERVED) {
+            return createErrorResponse(HttpStatus.NOT_FOUND, "User already reserved", ex.getMessage());
+        }
+        else if (ex.getErrorCode() == ErrorCode.USER_NOT_RESERVED) {
+            return createErrorResponse(HttpStatus.NOT_FOUND, "User not reserved", ex.getMessage());
+        }
+        else {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage());
+        }
+    }
+
+    @ExceptionHandler(TrainException.class)
+    public ResponseEntity<ErrorResponse> handleTrainException(TrainException ex) {
+        /*
+          기차 관련 ExceptionHandler
+         */
+        log.error("TrainException", ex);
+        if (ex.getErrorCode() == ErrorCode.TRAIN_NOT_FOUND) {
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Train Not Found", ex.getMessage());
+        }
+        else {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Train Internal Server Error", ex.getMessage());
+        }
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
         /*

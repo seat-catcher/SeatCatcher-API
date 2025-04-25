@@ -45,7 +45,7 @@ public class TrainSeatServiceTest {
     @DisplayName("Modify Seat info test")
     void modifySeatInfoTest() throws Exception {
         //Given
-        TrainSeat original = sampleTrain.getTrainSeats().get(0);
+        TrainSeat original = sampleTrain.getTrainSeat().get(0);
 
         //When
         trainSeatService.update(original.getId(), TrainSeatRequest.builder()

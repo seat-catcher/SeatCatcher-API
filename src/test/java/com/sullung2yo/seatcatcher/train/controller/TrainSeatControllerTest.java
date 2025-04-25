@@ -54,7 +54,7 @@ public class TrainSeatControllerTest {
                 .orElseThrow(EntityNotFoundException::new).getId();
         seatId = trainSeatGroupService.findByTrainCodeAndCarCode(trainCode, carCode).stream().findFirst()
                 .orElseThrow(EntityNotFoundException::new)
-                .getTrainSeats().get(0).getId();;
+                .getTrainSeat().get(0).getId();;
     }
 
     // 어떤 그룹의 모든 좌석을 끌어오는 API, 좌석 정보를 수정하는 API 두 개를 테스트해봐야 함.

@@ -38,7 +38,7 @@ public class TrainServiceTest {
         Assertions.assertEquals("2111", group.getCarCode());
         Assertions.assertEquals(SeatGroupType.NORMAL_A_14, group.getType());
 
-        List<TrainSeat> seats = group.getTrainSeats();
+        List<TrainSeat> seats = group.getTrainSeat();
         Assertions.assertEquals(group.getType().getSeatCount(), seats.size());
 
         for(int i = 0; i < seats.size(); i++)
@@ -64,7 +64,7 @@ public class TrainServiceTest {
         Assertions.assertEquals("2111", group.getCarCode());
         Assertions.assertEquals(SeatGroupType.ELDERLY_A, group.getType());
 
-        List<TrainSeat> seats = group.getTrainSeats();
+        List<TrainSeat> seats = group.getTrainSeat();
         Assertions.assertEquals(group.getType().getSeatCount(), seats.size());
 
         for(int i = 0; i < seats.size(); i++)

@@ -20,8 +20,8 @@ public class TrainSeatServiceImpl implements TrainSeatService {
     private final TrainSeatRepository trainSeatRepository;
 
     @Override
-    public List<TrainSeat> findAllBySeatGroupId(Long id) {
-        List<TrainSeat> result = trainSeatRepository.findAllByTrainSeatGroupId(id);
+    public List<TrainSeat> findAllBySeatId(Long id) {
+        List<TrainSeat> result = trainSeatRepository.findAllById(id);
         if(result == null || result.isEmpty()) {
             throw new EntityNotFoundException("TrainSeat not found");
         }
