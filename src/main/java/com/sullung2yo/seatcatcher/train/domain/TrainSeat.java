@@ -41,5 +41,5 @@ public class TrainSeat extends BaseEntity {
     private SeatType seatType = SeatType.NORMAL; // 노약자석 / 임산부좌석 / 일반좌석 세 가지만 일단 존재합니다.
 
     @Column(name = "jjim_count")
-    private int jjimCount;
+    private int jjimCount; // 찜 기능은 없앤다고 했지 않았나요?
 }
