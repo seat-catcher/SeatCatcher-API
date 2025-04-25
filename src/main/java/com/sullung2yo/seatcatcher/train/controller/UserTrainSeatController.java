@@ -2,6 +2,8 @@ package com.sullung2yo.seatcatcher.train.controller;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
+import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.dto.response.UserTrainSeatResponse;
@@ -54,19 +56,16 @@ public class UserTrainSeatController {
             @RequestBody UserTrainSeatRequest userTrainSeatRequest
     )
     {
+        // Bearer 토큰 검증
         Long userId = verifyUserAndGetId(bearerToken);
+        if (userId == null) {
+            throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
+        }
 
-        try
-        {
-            userTrainSeatService.create(userId, userTrainSeatRequest.getSeatId());
-            log.debug("성공적으로 생성 완료");
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        }
-        catch(EntityNotFoundException e)
-        {
-            log.error("해당 좌석 ID({})를 찾을 수 없음", userTrainSeatRequest.getSeatId());
-            return ResponseEntity.notFound().build();
-        }
+        userTrainSeatService.reserveSeat(userId, userTrainSeatRequest.getSeatId());
+        log.debug("성공적으로 좌석 점유 지정 완료");
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping
@@ -75,33 +74,29 @@ public class UserTrainSeatController {
             description = "현재 등록된 유저에 대한 착석 정보를 제거, 즉 하차 처리를 수행합니다.",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
+                            responseCode = "204",
                             description = "성공적으로 제거 완료"
                     ),
                     @ApiResponse(
                             responseCode = "404",
-                            description = "해당 유저에 대한 착석 정보를 찾을 수 없음"
+                            description = "사용자를 찾을 수 없거나, 사용자가 앉은 좌석 정보가 데이터베이스에 없는 경우"
                     )
             }
     )
     public ResponseEntity<Void> deleteSittingInfo(@RequestHeader("Authorization") String bearerToken)
     {
         // Bearer 토큰 검증
-        Long uid = verifyUserAndGetId(bearerToken);
+        Long userId = verifyUserAndGetId(bearerToken);
+        if (userId == null) {
+            throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
+        }
 
-        try{
-            userTrainSeatService.delete(uid);
-            log.debug("성공적으로 제거 완료");
-            return ResponseEntity.ok().build();
-        }
-        catch(EntityNotFoundException e)
-        {
-            log.error("해당 유저에 대한 착석 정보를 찾을 수 없음");
-            return ResponseEntity.notFound().build(); // TODO :: Description 에 있는 에러 메시지도 같이 보내주기
-        }
+        userTrainSeatService.releaseSeat(userId);
+        log.debug("성공적으로 좌석 점유 해제 완료");
+        return ResponseEntity.noContent().build();
     }
 
-    //TODO :: 지금은 이렇게 만들지만 나중에는 AOT 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.
+    //TODO :: 지금은 이렇게 만들지만 나중에는 AOP 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.
     // 혹은 단순하게 AuthService 등에 해당 로직을 옮겨놓는 것도 좋을 듯.
     private Long verifyUserAndGetId(String bearerToken)
     {

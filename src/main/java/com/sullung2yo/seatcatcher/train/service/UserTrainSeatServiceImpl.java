@@ -23,7 +23,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
     @Override
     @Transactional
-    public void create(Long userId, Long seatId) {
+    public void reserveSeat(Long userId, Long seatId) {
         User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         TrainSeat seat = trainSeatRepository.findById(seatId).orElseThrow(EntityNotFoundException::new);
 
@@ -47,7 +47,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
     @Override
     @Transactional
-    public void delete(Long userId) {
+    public void releaseSeat(Long userId) {
         UserTrainSeat item = userTrainSeatRepository.findUserTrainSeatByUserId(userId)
                 .orElseThrow(EntityNotFoundException::new);
 

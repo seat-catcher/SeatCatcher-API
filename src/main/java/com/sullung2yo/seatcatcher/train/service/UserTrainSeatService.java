@@ -5,10 +5,10 @@ import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 
 public interface UserTrainSeatService {
 
-    void create(Long userId, Long seatId);
+    void reserveSeat(Long userId, Long seatId);
 
     UserTrainSeat findUserTrainSeatByUserId(Long id);
     UserTrainSeat findUserTrainSeatBySeatId(Long id);
 
-    void delete(Long id);
+    void releaseSeat(Long id);
 }
