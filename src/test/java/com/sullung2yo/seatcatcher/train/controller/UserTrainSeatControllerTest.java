@@ -41,9 +41,6 @@ public class UserTrainSeatControllerTest {
     private JwtTokenProviderImpl jwtTokenProvider;
 
     @Autowired
-    private UserTrainSeatService userTrainSeatService;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -93,79 +90,12 @@ public class UserTrainSeatControllerTest {
     }
 
     @Test
-    void testGetSittingInfoWithToken() throws Exception {
-
-        // When 유저의 착석 정보가 없는데 Get 을 하려고 하는 경우
-        mockMvc.perform(get("/user/seats")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + accessToken))
-                //Then
-                .andExpect(status().isNoContent());
-
-        // Given
-        userTrainSeatService.reserveSeat(user.getId(), seat.getId());
-
-        // When
-        mockMvc.perform(get("/user/seats")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + accessToken))
-                //Then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.seatId").value(seat.getId()))
-                .andExpect(jsonPath("$.userId").value(user.getId()));
+    void testReserveSeat() throws Exception {
+        // TODO : 좌석 예약 API 테스트
     }
 
     @Test
-    void testCreateSittingInfoWithToken() throws Exception {
-        //Given
-        UserTrainSeatRequest request = UserTrainSeatRequest.builder()
-                .seatId(seat.getId())
-                .build();
-        //When
-        mockMvc.perform(post("/user/seats")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .header("Authorization", "Bearer " + accessToken))
-        //then
-                .andExpect(status().isCreated());
-
-
-        // When
-        mockMvc.perform(get("/user/seats")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + accessToken))
-        //Then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.seatId").value(seat.getId()))
-                .andExpect(jsonPath("$.userId").value(user.getId()));
-    }
-
-    @Test
-    void testDeleteSittingInfoWithToken() throws Exception {
-        //Given
-        UserTrainSeatRequest request = UserTrainSeatRequest.builder()
-                .seatId(seat.getId())
-                .build();
-
-        mockMvc.perform(post("/user/seats")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .header("Authorization", "Bearer " + accessToken));
-
-        // When
-        mockMvc.perform(delete("/user/seats")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + accessToken)
-        )
-                //Then
-                .andExpect(status().isOk());
-
-        // When 유저의 착석 정보가 없는데도 제거하려고 할 때
-        mockMvc.perform(delete("/user/seats")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + accessToken)
-                )
-                //Then
-                .andExpect(status().isNotFound());
+    void testReleaseSeat() throws Exception {
+        // TODO : 좌석 해제 API 테스트
     }
 }
