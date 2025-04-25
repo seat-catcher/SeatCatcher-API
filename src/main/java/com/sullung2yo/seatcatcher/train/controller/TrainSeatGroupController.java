@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.train.controller;
 
-import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
+import com.sullung2yo.seatcatcher.train.domain.Train;
 import com.sullung2yo.seatcatcher.train.dto.response.TrainSeatGroupResponse;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,9 +51,9 @@ public class TrainSeatGroupController {
 
         try
         {
-            List<TrainSeatGroup> records = trainSeatGroupService.findByTrainCodeAndCarCode(trainCode, carCode);
+            List<Train> records = trainSeatGroupService.findByTrainCodeAndCarCode(trainCode, carCode);
 
-            for(TrainSeatGroup record : records) {
+            for(Train record : records) {
                 responses.getItems().add(new TrainSeatGroupResponse.SingleResponse(record));
             }
 
@@ -63,8 +63,8 @@ public class TrainSeatGroupController {
         catch(EntityNotFoundException e)
         {
             // 엔티티가 없는 경우. 에러를 뿌리는게 아니라 새로 생성해줘야 함.
-            List<TrainSeatGroup> records = trainSeatGroupService.createGroupsOf(trainCode, carCode);
-            for(TrainSeatGroup record : records) {
+            List<Train> records = trainSeatGroupService.createGroupsOf(trainCode, carCode);
+            for(Train record : records) {
                 responses.getItems().add(new TrainSeatGroupResponse.SingleResponse(record));
             }
 

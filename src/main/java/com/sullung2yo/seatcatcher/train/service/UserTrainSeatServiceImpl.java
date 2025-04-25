@@ -5,7 +5,7 @@ import com.sullung2yo.seatcatcher.common.exception.SeatException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
-import com.sullung2yo.seatcatcher.train.dto.event.SeatEvent;
+import com.sullung2yo.seatcatcher.train.event_handler.SeatEventAssembler;
 import com.sullung2yo.seatcatcher.train.event_handler.SeatEventPublisher;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
@@ -28,7 +28,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     private final TrainSeatRepository trainSeatRepository;
     private final UserRepository userRepository;
     private final SeatEventPublisher seatEventPublisher;
-    // private final SeatEventAssembler seatEventAssembler;
+    private final SeatEventAssembler seatEventAssembler;
 
     @Override
     @Transactional
@@ -45,6 +45,18 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
             throw new UserException("seatId에 해당하는 좌석을 찾을 수 없습니다.", ErrorCode.SEAT_NOT_FOUND);
         }
 
+        // 해당 사용자가 예약한 좌석이 이미 있는지 확인
+        Optional<UserTrainSeat> hasUserReservedAlready = userTrainSeatRepository.findUserTrainSeatByUserId(userId);
+        if (hasUserReservedAlready.isPresent()) {
+            throw new SeatException("이미 다른 좌석을 예약한 사용자입니다.", ErrorCode.USER_ALREADY_RESERVED);
+        }
+
+        // 다른 사용자가 해당 좌석을 점유중인지 확인
+        Optional<UserTrainSeat> hasAlreadyReserved = userTrainSeatRepository.findUserTrainSeatByTrainSeatId(seatId);
+        if (hasAlreadyReserved.isPresent()) {
+            throw new SeatException("해당 좌석은 다른 사용자가 점유중입니다.", ErrorCode.SEAT_ALREADY_RESERVED);
+        }
+
         // 좌석 점유 정보 생성 및 저장
         UserTrainSeat userSeat = UserTrainSeat.builder()
                 .user(user.get())
@@ -52,8 +64,9 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         userTrainSeatRepository.save(userSeat);
 
         // 좌석 예약 이벤트 발행
-        // 1. SeatEvent 객체 생성
-        // 2. seatEventPublisher.publish(seatEvent); // RabbitMQ에 발행
+        // 1. 업데이트 된 SeatEvent 객체 생성
+
+        // seatEventPublisher.publish(seatEvent); // RabbitMQ에 발행
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.sullung2yo.seatcatcher.train.domain;
 
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
-import com.sullung2yo.seatcatcher.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -29,10 +28,10 @@ public class TrainSeat extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "seat_group_id", nullable = false)
-    private TrainSeatGroup trainSeatGroup;
+    private Train train;
 
     @Column(name = "seat_location", nullable = false)
-    private int seatLocation; // 좌석 위치와 매핑되는 정보.
+    private int seatLocation; // 좌석 위치와 매핑되는 정보 (Train의 SeatGroupType에 의해 최대 갯수 결정).
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -40,6 +39,4 @@ public class TrainSeat extends BaseEntity {
     @Builder.Default
     private SeatType seatType = SeatType.NORMAL; // 노약자석 / 임산부좌석 / 일반좌석 세 가지만 일단 존재합니다.
 
-    @Column(name = "jjim_count")
-    private int jjimCount; // 찜 기능은 없앤다고 했지 않았나요?
 }

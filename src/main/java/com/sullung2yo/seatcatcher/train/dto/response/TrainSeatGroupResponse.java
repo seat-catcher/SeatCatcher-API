@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.train.dto.response;
 
 import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
-import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
+import com.sullung2yo.seatcatcher.train.domain.Train;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -31,7 +31,7 @@ public class TrainSeatGroupResponse {
         @Schema(description = "Seat Group의 타입입니다.")
         private SeatGroupType groupType;
 
-        public SingleResponse(TrainSeatGroup record) {
+        public SingleResponse(Train record) {
             this.id = record.getId();
             this.trainCode = record.getTrainCode();
             this.carCode = record.getCarCode();

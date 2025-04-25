@@ -10,11 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashSet;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class TrainSeatGroupServiceTest {
+public class TrainServiceTest {
 
     private TrainSeatGroupService service;
 
@@ -31,7 +30,7 @@ public class TrainSeatGroupServiceTest {
     void testCreateGroup_normal()
     {
         //when
-        TrainSeatGroup group = service.create("2204","2111", SeatGroupType.NORMAL_A_14);
+        Train group = service.create("2204","2111", SeatGroupType.NORMAL_A_14);
 
         //then
         Assertions.assertNotNull(group);
@@ -46,9 +45,8 @@ public class TrainSeatGroupServiceTest {
         {
             TrainSeat seat = seats.get(i);
             Assertions.assertNotNull(seat);
-            Assertions.assertEquals(group, seat.getTrainSeatGroup());
+            Assertions.assertEquals(group, seat.getTrain());
             Assertions.assertEquals(i, seat.getSeatLocation());
-            Assertions.assertEquals(0, seat.getJjimCount());
             Assertions.assertEquals(SeatType.NORMAL, seat.getSeatType());
         }
     }
@@ -58,7 +56,7 @@ public class TrainSeatGroupServiceTest {
     void testCreateGroup_elderly()
     {
         //when
-        TrainSeatGroup group = service.create("2204","2111", SeatGroupType.ELDERLY_A);
+        Train group = service.create("2204","2111", SeatGroupType.ELDERLY_A);
 
         //then
         Assertions.assertNotNull(group);
@@ -73,9 +71,8 @@ public class TrainSeatGroupServiceTest {
         {
             TrainSeat seat = seats.get(i);
             Assertions.assertNotNull(seat);
-            Assertions.assertEquals(group, seat.getTrainSeatGroup());
+            Assertions.assertEquals(group, seat.getTrain());
             Assertions.assertEquals(i, seat.getSeatLocation());
-            Assertions.assertEquals(0, seat.getJjimCount());
             Assertions.assertEquals(SeatType.ELDERLY, seat.getSeatType());
         }
     }

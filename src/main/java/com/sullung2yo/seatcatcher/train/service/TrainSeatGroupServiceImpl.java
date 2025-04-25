@@ -20,8 +20,8 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
 
     @Override
-    public List<TrainSeatGroup> findByTrainCodeAndCarCode(String trainCode, String carCode) {
-        List<TrainSeatGroup> result = trainSeatGroupRepository.findAllByTrainCodeAndCarCode(trainCode, carCode);
+    public List<Train> findByTrainCodeAndCarCode(String trainCode, String carCode) {
+        List<Train> result = trainSeatGroupRepository.findAllByTrainCodeAndCarCode(trainCode, carCode);
 
         if(result.isEmpty())
         {
@@ -33,8 +33,8 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
     @Override
     @Transactional
-    public List<TrainSeatGroup> createGroupsOf(String trainCode, String carCode) {
-        List<TrainSeatGroup> groups = new ArrayList<>();
+    public List<Train> createGroupsOf(String trainCode, String carCode) {
+        List<Train> groups = new ArrayList<>();
 
         // trainCode 를 통해 매핑을 해서 어떤 타입의 좌석을 만들어야 하는지를 알아내야 함.
 
@@ -60,9 +60,9 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
     @Override
     @Transactional
-    public TrainSeatGroup create(String trainCode, String carCode, SeatGroupType groupType){
+    public Train create(String trainCode, String carCode, SeatGroupType groupType){
 
-        TrainSeatGroup trainSeatGroup = TrainSeatGroup.builder()
+        Train train = Train.builder()
                 .trainCode(trainCode)
                 .carCode(carCode)
                 .trainSeats(new ArrayList<>())
@@ -72,22 +72,21 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         for(int i = 0; i < groupType.getSeatCount(); i++)
         {
             SeatType seatType;
-            if(trainSeatGroup.getType() == SeatGroupType.ELDERLY_A || trainSeatGroup.getType() == SeatGroupType.ELDERLY_B)
+            if(train.getType() == SeatGroupType.ELDERLY_A || train.getType() == SeatGroupType.ELDERLY_B)
             {
                 seatType = SeatType.ELDERLY;
             }
             else seatType = SeatType.NORMAL; // 임산부 좌석은 고려하지 않고 일단 Normal 로 모두 설정하겠음. TODO :: 추후에 임산부 좌석이 고려되어야 할 경우 이 부분을 변경할 것.
 
             TrainSeat trainSeat = TrainSeat.builder()
-                    .trainSeatGroup(trainSeatGroup)
+                    .train(train)
                     .seatLocation(i)
                     .seatType(seatType)
-                    .jjimCount(0)
                     .build();
-            trainSeatGroup.getTrainSeats().add(trainSeat);
+            train.getTrainSeats().add(trainSeat);
         }
 
-        return trainSeatGroup;
+        return train;
     }
 }
 

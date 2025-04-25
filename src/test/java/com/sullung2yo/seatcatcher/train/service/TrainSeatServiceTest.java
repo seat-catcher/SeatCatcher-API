@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.SeatType;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
-import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
+import com.sullung2yo.seatcatcher.train.domain.Train;
 import com.sullung2yo.seatcatcher.train.dto.request.TrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +31,13 @@ public class TrainSeatServiceTest {
     @Autowired
     private TrainSeatService trainSeatService;
 
-    private TrainSeatGroup sampleTrainSeatGroup;
+    private Train sampleTrain;
     @Autowired
     private TrainSeatGroupService trainSeatGroupService;
 
     @BeforeEach
     void setUp() {
-        sampleTrainSeatGroup = trainSeatGroupService.createGroupsOf("2222", "2222").get(0);
+        sampleTrain = trainSeatGroupService.createGroupsOf("2222", "2222").get(0);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class TrainSeatServiceTest {
     @DisplayName("Modify Seat info test")
     void modifySeatInfoTest() throws Exception {
         //Given
-        TrainSeat original = sampleTrainSeatGroup.getTrainSeats().get(0);
+        TrainSeat original = sampleTrain.getTrainSeats().get(0);
 
         //When
         trainSeatService.update(original.getId(), TrainSeatRequest.builder()
