@@ -4,7 +4,6 @@ import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -28,7 +27,7 @@ public class TrainSeat extends BaseEntity {
     */
 
     @ManyToOne
-    @JoinColumn(name = "seat_group_id", nullable = false)
+    @JoinColumn(name = "train_id", nullable = false)
     private Train train;
 
     @Column(name = "seat_location", nullable = false)

@@ -30,7 +30,7 @@ public class Train extends BaseEntity {
     // 좌석 그룹 타입은 다음과 같습니다.
     // 노약자구역 A, 일반구역 A B C , 노약자구역 B
 
-    @OneToMany(mappedBy = "train", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "train", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("seatLocation asc")
-    private List<TrainSeat> trainSeats; // Train에 생성된 좌석 정보 엔티티 리스트
+    private List<TrainSeat> trainSeat; // Train에 생성된 좌석 정보 엔티티 리스트
 }

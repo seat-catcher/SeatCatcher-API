@@ -12,6 +12,6 @@ public interface UserTrainSeatRepository extends JpaRepository<UserTrainSeat, Lo
     void deleteUserTrainSeatByUserId(Long userId);
 
     // 좌성 id 리스트를 사용해서 UserTrainSeat 리스트를 가져오는 메서드
-    // 메서드 이름 뒤에 In을 붙이면 In 쿼리로 변환됨 (SELECT * FROM a WHERE id IN 리스트)
-    List<UserTrainSeat> findAllByTrainSeatIdIn(List<Long> trainSeatIds);
+    // In을 붙이면 In 쿼리로 변환됨 (SELECT * FROM a WHERE id IN 리스트)
+    List<UserTrainSeat> findAllByTrainSeat_IdIn(List<Long> trainSeatIds);
 }
