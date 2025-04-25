@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.common.exception.SubwayStationException;
+import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.subway_station.converter.PathHistoryConverter;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
@@ -38,10 +38,10 @@ public class PathHistoryServiceImpl implements PathHistoryService{
                 .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + request.getUserId(), ErrorCode.USER_NOT_FOUND));
 
         SubwayStation startStation = subwayStationRepository.findById(request.getStartStationId())
-                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없습니다. : "+request.getStartStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+                .orElseThrow(() -> new SubwayException("해당 id를 가진 역을 찯을 수 없습니다. : "+request.getStartStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
 
         SubwayStation endStation = subwayStationRepository.findById(request.getEndStationId())
-                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없습니다. : "+request.getEndStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+                .orElseThrow(() -> new SubwayException("해당 id를 가진 역을 찯을 수 없습니다. : "+request.getEndStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
 
 
         PathHistory newPathHistory = pathHistoryConverter.toPathHistory(user, startStation, endStation);
@@ -61,10 +61,10 @@ public class PathHistoryServiceImpl implements PathHistoryService{
                 .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. providerId : " + providerId, ErrorCode.USER_NOT_FOUND));
 
         PathHistory pathHistory = pathHistoryRepository.findById(pathId)
-                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없습니다. : " + pathId, ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+                .orElseThrow(() -> new SubwayException("해당 id를 가진 역을 찯을 수 없습니다. : " + pathId, ErrorCode.SUBWAY_STATION_NOT_FOUND ));
 
         if(!pathHistory.getUser().equals(user))
-            throw new SubwayStationException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
+            throw new SubwayException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
 
         PathHistoryResponse.PathHistoryInfoResponse response = pathHistoryConverter.toResponse(pathHistory);
         return response;
@@ -99,10 +99,10 @@ public class PathHistoryServiceImpl implements PathHistoryService{
                 .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. providerId : " + providerId, ErrorCode.USER_NOT_FOUND));
 
         PathHistory pathHistory = pathHistoryRepository.findById(pathId)
-                .orElseThrow(() -> new SubwayStationException("해당 id를 가진 역을 찯을 수 없습니다. : "+pathId,ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+                .orElseThrow(() -> new SubwayException("해당 id를 가진 역을 찯을 수 없습니다. : "+pathId,ErrorCode.SUBWAY_STATION_NOT_FOUND ));
 
         if(!pathHistory.getUser().equals(user))
-            throw new SubwayStationException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
+            throw new SubwayException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
 
         pathHistoryRepository.delete(pathHistory);
     }
