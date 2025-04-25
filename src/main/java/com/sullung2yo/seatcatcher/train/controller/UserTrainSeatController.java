@@ -29,45 +29,12 @@ public class UserTrainSeatController {
     private final UserTrainSeatService userTrainSeatService;
     private final UserService userService;
 
-    @GetMapping
-    @Operation(
-            summary = "착석 정보를 조회하는 API",
-            description = "현재 등록된 유저에 대한 착석 정보를 가져옵니다.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공적으로 착석 정보를 조회했습니다.",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserTrainSeatResponse.class))
-                    ),
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "해당 유저는 착석 정보가 없습니다."
-                    )
-            }
-    )
-    public ResponseEntity<UserTrainSeatResponse> getSittingInfo(@RequestHeader("Authorization") String bearerToken)
-    {
-        Long uid = verifyUserAndGetId(bearerToken);
-
-        try
-        {
-            UserTrainSeat record = userTrainSeatService.findUserTrainSeatByUserId(uid);
-            log.debug("성공적으로 착석 정보를 조회했습니다.");
-            return ResponseEntity.ok(new UserTrainSeatResponse(record));
-        }
-        catch(EntityNotFoundException e)
-        {
-            log.info("해당 유저는 착석 정보가 없습니다.");
-            return ResponseEntity.noContent().build();
-        }
-    }
-
     @PostMapping
     @Operation(
             summary = "착석 정보를 생성하는 API",
             description = "좌석 id와 유저 id를 이용하여 착석 정보(매핑 정보)를 만들어줍니다.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "착석 정보입니다. User ID의 경우 알아낼 방법이 있지만, 그럼에도 불구하고 명시적으로 두 정보 모두 채워주세요!",
+                    description = "",
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserTrainSeatRequest.class))
             ),
@@ -87,11 +54,11 @@ public class UserTrainSeatController {
             @RequestBody UserTrainSeatRequest userTrainSeatRequest
     )
     {
-        Long uid = verifyUserAndGetId(bearerToken);
+        Long userId = verifyUserAndGetId(bearerToken);
 
         try
         {
-            userTrainSeatService.create(uid, userTrainSeatRequest.getSeatId());
+            userTrainSeatService.create(userId, userTrainSeatRequest.getSeatId());
             log.debug("성공적으로 생성 완료");
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }

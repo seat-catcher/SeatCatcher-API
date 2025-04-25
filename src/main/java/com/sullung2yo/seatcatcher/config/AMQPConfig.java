@@ -23,7 +23,7 @@ public class AMQPConfig {
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
 
-    @Value("${rabbitmq.binding.key}")
+    @Value("${rabbitmq.binding.prefix}")
     private String bindingKey;
 
     // RabbitMQ에서 Seatcatcher 서비스에 사용할 큐
