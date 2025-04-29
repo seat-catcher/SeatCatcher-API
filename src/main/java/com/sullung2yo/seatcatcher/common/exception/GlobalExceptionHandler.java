@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SeatException.class)
     public ResponseEntity<ErrorResponse> handleSeatException(SeatException ex) {
         /*
-          유저 관련 ExceptionHandler
+          좌석 관련 ExceptionHandler
          */
         log.error("SeatException", ex);
         if (ex.getErrorCode() == ErrorCode.SEAT_ALREADY_RESERVED) {
