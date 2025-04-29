@@ -124,21 +124,15 @@ jobs:
           script: |
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
-            docker-compose -f docker-compose.remote.dev.yml stop api
-            docker-compose -f docker-compose.remote.dev.yml up -d api
-
-      - name: Check docker health
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.DEV_EC2_HOST }}
-          username: ${{ secrets.DEV_EC2_USERNAME }}
-          key: ${{ secrets.DEV_EC2_KEY }}
-          script: |
-            sleep 60
-            if [ $(docker inspect --format='{{.State.Health.Status}}' springboot) == "healthy" ]; then
+            docker-compose -f docker-compose.remote.dev.yml stop springboot
+            docker-compose -f docker-compose.remote.dev.yml up -d --wait springboot
+            result=$?
+            
+            if [ $result -eq 0 ]; then
               echo "🥳 API server is healthy"
             else
               echo "👺 API server is not healthy"
+              docker compose -f docker-compose.remote.dev.yml logs --tail 100 springboot
               exit 1
             fi
 
@@ -173,19 +167,14 @@ jobs:
           key: ${{ secrets.DEV_EC2_KEY }}
           script: |
             cp ./artifact/openapi.json ./openapi.json
-            docker-compose -f docker-compose.remote.dev.yml restart docs
-
-      - name: Check docker health
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.DEV_EC2_HOST }}
-          username: ${{ secrets.DEV_EC2_USERNAME }}
-          key: ${{ secrets.DEV_EC2_KEY }}
-          script: |
-            sleep 60
-            if [ $(docker inspect --format='{{.State.Health.Status}}' swagger-ui) == "healthy" ]; then
+            docker-compose -f docker-compose.remote.dev.yml stop swagger
+            docker-compose -f docker-compose.remote.dev.yml up -d --wait swagger
+            result=$?
+            
+            if [ $result -eq 0 ]; then
               echo "🥳 Swagger server is healthy"
             else
               echo "👺 Swagger server is not healthy"
+              docker compose -f docker-compose.remote.dev.yml logs --tail 100 swagger
               exit 1
             fi
