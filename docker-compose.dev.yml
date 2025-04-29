@@ -4,6 +4,7 @@ services:
 
   # Spring Boot Application Container
   backend:
+    container_name: springboot
     build: .
     ports:
       - "8080:8080"
@@ -15,6 +16,7 @@ services:
 
   # RabbitMQ Container
   rabbitmq:
+    container_name: rabbitmq
     image: rabbitmq:4.1.0-management-alpine
     ports:
       - "5672:5672" # AMQP
