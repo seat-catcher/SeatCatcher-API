@@ -1,6 +1,7 @@
 package com.sullung2yo.seatcatcher.common.exception;
 
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -102,16 +103,16 @@ public class GlobalExceptionHandler {
          */
         log.error("SeatException", ex);
         if (ex.getErrorCode() == ErrorCode.SEAT_ALREADY_RESERVED) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "Seat already reserved", ex.getMessage());
+            return createErrorResponse(HttpStatus.CONFLICT, "Seat already reserved", ex.getMessage());
         }
         else if (ex.getErrorCode() == ErrorCode.SEAT_NOT_FOUND) {
-            return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid Profile Image Number", ex.getMessage());
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Seat not found", ex.getMessage());
         }
         else if (ex.getErrorCode() == ErrorCode.USER_ALREADY_RESERVED) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "User already reserved", ex.getMessage());
+            return createErrorResponse(HttpStatus.CONFLICT, "User already reserved", ex.getMessage());
         }
         else if (ex.getErrorCode() == ErrorCode.USER_NOT_RESERVED) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "User not reserved", ex.getMessage());
+            return createErrorResponse(HttpStatus.CONFLICT, "User not reserved", ex.getMessage());
         }
         else {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage());
@@ -130,6 +131,15 @@ public class GlobalExceptionHandler {
         else {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Train Internal Server Error", ex.getMessage());
         }
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
+        /*
+          404 Not Found 처리 메서드
+         */
+        log.error("EntityNotFoundException", ex);
+        return createErrorResponse(HttpStatus.NOT_FOUND, "Entity Not Found", ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

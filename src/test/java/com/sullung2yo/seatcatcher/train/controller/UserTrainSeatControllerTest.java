@@ -86,7 +86,7 @@ public class UserTrainSeatControllerTest {
         //테스트할 좌석 생성
         seat = trainSeatGroupService.createGroupsOf("2222", "2222").stream().findFirst()
                 .orElseThrow(EntityNotFoundException::new)
-                .getTrainSeat().get(0);;
+                .getTrainSeat().get(0);
     }
 
     @Test

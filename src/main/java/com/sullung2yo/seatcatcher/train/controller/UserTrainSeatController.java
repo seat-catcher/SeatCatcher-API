@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class UserTrainSeatController {
     @Operation(
             summary = "착석 정보를 생성하는 API",
             description = "좌석 id와 유저 id를 이용하여 착석 정보(매핑 정보)를 만들어줍니다.",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            requestBody = @RequestBody(
                     description = "",
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserTrainSeatRequest.class))
@@ -67,7 +68,7 @@ public class UserTrainSeatController {
     @DeleteMapping
     @Operation(
             summary = "착석 정보를 제거하는 API",
-            description = "현재 등록된 유저에 대한 착석 정보를 제거, 즉 하차 처리를 수행합니다.",
+            description = "현재 등록된 유저에 대한 착석 정보를 제거하는 API",
             responses = {
                     @ApiResponse(
                             responseCode = "204",

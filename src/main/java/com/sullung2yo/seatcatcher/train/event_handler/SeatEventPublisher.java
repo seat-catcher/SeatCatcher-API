@@ -2,12 +2,13 @@ package com.sullung2yo.seatcatcher.train.event_handler;
 
 import com.sullung2yo.seatcatcher.train.dto.event.SeatEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SeatEventPublisher {
@@ -24,9 +25,15 @@ public class SeatEventPublisher {
 
     public void publish(SeatEvent seatEvent) {
         // RabbutMQ Exchange한테 메세지 발행
+        log.info("좌석 이벤트 발행: {}", seatEvent.toString());
         String routingKey = bindingPrefix + "." + seatEvent.getTrainCode() + "." + seatEvent.getCarCode();
 
         // Exchange한테 routingKey를 사용해서 seatEvent 담아서 전달
-        rabbitTemplate.convertAndSend(exchangeName, routingKey, seatEvent);
+        try {
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, seatEvent);
+            log.debug("RabbitMQ에 좌석 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
+        } catch (Exception e) {
+            log.error("RabbitMQ에 좌석 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
+        }
     }
 }

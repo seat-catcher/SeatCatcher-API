@@ -1,6 +1,7 @@
 package com.sullung2yo.seatcatcher.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
+@Slf4j
 @Configuration
 @EnableRabbit
 @RequiredArgsConstructor
@@ -65,6 +67,14 @@ public class AMQPConfig {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter); // 메세지 어떤 형식으로 변환할건지 지정 (JSON)
         rabbitTemplate.setMandatory(true); // returnCallback을 사용하기 위해 true로 설정 -> returnCallback : 메세지를 전송했을 때, 성공/실패 여부를 알려주는 콜백
+        rabbitTemplate.setReturnsCallback(returnedMessage -> {
+            log.error("메세지 전송 실패: {}, {}, {}", returnedMessage.getExchange(), returnedMessage.getRoutingKey(), returnedMessage.getMessage());
+        });
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+            if (!ack) {
+                log.error("메세지 전송 실패: {}, {}", correlationData, cause);
+            }
+        });
         return rabbitTemplate;
     }
 }

@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Optional;
 
@@ -92,9 +94,9 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException("userId에 해당하는 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
 
-        // 좌석 정보 가져오기
-        TrainSeat seat = trainSeatRepository.findById(seatId)
-                .orElseThrow(() -> new UserException("seatId에 해당하는 좌석을 찾을 수 없습니다.", ErrorCode.SEAT_NOT_FOUND));
+        // 좌석 정보 가져오기 (Lock 획득)
+        TrainSeat seat = trainSeatRepository.findByIdForUpdate(seatId)
+                .orElseThrow(() -> new SeatException("seatId에 해당하는 좌석을 찾을 수 없습니다.", ErrorCode.SEAT_NOT_FOUND));
 
         // 해당 사용자가 예약한 좌석이 이미 있는지 확인
         Optional<UserTrainSeat> hasUserReservedAlready = userTrainSeatRepository.findUserTrainSeatByUserId(userId);
