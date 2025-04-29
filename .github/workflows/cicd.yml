@@ -124,15 +124,15 @@ jobs:
           script: |
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
-            docker-compose -f docker-compose.remote.dev.yml stop springboot
-            docker-compose -f docker-compose.remote.dev.yml up -d --wait springboot
+            docker-compose -f docker-compose.remote.dev.yml stop api
+            docker-compose -f docker-compose.remote.dev.yml up -d --wait api
             result=$?
             
             if [ $result -eq 0 ]; then
               echo "🥳 API server is healthy"
             else
               echo "👺 API server is not healthy"
-              docker compose -f docker-compose.remote.dev.yml logs --tail 100 springboot
+              docker compose -f docker-compose.remote.dev.yml logs --tail 100 api
               exit 1
             fi
 
@@ -167,14 +167,14 @@ jobs:
           key: ${{ secrets.DEV_EC2_KEY }}
           script: |
             cp ./artifact/openapi.json ./openapi.json
-            docker-compose -f docker-compose.remote.dev.yml stop swagger
-            docker-compose -f docker-compose.remote.dev.yml up -d --wait swagger
+            docker-compose -f docker-compose.remote.dev.yml stop docs
+            docker-compose -f docker-compose.remote.dev.yml up -d --wait docs
             result=$?
             
             if [ $result -eq 0 ]; then
               echo "🥳 Swagger server is healthy"
             else
               echo "👺 Swagger server is not healthy"
-              docker compose -f docker-compose.remote.dev.yml logs --tail 100 swagger
+              docker compose -f docker-compose.remote.dev.yml logs --tail 100 docs
               exit 1
             fi
