@@ -2,7 +2,7 @@
 FROM bellsoft/liberica-openjdk-alpine:17 AS builder
 WORKDIR /app
 COPY . .
-COPY src/main/resources/prod.properties src/main/resources/application.properties
+COPY src/main/resources/application.properties src/main/resources/application.properties
 RUN ./gradlew clean build -x test
 
 # Run stage

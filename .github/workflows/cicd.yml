@@ -33,6 +33,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
+      - name: Check application.properties is properly set
+        run: |
+          if [ -s ./src/main/resources/application.properties ]; then
+            echo "✅ application.properties is properly set"
+            cat ./src/main/resources/application.properties
+          else
+            echo "❌ application.properties is not properly set"
+            exit 1
+          fi
+
       - name: Create new docker image
         run: |
           docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }} .
@@ -63,6 +73,16 @@ jobs:
           mkdir -p ./src/main/resources
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
           echo "${{ secrets.PRODUCTION_PROPERTIES }}" > ./src/main/resources/prod.properties
+
+      - name: Check application.properties is properly set
+        run: |
+          if [ -s ./src/main/resources/application.properties ]; then
+            echo "✅ application.properties is properly set"
+            cat ./src/main/resources/application.properties
+          else
+            echo "❌ application.properties is not properly set"
+            exit 1
+          fi
 
       - name: Generate Swagger JSON
         run: |

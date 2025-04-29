@@ -1,4 +1,3 @@
-version: '3.8'
 # Local Development Environment only (Not for dev in AWS and prod)
 
 services:
@@ -9,7 +8,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     networks:
       - dev-network
 
@@ -22,7 +22,12 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=test
       - RABBITMQ_DEFAULT_PASS=test123
-      - RABBITMQ_DEFAULT_VHOST=seatcatcher_local
+      - RABBITMQ_DEFAULT_VHOST=seatcatcher
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
         - dev-network
 
