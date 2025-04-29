@@ -2,10 +2,7 @@ package com.sullung2yo.seatcatcher.train.domain;
 
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -28,10 +25,10 @@ public class UserTrainSeat extends BaseEntity {
         One To One 관계를 구현하기 위해 생성되었습니다.
     */
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "seat_id")
+    @JoinColumn(name = "seat_id", unique = true)
     private TrainSeat trainSeat;
 }

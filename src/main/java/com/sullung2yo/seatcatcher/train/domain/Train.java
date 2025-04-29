@@ -13,19 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="train_seat_groups")
-public class TrainSeatGroup extends BaseEntity {
-
-/*
-    // Old
-    @ManyToOne
-    @JoinColumn(name = "train_car_id", nullable = false)
-    private TrainCar trainCar;
- */
-
-    @OneToMany(mappedBy = "trainSeatGroup", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("seatLocation asc")
-    private List<TrainSeat> trainSeats;
+@Table(name="train")
+public class Train extends BaseEntity {
 
     @Column(name = "train_code")
     private String trainCode;
@@ -40,4 +29,8 @@ public class TrainSeatGroup extends BaseEntity {
     private SeatGroupType type = SeatGroupType.NORMAL_A_14;
     // 좌석 그룹 타입은 다음과 같습니다.
     // 노약자구역 A, 일반구역 A B C , 노약자구역 B
+
+    @OneToMany(mappedBy = "train", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("seatLocation asc")
+    private List<TrainSeat> trainSeat; // Train에 생성된 좌석 정보 엔티티 리스트
 }

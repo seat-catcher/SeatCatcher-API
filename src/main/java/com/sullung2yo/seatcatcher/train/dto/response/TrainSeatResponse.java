@@ -23,13 +23,9 @@ public class TrainSeatResponse {
     @Schema(description = "좌석의 타입입니다. 일반석, 노약자석, 임산부석 등의 종류가 있습니다.")
     private SeatType seatType;
 
-    @Schema(description = "유저들이 해당 좌석을 찜한 횟수입니다.")
-    private int jjimCount;
-
     public TrainSeatResponse(TrainSeat record) {
         this.id = record.getId();
         this.seatLocation = record.getSeatLocation();
         this.seatType = record.getSeatType();
-        this.jjimCount = record.getJjimCount();
     }
 }

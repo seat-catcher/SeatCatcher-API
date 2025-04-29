@@ -166,9 +166,9 @@ public class PathHistoryServiceImplTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // when & then
-        com.sullung2yo.seatcatcher.common.exception.SubwayStationException exception =
+        com.sullung2yo.seatcatcher.common.exception.SubwayException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
-                        com.sullung2yo.seatcatcher.common.exception.SubwayStationException.class,
+                        com.sullung2yo.seatcatcher.common.exception.SubwayException.class,
                         () -> pathHistoryService.getPathHistory(pathHistory.getId())
                 );
 
