@@ -29,10 +29,6 @@ jobs:
         run: |
           echo "${{ secrets.FIREBASE_KEY_JSON }}" | base64 --decode > ./src/main/resources/seat-catcher-firebase-adminsdk-fbsvc-5d0ae449ec.json
 
-      - name: Debug Firebase JSON
-        run: |
-          cat ./src/main/resources/seat-catcher-firebase-adminsdk-fbsvc-5d0ae449ec.json
-
       - name: Set AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
