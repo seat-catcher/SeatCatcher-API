@@ -115,4 +115,12 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         userTrainSeatRepository.save(userSeat);
         entityManager.flush(); // 트랜잭션이 끝나기 전에 DB에 반영되도록 강제 호출
     }
+
+    @Override
+    @Transactional
+    public void yieldSeat(Long seatId, Long giverID, Long takerId) {
+        releaseSeat(giverID);
+        reserveSeat(takerId, seatId);
+        //TODO :: 함수 구조를 이렇게 해서 이벤트가 두 번 발생할 것으로 예상됩니다. 추후 수정이 필요할 수도 있습니다.
+    }
 }

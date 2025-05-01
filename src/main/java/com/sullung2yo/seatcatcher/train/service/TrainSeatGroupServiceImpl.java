@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
     private final TrainRepository trainRepository;
-
+    private final ApplicationContext applicationContext;
 
     @Override
     public List<Train> findByTrainCodeAndCarCode(String trainCode, String carCode) {
@@ -29,6 +30,27 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         }
 
         else return result;
+    }
+
+    /*
+        열차 번호와 차량 번호로 좌석 그룹을 찾고
+        만약 없다면 새로 생성까지 하는 함수입니다.
+
+        해당 함수에서 호출하는 createGroupsOf 함수는
+        Database 에 commit 하는 기능을 포함합니다. 따라서 별도의 save가 필요 없습니다.
+     */
+    @Override
+    public List<Train> findOrCreateByTrainCodeAndCarCode(String trainCode, String carCode) {
+        try
+        {
+            return findByTrainCodeAndCarCode(trainCode, carCode);
+        }
+        catch(EntityNotFoundException e)
+        {
+            TrainSeatGroupService proxy = (TrainSeatGroupService) applicationContext.getBean("trainSeatGroupService");
+            // 해당 함수에서 Service 의 Transactional 이 붙은 함수를 호출하고 있으므로, 프록시 객체를 만들어서 해당 프록시를 통해 트랜잭션을 보장.
+            return proxy.createGroupsOf(trainCode, carCode);
+        }
     }
 
     @Override
