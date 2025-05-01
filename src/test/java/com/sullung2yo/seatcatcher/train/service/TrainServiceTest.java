@@ -8,11 +8,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static reactor.core.publisher.Mono.when;
+
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class TrainServiceTest {
 
@@ -21,63 +28,44 @@ public class TrainServiceTest {
     @Mock
     private TrainRepository trainRepository;
 
-    @Mock
-    private ApplicationContext applicationContext;
+    @Autowired
+    private TrainSeatGroupHelperService helperService;
 
     @BeforeEach
     void setUp() {
-        service = new TrainSeatGroupServiceImpl(trainRepository, applicationContext);
+        service = new TrainSeatGroupServiceImpl(trainRepository, helperService);
     }
 
     @Test
-    @DisplayName("Normal A, B, C 중 하나로 그룹을 만들었을 경우를 테스트")
-    void testCreateGroup_normal()
-    {
-        //when
-        Train group = service.create("2204","2111", SeatGroupType.NORMAL_A_14);
+    @DisplayName("열차 코드와 차량 코드로 그룹을 찾거나 생성하는 기능 테스트")
+    void testFindOrCreateByTrainCodeAndCarCode() {
+        // given
+        String trainCode = "9999";
+        String carCode = "9999";
 
-        //then
-        Assertions.assertNotNull(group);
-        Assertions.assertEquals("2204", group.getTrainCode());
-        Assertions.assertEquals("2111", group.getCarCode());
-        Assertions.assertEquals(SeatGroupType.NORMAL_A_14, group.getType());
+        Train mockTrain = new Train();
+        mockTrain.setTrainCode(trainCode);
+        mockTrain.setCarCode(carCode);
 
-        List<TrainSeat> seats = group.getTrainSeat();
-        Assertions.assertEquals(group.getType().getSeatCount(), seats.size());
+        List<Train> trains = List.of(mockTrain);
 
-        for(int i = 0; i < seats.size(); i++)
-        {
-            TrainSeat seat = seats.get(i);
-            Assertions.assertNotNull(seat);
-            Assertions.assertEquals(group, seat.getTrain());
-            Assertions.assertEquals(i, seat.getSeatLocation());
-            Assertions.assertEquals(SeatType.NORMAL, seat.getSeatType());
-        }
-    }
+        // when
+        System.out.println("service : " + service);
+        List<Train> result = service.findOrCreateByTrainCodeAndCarCode(trainCode, carCode);
 
-    @Test
-    @DisplayName("Elderly A, B 중 하나로 그룹을 만들었을 경우를 테스트")
-    void testCreateGroup_elderly()
-    {
-        //when
-        Train group = service.create("2204","2111", SeatGroupType.ELDERLY_A);
+        // then
+        Assertions.assertNotNull(result);
+        Assertions.assertFalse(result.isEmpty());
+        Assertions.assertEquals(trainCode, result.get(0).getTrainCode());
+        Assertions.assertEquals(carCode, result.get(0).getCarCode());
 
-        //then
-        Assertions.assertNotNull(group);
-        Assertions.assertEquals("2204", group.getTrainCode());
-        Assertions.assertEquals("2111", group.getCarCode());
-        Assertions.assertEquals(SeatGroupType.ELDERLY_A, group.getType());
+        // when
+        result = service.findOrCreateByTrainCodeAndCarCode("99999", "99999"); // DB에는 없는걸로 질의
 
-        List<TrainSeat> seats = group.getTrainSeat();
-        Assertions.assertEquals(group.getType().getSeatCount(), seats.size());
-
-        for(int i = 0; i < seats.size(); i++)
-        {
-            TrainSeat seat = seats.get(i);
-            Assertions.assertNotNull(seat);
-            Assertions.assertEquals(group, seat.getTrain());
-            Assertions.assertEquals(i, seat.getSeatLocation());
-            Assertions.assertEquals(SeatType.ELDERLY, seat.getSeatType());
-        }
+        // then
+        Assertions.assertNotNull(result);
+        Assertions.assertFalse(result.isEmpty());
+        Assertions.assertEquals("99999", result.get(0).getTrainCode());
+        Assertions.assertEquals("99999", result.get(0).getCarCode());
     }
 }
