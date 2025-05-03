@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
-import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
-import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
-import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
+import com.sullung2yo.seatcatcher.train.service.TrainService;
 import com.sullung2yo.seatcatcher.user.domain.*;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
@@ -18,14 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @AutoConfigureMockMvc
@@ -50,7 +45,7 @@ public class UserTrainSeatControllerTest {
     private UserTagRepository userTagRepository;
 
     @Autowired
-    private TrainSeatGroupService trainSeatGroupService;
+    private TrainService trainService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -84,7 +79,7 @@ public class UserTrainSeatControllerTest {
         accessToken = jwtTokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
 
         //테스트할 좌석 생성
-        seat = trainSeatGroupService.createGroupsOf("2222", "2222").stream().findFirst()
+        seat = trainService.createGroupsOf("2222", "2222").stream().findFirst()
                 .orElseThrow(EntityNotFoundException::new)
                 .getTrainSeat().get(0);
     }

@@ -18,14 +18,14 @@ import java.util.List;
 @ExtendWith(MockitoExtension.class)
 public class TrainServiceHelperTest {
 
-    private TrainSeatGroupHelperService service;
+    private TrainHelperService service;
 
     @Mock
     private TrainRepository trainRepository;
 
     @BeforeEach
     void setUp(){
-        service = new TrainSeatGroupHelperServiceImpl(trainRepository);
+        service = new TrainHelperServiceImpl(trainRepository);
     }
 
     @Test

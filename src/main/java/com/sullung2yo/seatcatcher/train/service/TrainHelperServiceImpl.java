@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j // 이걸 추가하면 로깅을 마음껏 쓸 수 있음.
-public class TrainSeatGroupHelperServiceImpl implements TrainSeatGroupHelperService{
+public class TrainHelperServiceImpl implements TrainHelperService {
 
     private final TrainRepository trainRepository;
 

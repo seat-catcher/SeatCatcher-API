@@ -3,31 +3,30 @@ package com.sullung2yo.seatcatcher.train.service;
 import com.sullung2yo.seatcatcher.train.domain.*;
 import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j // 이걸 추가하면 로깅을 마음껏 쓸 수 있음.
-public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
+public class TrainServiceImpl implements TrainService {
 
     private final TrainRepository trainRepository;
-    private final TrainSeatGroupHelperService helperService;
+    private final TrainHelperService helperService;
 
     @Override
     public List<Train> findByTrainCodeAndCarCode(String trainCode, String carCode) {
         List<Train> result = trainRepository.findAllByTrainCodeAndCarCode(trainCode, carCode);
 
-        if(result.isEmpty())
-        {
+        if(result.isEmpty()) {
             throw new EntityNotFoundException("TrainSeatGroup not found"); // 이를 Catch 하면 됨.
+        } else {
+            return result;
         }
-
-        else return result;
     }
 
     /*
@@ -38,20 +37,17 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         Database 에 commit 하는 기능을 포함합니다. 따라서 별도의 save가 필요 없습니다.
      */
     @Override
-    public List<Train> findOrCreateByTrainCodeAndCarCode(String trainCode, String carCode) {
-        try
-        {
+    public List<Train> findOrCreateByTrainCodeAndCarCode(@NonNull String trainCode, @NonNull String carCode) {
+        try {
             return findByTrainCodeAndCarCode(trainCode, carCode);
         }
         catch(EntityNotFoundException e) {
-            try
-            {
+            try {
                 // 이렇게 하면 동시성 문제를 해결할 수 있다고 함.
                 return findByTrainCodeAndCarCode(trainCode, carCode);
             }
-            catch (EntityNotFoundException secondAttemptException)
-            {
-                log.info("TrainSeatGroup not found for trainCode: {} and carCode: {}, creating new groups", trainCode, carCode);
+            catch (EntityNotFoundException secondAttemptException) {
+                log.info("열차 정보를 찾을 수 없습니다. trainCode: {} carCode: {}. 해당 정보로 새로운 열차 정보를 생성합니다.", trainCode, carCode);
                 return createGroupsOf(trainCode, carCode);
             }
         }
@@ -66,6 +62,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
     public Train create(String trainCode, String carCode, SeatGroupType groupType){
         return helperService.create(trainCode, carCode, groupType);
     }
+
 }
 
 /*

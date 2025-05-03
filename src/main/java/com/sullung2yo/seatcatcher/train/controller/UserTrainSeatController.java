@@ -3,13 +3,15 @@ package com.sullung2yo.seatcatcher.train.controller;
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
-import com.sullung2yo.seatcatcher.train.dto.request.GetSittingInfoRequest;
+import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
 import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.service.TrainService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,16 +31,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserTrainSeatController {
 
     private final UserTrainSeatService userTrainSeatService;
+    private final TrainService trainService;
     private final UserService userService;
 
     @GetMapping
     @Operation(
             summary = "착석 정보를 조회하는 API",
             description = "착석 정보를 조회하는 API입니다. (Websocket 연결 후 trainCode로 구독했을 때, 이 API를 통해 초기 착석 정보를 가져올 수 있습니다.)",
-            requestBody = @RequestBody(
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = GetSittingInfoRequest.class))
-            ),
+            parameters = {
+                    @Parameter(name = "trainCode", description = "열차 코드"),
+                    @Parameter(name = "carCode", description = "차량 코드"),
+                    @Parameter(name = "seatGroupType", description = "착석 그룹 타입 (ELDERLY_A, ELDERLY_B, NORMAL_A_14, NORMAL_B_14, NORMAL_C_14, ...)")
+            },
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -50,10 +54,12 @@ public class UserTrainSeatController {
                     )
             }
     )
-    public ResponseEntity<SeatInfoResponse> getSittingInfo(
+    public ResponseEntity<SeatInfoResponse> getSeatInformation(
             @RequestHeader("Authorization") String bearerToken,
-            @RequestBody GetSittingInfoRequest getSittingInfoRequest
-            ) {
+            @RequestParam String trainCode,
+            @RequestParam String carCode,
+            @RequestParam SeatGroupType seatGroupType
+    ) {
         /*
          * 착성 정보 조회 API
          * Websocket 연결 후 trainCode로 구독했을 때,
@@ -65,11 +71,7 @@ public class UserTrainSeatController {
         }
 
         // 좌석 정보 가져와서 반환
-        SeatInfoResponse response = userTrainSeatService.getSeatInfo(
-                getSittingInfoRequest.getTrainCode(),
-                getSittingInfoRequest.getCarCode(),
-                getSittingInfoRequest.getSeatGroupType()
-        );
+        SeatInfoResponse response = userTrainSeatService.f(trainCode, carCode, seatGroupType);
         return ResponseEntity.ok().body(response);
     }
 

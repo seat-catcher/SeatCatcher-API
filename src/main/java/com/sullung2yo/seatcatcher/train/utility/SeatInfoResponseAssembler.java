@@ -26,7 +26,13 @@ public class SeatInfoResponseAssembler {
     private final TrainSeatRepository trainSeatRepository;
     private final UserTrainSeatRepository userTrainSeatRepository;
 
-    public SeatInfoResponse assembleSeatEvents(@NonNull Train train) {
+    /**
+     * 열차 좌석 정보, 사용자 정보 조합해서 응답 DTO 생성하는 메서드
+     *
+     * @param train 좌석 정보를 조회할 열차 객체
+     * @return 좌석 상태 정보가 포함된 업데이트된 SeatInfoResponse 객체
+     */
+    public SeatInfoResponse assembleSeatResponse(@NonNull Train train) {
         // 1. 열차에 있는 모든 좌석 정보 조회 (Eager Load)
         List<TrainSeat> seats = trainSeatRepository.findAllWithTrain(train);
 
@@ -57,7 +63,7 @@ public class SeatInfoResponseAssembler {
                         .build())
                 .collect(Collectors.toList());
 
-        // 4. SeatEvent 조립 후 반환
+        // 4. SeatInfoResponse 조립 후 반환
         return SeatInfoResponse.builder()
                 .trainCode(train.getTrainCode())
                 .carCode(train.getCarCode())

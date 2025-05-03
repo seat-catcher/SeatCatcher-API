@@ -17,5 +17,4 @@ public interface UserTrainSeatService {
 
     void yieldSeat(Long seatId, Long giverID, Long takerId);
 
-    public SeatInfoResponse getSeatInfo(String trainCode, String carCode, SeatGroupType seatGroupType);
 }

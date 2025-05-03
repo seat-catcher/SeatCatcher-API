@@ -18,5 +18,4 @@ public interface TrainRepository extends JpaRepository<Train, Long> {
     @Query("select ts.train from TrainSeat ts where ts.id = :seatId")
     Optional<Train> findTrainBySeatId(@Param("seatId") Long seatId);
 
-    Optional<Train> findTrainByTrainCode(@Param("trainCode") String trainCode);
 }

@@ -8,32 +8,29 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static reactor.core.publisher.Mono.when;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class TrainServiceTest {
 
-    private TrainSeatGroupService service;
+    private TrainService service;
 
     @Mock
     private TrainRepository trainRepository;
 
     @Autowired
-    private TrainSeatGroupHelperService helperService;
+    private TrainHelperService helperService;
 
     @BeforeEach
     void setUp() {
-        service = new TrainSeatGroupServiceImpl(trainRepository, helperService);
+        service = new TrainServiceImpl(trainRepository, helperService);
     }
 
     @Test
