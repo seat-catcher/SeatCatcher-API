@@ -54,6 +54,7 @@ public class SubwayStationServiceImpl implements SubwayStationService {
                     .stationName(station.getSubwayStationName())
                     .distance(station.getDistanceKm())
                     .timeMinSec(station.getHourMinutes())
+                    .line(Line.valueOf(station.getSubwayLine()))
                     .accumulateDistance(station.getAccumulatedDistance())
                     .build();
 
