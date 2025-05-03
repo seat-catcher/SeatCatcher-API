@@ -74,7 +74,7 @@ class SubwayStationServiceImplTest {
     void testSaveSubwayData() {
         // Given
         SubwayStationData subwayStationData = new SubwayStationData();
-        subwayStationData.setSubwayLine("1");
+        subwayStationData.setSubwayLine("2");
 
         // When
         subwayStationService.saveSubwayData(List.of(subwayStationData));
@@ -112,53 +112,6 @@ class SubwayStationServiceImplTest {
         List<SubwayStation> foundStations = subwayStationService.findWithKeyword(stationName);
         assertEquals(1, foundStations.size());
     }
-//
-//    @Test
-//    void testFindWithAscendingOrder() {
-//        // Given
-//        SubwayStation subwayStation1 = new SubwayStation();
-//        subwayStation1.setStationName("Test station");
-//        subwayStation1.setAccumulateDistance(123.45f);
-//        subwayStation1.setLine(Line.LINE_1);
-//
-//        SubwayStation subwayStation2 = new SubwayStation();
-//        subwayStation2.setStationName("Another station");
-//        subwayStation2.setAccumulateDistance(678.90f);
-//        subwayStation2.setLine(Line.LINE_1);
-//
-//        // When
-//        when(subwayStationRepository.findBy("station", Line.LINE_1, "up")).thenReturn(List.of(subwayStation1, subwayStation2)); // 정렬되지 않은 상태로 반환
-//
-//        // Then
-//        List<SubwayStation> foundStations = subwayStationService.findWith("station", Line.LINE_1, "up");
-//        assertFalse(foundStations.isEmpty());
-//        assertEquals(2, subwayStationService.findWith("station", Line.LINE_1, "up").size());
-//        assertTrue(foundStations.get(0).getAccumulateDistance() < foundStations.get(1).getAccumulateDistance());
-//    }
-
-//    @Test
-//    void testFindWithDescendingOrder() {
-//        // Given
-//        SubwayStation subwayStation1 = new SubwayStation();
-//        subwayStation1.setStationName("Test station");
-//        subwayStation1.setAccumulateDistance(123.45f);
-//        subwayStation1.setLine(Line.LINE_1);
-//
-//        SubwayStation subwayStation2 = new SubwayStation();
-//        subwayStation2.setStationName("Another station");
-//        subwayStation2.setAccumulateDistance(678.90f);
-//        subwayStation2.setLine(Line.LINE_1);
-//
-//        // When
-//        when(subwayStationRepository.findBy("station", Line.LINE_1, "down")).thenReturn(List.of(subwayStation1, subwayStation2)); // 정렬되지 않은 상태로 반환
-//
-//        // Then
-//        // 서비스의 정렬 로직이 올바르게 동작하는지 확인
-//        List<SubwayStation> foundStations = subwayStationService.findWith("station", Line.LINE_1, "down");
-//        assertFalse(foundStations.isEmpty());
-//        assertEquals(2, subwayStationService.findWith("station", Line.LINE_1, "down").size());
-//        assertTrue(foundStations.get(0).getAccumulateDistance() > foundStations.get(1).getAccumulateDistance());
-//    }
 
     @Test
     void findByStationNameAndLine() {
