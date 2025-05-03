@@ -45,8 +45,8 @@ public class UserTrainSeatController {
                             description = "성공적으로 조회 완료"
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "해당 유저, 혹은 좌석 ID를 찾을 수 없음"
+                            responseCode = "400",
+                            description = "잘못된 요청"
                     )
             }
     )
@@ -65,8 +65,11 @@ public class UserTrainSeatController {
         }
 
         // 좌석 정보 가져와서 반환
-        SeatInfoResponse response = userTrainSeatService.getSeatInfo(getSittingInfoRequest.getTrainCode());
-
+        SeatInfoResponse response = userTrainSeatService.getSeatInfo(
+                getSittingInfoRequest.getTrainCode(),
+                getSittingInfoRequest.getCarCode(),
+                getSittingInfoRequest.getSeatGroupType()
+        );
         return ResponseEntity.ok().body(response);
     }
 

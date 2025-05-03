@@ -18,12 +18,12 @@ public class GetSittingInfoRequest {
     @Schema(description = "지하철 ID", example = "1001")
     private String trainCode; // 지하철 코드
 
-//    @NotNull
-//    @Schema(description = "차량 ID", example = "1001")
-//    private String carCode; // 차량 코드
-//
-//    @NotNull
-//    @Schema(description = "좌석 그룹 타입", example = "ELDERY_A, ELDERY_B, NORMAL_A_14, NORMAL_B_14, NORMAL_C_14, NORMAL_A_12, NORMAL_B_12, NORMAL_C_12")
-//    private SeatGroupType seatGroupType; // 좌석 그룹 타입
+    @NotNull
+    @Schema(description = "차량 ID", example = "1001")
+    private String carCode; // 차량 코드
+
+    @NotNull
+    @Schema(description = "좌석 그룹 타입", example = "ELDERY_A, ELDERY_B, NORMAL_A_14, NORMAL_B_14, NORMAL_C_14, NORMAL_A_12, NORMAL_B_12, NORMAL_C_12")
+    private SeatGroupType seatGroupType; // 좌석 그룹 타입
 
 }
