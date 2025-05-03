@@ -13,7 +13,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="train")
+@Table(name="train",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"train_code", "car_code", "type"})
+            // 우리는 좌석 타입도 ELDERLY_A , B 이렇게 철저하게 구분을 하기 때문에 이런 constraint 를 추가할 수 있음.
+    }
+)
 public class Train extends BaseEntity {
 
     @Column(name = "train_code")

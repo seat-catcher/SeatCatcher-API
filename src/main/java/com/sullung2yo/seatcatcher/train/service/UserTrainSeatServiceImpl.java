@@ -4,11 +4,13 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.SeatException;
 import com.sullung2yo.seatcatcher.common.exception.TrainException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
 import com.sullung2yo.seatcatcher.train.domain.Train;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
-import com.sullung2yo.seatcatcher.train.dto.event.SeatEvent;
-import com.sullung2yo.seatcatcher.train.event_handler.SeatEventAssembler;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
+import com.sullung2yo.seatcatcher.train.utility.SeatInfoResponseAssembler;
 import com.sullung2yo.seatcatcher.train.event_handler.SeatEventPublisher;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
@@ -16,6 +18,7 @@ import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,11 +31,13 @@ import java.util.Optional;
 @Slf4j
 public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
+    private final TrainRepository trainRepository;
     private final UserTrainSeatRepository userTrainSeatRepository;
     private final TrainSeatRepository trainSeatRepository;
     private final UserRepository userRepository;
     private final SeatEventPublisher seatEventPublisher;
-    private final SeatEventAssembler seatEventAssembler;
+    private final SeatInfoResponseAssembler seatInfoResponseAssembler;
+    private final TrainSeatGroupService trainSeatGroupService;
     private final EntityManager entityManager;
 
     @Override
@@ -49,7 +54,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         // 모든 관련 정보를 담게 된다.
         Train train = trainSeatRepository.findTrainByTrainSeatId(seatId)
                 .orElseThrow(() -> new TrainException("해당 열차를 찾을 수 없습니다.", ErrorCode.TRAIN_NOT_FOUND));
-        SeatEvent event = seatEventAssembler.assembleSeatEvents(train);
+        SeatInfoResponse event = seatInfoResponseAssembler.assembleSeatEvents(train);
         seatEventPublisher.publish(event); // RabbitMQ에 발행
     }
 
@@ -83,8 +88,26 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         userTrainSeatRepository.deleteUserTrainSeatByUserId(userId);
 
         // 업데이트된 좌석 정보 전달
-        SeatEvent event = seatEventAssembler.assembleSeatEvents(train);
+        SeatInfoResponse event = seatInfoResponseAssembler.assembleSeatEvents(train);
         seatEventPublisher.publish(event);
+    }
+
+    @Override
+    public SeatInfoResponse getSeatInfo(@NonNull String trainCode, @NonNull String carCode, @NonNull SeatGroupType seatGroupType) {
+        // 열차 정보 가져오기
+        Optional<Train> optionalTrain = trainRepository.findTrainByTrainCode(trainCode);
+        Train train = null;
+        if (optionalTrain.isEmpty()) { // 만약 최초로 입력된 trainCode의 경우에는 열차 정보가 없기 때문에 생성해주어야 한다.
+            log.debug("최초로 입력된 trainCode : {}, 열차 정보 엔티티를 생성합니다.", trainCode);
+
+            // 열차 정보 생성
+            train = trainSeatGroupService.create(trainCode, carCode, seatGroupType);
+        } else {
+            train = optionalTrain.get();
+        }
+
+        // 좌석 정보 조립해서 반환
+        return seatInfoResponseAssembler.assembleSeatEvents(train);
     }
 
     private void reserve(Long userId, Long seatId) {
@@ -114,5 +137,13 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
                 .trainSeat(seat).build();
         userTrainSeatRepository.save(userSeat);
         entityManager.flush(); // 트랜잭션이 끝나기 전에 DB에 반영되도록 강제 호출
+    }
+
+    @Override
+    @Transactional
+    public void yieldSeat(Long seatId, Long giverId, Long takerId) {
+        releaseSeat(giverId);
+        reserveSeat(takerId, seatId);
+        //TODO :: 함수 구조를 이렇게 해서 이벤트가 두 번 발생할 것으로 예상됩니다. 추후 수정이 필요할 수도 있습니다.
     }
 }

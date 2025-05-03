@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.train.dto.event;
+package com.sullung2yo.seatcatcher.train.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Builder
 @ToString
-public class SeatEvent {
+public class SeatInfoResponse {
     private String trainCode; // 기차 코드
     private String carCode; // 차량 코드
     private List<SeatStatus> seatStatus; // 좌석 상태 리스트

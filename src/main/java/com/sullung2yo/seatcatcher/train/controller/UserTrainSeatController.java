@@ -3,7 +3,10 @@ package com.sullung2yo.seatcatcher.train.controller;
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.train.dto.request.GetSittingInfoRequest;
+import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +30,48 @@ public class UserTrainSeatController {
 
     private final UserTrainSeatService userTrainSeatService;
     private final UserService userService;
+
+    @GetMapping
+    @Operation(
+            summary = "착석 정보를 조회하는 API",
+            description = "착석 정보를 조회하는 API입니다. (Websocket 연결 후 trainCode로 구독했을 때, 이 API를 통해 초기 착석 정보를 가져올 수 있습니다.)",
+            requestBody = @RequestBody(
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = GetSittingInfoRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 조회 완료"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "잘못된 요청"
+                    )
+            }
+    )
+    public ResponseEntity<SeatInfoResponse> getSittingInfo(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestBody GetSittingInfoRequest getSittingInfoRequest
+            ) {
+        /*
+         * 착성 정보 조회 API
+         * Websocket 연결 후 trainCode로 구독했을 때,
+         * 이 API를 통해 초기 착석 정보를 가져올 수 있습니다.
+         */
+        Long userId = verifyUserAndGetId(bearerToken);
+        if (userId == null) {
+            throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
+        }
+
+        // 좌석 정보 가져와서 반환
+        SeatInfoResponse response = userTrainSeatService.getSeatInfo(
+                getSittingInfoRequest.getTrainCode(),
+                getSittingInfoRequest.getCarCode(),
+                getSittingInfoRequest.getSeatGroupType()
+        );
+        return ResponseEntity.ok().body(response);
+    }
 
     @PostMapping
     @Operation(
@@ -93,6 +138,50 @@ public class UserTrainSeatController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/yield")
+    @Operation(
+            summary = "유저간의 자리 교환을 수행하는 API",
+            description = "좌석 id와 유저 id를 이용하여 자리 교환을 수행합니다. 반드시!! 좌석을 양보하는 쪽에서만 최초 한 번 요청되어야 합니다.",
+            requestBody = @RequestBody(
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = SeatYieldRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 교환 (새로운 좌석 점유 정보 생성) 완료"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "잘못된 요청"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "해당 유저, 혹은 좌석 ID를 찾을 수 없음"
+                    )
+            }
+    )
+    public ResponseEntity<Void> yieldSeat(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestBody SeatYieldRequest yieldRequest
+    )
+    {
+        // Bearer 토큰 검증
+        Long givingUserId;
+        Long takingUserId;
+
+        givingUserId = verifyUserAndGetId(bearerToken);
+        if (givingUserId == null) {
+            throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
+        }
+        takingUserId = yieldRequest.getTakerId();
+
+        userTrainSeatService.yieldSeat(yieldRequest.getSeatId(), givingUserId, takingUserId);
+        log.debug("성공적으로 좌석 교환 완료");
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     //TODO :: 지금은 이렇게 만들지만 나중에는 AOP 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.
     // 혹은 단순하게 AuthService 등에 해당 로직을 옮겨놓는 것도 좋을 듯.
     private Long verifyUserAndGetId(String bearerToken)
@@ -112,4 +201,5 @@ public class UserTrainSeatController {
         log.debug("JWT 파싱 성공");
         return token;
     }
+
 }

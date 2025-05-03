@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,7 +16,7 @@ import java.util.List;
 public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
     private final TrainRepository trainRepository;
-
+    private final TrainSeatGroupHelperService helperService;
 
     @Override
     public List<Train> findByTrainCodeAndCarCode(String trainCode, String carCode) {
@@ -31,68 +30,43 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         else return result;
     }
 
+    /*
+        열차 번호와 차량 번호로 좌석 그룹을 찾고
+        만약 없다면 새로 생성까지 하는 함수입니다.
+
+        해당 함수에서 호출하는 createGroupsOf 함수는
+        Database 에 commit 하는 기능을 포함합니다. 따라서 별도의 save가 필요 없습니다.
+     */
     @Override
-    @Transactional
-    public List<Train> createGroupsOf(String trainCode, String carCode) {
-        List<Train> groups = new ArrayList<>();
-
-        // trainCode 를 통해 매핑을 해서 어떤 타입의 좌석을 만들어야 하는지를 알아내야 함.
-
-        // 기본적인 37773 배치의 차량을 세팅하는 코드.
-        groups.add(create(trainCode, carCode, SeatGroupType.ELDERLY_A));
-        groups.add(create(trainCode, carCode, SeatGroupType.NORMAL_A_14));
-        groups.add(create(trainCode, carCode, SeatGroupType.NORMAL_B_14));
-        groups.add(create(trainCode, carCode, SeatGroupType.NORMAL_C_14));
-        groups.add(create(trainCode, carCode, SeatGroupType.ELDERLY_B));
-
-/*
-        groups.add(create(trainCode, carCode, SeatGroupType.ELDERLY_A));
-        groups.add(create(trainCode, carCode, SeatGroupType.NORMAL_A_12));
-        groups.add(create(trainCode, carCode, SeatGroupType.NORMAL_B_12));
-        groups.add(create(trainCode, carCode, SeatGroupType.NORMAL_C_12));
-        groups.add(create(trainCode, carCode, SeatGroupType.ELDERLY_B));
- */
-
-        trainRepository.saveAll(groups);
-
-        return groups;
+    public List<Train> findOrCreateByTrainCodeAndCarCode(String trainCode, String carCode) {
+        try
+        {
+            return findByTrainCodeAndCarCode(trainCode, carCode);
+        }
+        catch(EntityNotFoundException e) {
+            try
+            {
+                // 이렇게 하면 동시성 문제를 해결할 수 있다고 함.
+                return findByTrainCodeAndCarCode(trainCode, carCode);
+            }
+            catch (EntityNotFoundException secondAttemptException)
+            {
+                log.info("TrainSeatGroup not found for trainCode: {} and carCode: {}, creating new groups", trainCode, carCode);
+                return createGroupsOf(trainCode, carCode);
+            }
+        }
     }
 
     @Override
-    @Transactional
+    public List<Train> createGroupsOf(String trainCode, String carCode) {
+        return helperService.createGroupsOf(trainCode, carCode);
+    }
+
+    @Override
     public Train create(String trainCode, String carCode, SeatGroupType groupType){
-
-        Train train = Train.builder()
-                .trainCode(trainCode)
-                .carCode(carCode)
-                .trainSeat(new ArrayList<>())
-                .type(groupType)
-                .build();
-
-        for(int i = 0; i < groupType.getSeatCount(); i++)
-        {
-            SeatType seatType;
-            if(train.getType() == SeatGroupType.ELDERLY_A || train.getType() == SeatGroupType.ELDERLY_B)
-            {
-                seatType = SeatType.ELDERLY;
-            }
-            else seatType = SeatType.NORMAL; // 임산부 좌석은 고려하지 않고 일단 Normal 로 모두 설정하겠음. TODO :: 추후에 임산부 좌석이 고려되어야 할 경우 이 부분을 변경할 것.
-
-            TrainSeat trainSeat = TrainSeat.builder()
-                    .train(train)
-                    .seatLocation(i)
-                    .seatType(seatType)
-                    .build();
-            train.getTrainSeat().add(trainSeat);
-        }
-
-        return train;
+        return helperService.create(trainCode, carCode, groupType);
     }
 }
-
-
-
-
 
 /*
     // Old ::TODO 변경 사항 테스트가 확정되면 해당 주석을 제거해야 합니다.
