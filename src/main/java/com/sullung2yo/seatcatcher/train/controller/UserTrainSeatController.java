@@ -10,6 +10,7 @@ import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
+import com.sullung2yo.seatcatcher.train.utility.SeatInfoResponseAssembler;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -44,12 +45,17 @@ public class UserTrainSeatController {
             parameters = {
                     @Parameter(name = "trainCode", description = "열차 코드"),
                     @Parameter(name = "carCode", description = "차량 코드"),
-                    @Parameter(name = "seatGroupType", description = "착석 그룹 타입 (ELDERLY_A, ELDERLY_B, NORMAL_A_14, NORMAL_B_14, NORMAL_C_14, ...)")
             },
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "성공적으로 조회 완료"
+                            description = "성공적으로 조회 완료",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = SeatInfoResponse.class)
+                                    )
+                            }
                     ),
                     @ApiResponse(
                             responseCode = "400",
@@ -57,14 +63,13 @@ public class UserTrainSeatController {
                     )
             }
     )
-    public ResponseEntity<SeatInfoResponse> getSeatInformation(
+    public ResponseEntity<List<SeatInfoResponse>> getSeatInformation(
             @RequestHeader("Authorization") String bearerToken,
             @RequestParam String trainCode,
-            @RequestParam String carCode,
-            @RequestParam SeatGroupType seatGroupType
+            @RequestParam String carCode
     ) {
         /*
-         * 착성 정보 조회 API
+         * 착석 정보 조회 API
          * Websocket 연결 후 trainCode로 구독했을 때,
          * 이 API를 통해 초기 착석 정보를 가져올 수 있습니다.
          */
@@ -73,11 +78,16 @@ public class UserTrainSeatController {
             throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
         }
 
-        // 열차 정보 가져오기
-        List<TrainSeatGroup> trainSeatGroups =
-        // 열차 정보를 통해 모든 좌석 정보 가져오기
-        // 반환
-        return ResponseEntity.ok().body(null);
+        // 좌석 그룹 정보 가져오기
+        List<TrainSeatGroup> trainSeatGroups = trainSeatGroupService.findAllByTrainCodeAndCarCode(trainCode, carCode);
+        if (trainSeatGroups.isEmpty()) {
+            log.warn("해당 열차 코드 : " + trainCode + "와 차량 코드 : " + carCode + "로 생성된 좌석 그룹이 없습니다. 새로 생성합니다.");
+            trainSeatGroups = trainSeatGroupService.createGroupsOf(trainCode, carCode);
+        }
+
+        // 응답 구조 생성
+        List<SeatInfoResponse> response = trainSeatGroupService.createSeatInfoResponse(trainSeatGroups);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping

@@ -8,7 +8,9 @@ import org.hibernate.annotations.Check;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -66,6 +68,10 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'IMAGE_1'")
     private ProfileImageNum profileImageNum; // 프로필 이미지 번호 (이미지 자체는 프론트에서 관리)
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @Column(nullable = false)
     @ColumnDefault("false")

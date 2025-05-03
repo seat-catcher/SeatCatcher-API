@@ -8,7 +8,7 @@ import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
-import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
+import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
 import com.sullung2yo.seatcatcher.train.utility.SeatInfoResponseAssembler;
 import com.sullung2yo.seatcatcher.train.event_handler.SeatEventPublisher;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
@@ -29,7 +29,7 @@ import java.util.Optional;
 @Slf4j
 public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
-    private final TrainRepository trainRepository;
+    private final TrainSeatGroupRepository trainSeatGroupRepository;
     private final UserTrainSeatRepository userTrainSeatRepository;
     private final TrainSeatRepository trainSeatRepository;
     private final UserRepository userRepository;

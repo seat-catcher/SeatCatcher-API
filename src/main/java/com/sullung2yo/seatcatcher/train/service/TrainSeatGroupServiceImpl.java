@@ -1,49 +1,124 @@
 package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
-import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
-import jakarta.transaction.Transactional;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
+import com.sullung2yo.seatcatcher.train.utility.SeatInfoResponseAssembler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j // 이걸 추가하면 로깅을 마음껏 쓸 수 있음.
 public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
-    private final TrainRepository trainRepository;
-    private final TrainHelperService helperService;
-
-    @Override
-    public List<TrainSeatGroup> findAllByTrainCode(String trainCode, String carCode) {
-        return trainRepository.findAllByTrainCode(trainCode);
-    }
+    private final TrainSeatGroupRepository trainSeatGroupRepository;
+    private final SeatInfoResponseAssembler seatInfoResponseAssembler;
 
     /*
-        열차 번호와 차량 번호로 좌석 그룹을 찾고
-        만약 없다면 새로 생성까지 하는 함수입니다.
-
-        해당 함수에서 호출하는 createGroupsOf 함수는
-        Database 에 commit 하는 기능을 포함합니다. 따라서 별도의 save가 필요 없습니다.
+        trainCode를 통해서 해당 열차에 생성되어있는 모든 좌석 그룹 리스트를 반환하는 메서드
      */
     @Override
+    public List<TrainSeatGroup> findAllByTrainCodeAndCarCode(String trainCode, String carCode) {
+        return trainSeatGroupRepository.findAllByTrainCodeAndCarCode(trainCode, carCode);
+    }
+
+    @Override
     @Transactional
-    public List<TrainSeatGroup> findOrCreateByTrainCode(@NonNull String trainCode, @NonNull String carCode) {
-        // trainCode 를 통해 매핑을 해서 어떤 타입의 좌석을 만들어야 하는지를 알아내야 함.
+    public List<TrainSeatGroup> createGroupsOf(@NonNull String trainCode, @NonNull String carCode) {
+        List<TrainSeatGroup> groups = new ArrayList<>();
+
+        // 차량 코드에서 편성번호 추출하고, 편성번호에 따라 좌석 배치 타입을 구분해서 TrainSeatGroup 엔티티 리스트 생성
+        if (this.SeatGroupChecker(carCode)) {
+            // 37773 배치의 차량을 세팅
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.ELDERLY_A));
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_A_14));
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_B_14));
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_C_14));
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.ELDERLY_B));
+        } else {
+            // 36663 배치의 차량 세팅
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.ELDERLY_A));
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_A_12));
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_B_12));
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_C_12));
+            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.ELDERLY_B));
+        }
+        trainSeatGroupRepository.saveAll(groups);
+
+        return groups;
     }
 
+    /**
+     * 응답 구조 생성해주는 메서드
+     * @param trainSeatGroups : 좌석 그룹 리스트
+     * @return 좌석 정보 응답 리스트
+     */
     @Override
-    public List<TrainSeatGroup> createGroupsOf(String trainCode, String carCode) {
-        return helperService.createGroupsOf(trainCode, carCode);
+    public List<SeatInfoResponse> createSeatInfoResponse(List<TrainSeatGroup> trainSeatGroups) {
+        return trainSeatGroups.stream()
+                .map(seatInfoResponseAssembler::assembleSeatResponse)
+                .toList();
     }
 
-    @Override
-    public TrainSeatGroup create(String trainCode, String carCode, SeatGroupType groupType){
-        return helperService.create(trainCode, carCode, groupType);
+    /**
+     * TrainSeatGroup 객체를 생성하는 메서드
+     * @param trainCode: 열차 코드
+     * @param carCode: 차량 코드
+     * @param groupType: 좌석 그룹 타입
+     * @return TrainSeatGroup 객체
+     */
+    public TrainSeatGroup createTrainSeatGroup(String trainCode, String carCode, SeatGroupType groupType){
+        // trainCode, carCode, groupType 를 통해서 TrainSeatGroup 객체 생성
+        TrainSeatGroup trainSeatGroup = TrainSeatGroup.builder()
+                .trainCode(trainCode)
+                .carCode(carCode)
+                .trainSeat(new ArrayList<>())
+                .seatGroupType(groupType)
+                .build();
+        List<TrainSeat> trainSeatList = new ArrayList<>();
+
+        // SeatGroupType에 따라 좌석 개수 설정해서 TrainSeat 객체 생성
+        for(int seatNumber = 0; seatNumber < groupType.getSeatCount(); seatNumber++) {
+            SeatType seatType = null;
+
+            // 노약자석의 경우에는 seatType 을 ELDERLY 로 설정
+            if(trainSeatGroup.getSeatGroupType() == SeatGroupType.ELDERLY_A || trainSeatGroup.getSeatGroupType() == SeatGroupType.ELDERLY_B) {
+                seatType = SeatType.ELDERLY;
+            } else {
+                seatType = SeatType.NORMAL; // 임산부 좌석은 고려하지 않고 일단 Normal 로 모두 설정하겠음. TODO :: 추후에 임산부 좌석이 고려되어야 할 경우 이 부분을 변경할 것.
+            }
+
+            // 좌석 엔티티 생성 후 리스트 저장
+            TrainSeat trainSeat = TrainSeat.builder()
+                    .trainSeatGroup(trainSeatGroup)
+                    .seatLocation(seatNumber)
+                    .seatType(seatType)
+                    .build();
+            trainSeatList.add(trainSeat);
+        }
+        trainSeatGroup.setTrainSeat(trainSeatList);
+        return trainSeatGroup;
     }
 
+    /**
+     * 차량 코드를 통해 편성 번호를 구해서,
+     * 편성번호에 따른 열차 차분을 파악하여 좌석 배치 타입을 알아내는 메서드
+     * 2호선의 경우 1차분은 37773, 2,3,4,5차분은 편의상 36663으로 설정
+     * 7호선의 경우 1,2,3,4차분은 37773, 5차분은 36663으로 설정
+     * @param carCode: 차량 코드
+     * return: true -> 37773 형태, false -> 36663 형태
+     */
+    private Boolean SeatGroupChecker(String carCode) {
+        int identifier = Integer.parseInt(carCode.charAt(0) + carCode.substring(2)); // 열차 번호가 2429이면 4를 제외한 229 -> 편성번호
+        // 36663
+        return (201 <= identifier && identifier <= 205) || (718 <= identifier && identifier <= 772);
+    }
 }
