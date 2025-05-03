@@ -69,7 +69,7 @@ jobs:
       - name: Setup application.properties
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.STAGING_PROPERTIES }}" > ./src/main/resources/application.properties
+          echo "${{ secrets.SWAGGER_PROPERTIES }}" > ./src/main/resources/application.properties
 
       - name: Check application.properties is properly set
         run: |
