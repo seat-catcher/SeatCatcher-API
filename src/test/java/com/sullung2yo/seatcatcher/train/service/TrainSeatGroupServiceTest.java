@@ -2,13 +2,17 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
-import com.sullung2yo.seatcatcher.train.utility.SeatInfoResponseAssembler;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -20,13 +24,9 @@ public class TrainSeatGroupServiceTest {
     @Autowired
     private TrainSeatGroupRepository trainSeatGroupRepository;
 
-    @Autowired
-    private SeatInfoResponseAssembler seatInfoResponseAssembler;
-
-
-    @BeforeEach
-    void setUp() {
-        service = new TrainSeatGroupServiceImpl(trainSeatGroupRepository, seatInfoResponseAssembler);
+    @AfterEach
+    void tearDown() {
+        trainSeatGroupRepository.deleteAll();
     }
 
     @Test
@@ -61,55 +61,42 @@ public class TrainSeatGroupServiceTest {
         assertEquals(carCode, result.get(0).getCarCode());
     }
 
-    @Test
-    @DisplayName("Normal A, B, C 중 하나로 그룹을 만들었을 경우를 테스트")
-    void testCreateGroup_normal()
-    {
-        //when
-        TrainSeatGroup group = service.createTrainSeatGroup("2204","2111", SeatGroupType.NORMAL_A_14);
+    @ParameterizedTest
+    @MethodSource("seatGroupTypeProvider")
+    @DisplayName("다양한 좌석 타입으로 그룹 만드는 테스트")
+    void testCreateGroupType14(SeatGroupType seatGroupType, SeatType expectedSeatType) {
+        // when
+        TrainSeatGroup group = service.createTrainSeatGroup("2204", "2111", seatGroupType);
 
-        //then
+        // then
         assertNotNull(group);
         assertEquals("2204", group.getTrainCode());
         assertEquals("2111", group.getCarCode());
-        assertEquals(SeatGroupType.NORMAL_A_14, group.getSeatGroupType()); // 2204 -> 204 -> 37773 타입
+        assertEquals(seatGroupType, group.getSeatGroupType());
 
         List<TrainSeat> seats = group.getTrainSeat();
         assertEquals(group.getSeatGroupType().getSeatCount(), seats.size());
 
-        for(int i = 0; i < seats.size(); i++)
-        {
+        for (int i = 0; i < seats.size(); i++) {
             TrainSeat seat = seats.get(i);
             assertNotNull(seat);
             assertEquals(group, seat.getTrainSeatGroup());
             assertEquals(i, seat.getSeatLocation());
-            assertEquals(SeatType.NORMAL, seat.getSeatType());
+            assertEquals(expectedSeatType, seat.getSeatType());
         }
     }
 
-    @Test
-    @DisplayName("Elderly A, B 중 하나로 그룹을 만들었을 경우를 테스트")
-    void testCreateGroup_elderly()
-    {
-        //when
-        TrainSeatGroup group = service.createTrainSeatGroup("2204","2111", SeatGroupType.ELDERLY_A);
-
-        //then
-        assertNotNull(group);
-        assertEquals("2204", group.getTrainCode());
-        assertEquals("2111", group.getCarCode());
-        assertEquals(SeatGroupType.ELDERLY_A, group.getSeatGroupType());
-
-        List<TrainSeat> seats = group.getTrainSeat();
-        assertEquals(group.getSeatGroupType().getSeatCount(), seats.size());
-
-        for(int i = 0; i < seats.size(); i++)
-        {
-            TrainSeat seat = seats.get(i);
-            assertNotNull(seat);
-            assertEquals(group, seat.getTrainSeatGroup());
-            assertEquals(i, seat.getSeatLocation());
-            assertEquals(SeatType.ELDERLY, seat.getSeatType());
-        }
+    // 테스트 파라미터 제공자
+    static Stream<Arguments> seatGroupTypeProvider() {
+        return Stream.of(
+                Arguments.of(SeatGroupType.NORMAL_A_14, SeatType.NORMAL),
+                Arguments.of(SeatGroupType.NORMAL_B_14, SeatType.NORMAL),
+                Arguments.of(SeatGroupType.NORMAL_C_14, SeatType.NORMAL),
+                Arguments.of(SeatGroupType.NORMAL_A_12, SeatType.NORMAL),
+                Arguments.of(SeatGroupType.NORMAL_B_12, SeatType.NORMAL),
+                Arguments.of(SeatGroupType.NORMAL_C_12, SeatType.NORMAL),
+                Arguments.of(SeatGroupType.ELDERLY_A, SeatType.ELDERLY),
+                Arguments.of(SeatGroupType.ELDERLY_B, SeatType.ELDERLY)
+        );
     }
 }

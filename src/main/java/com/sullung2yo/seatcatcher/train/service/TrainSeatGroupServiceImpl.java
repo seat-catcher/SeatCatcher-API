@@ -26,6 +26,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         trainCode를 통해서 해당 열차에 생성되어있는 모든 좌석 그룹 리스트를 반환하는 메서드
      */
     @Override
+    @Transactional(readOnly = true) // 읽기 전용 트랜잭션
     public List<TrainSeatGroup> findAllByTrainCodeAndCarCode(String trainCode, String carCode) {
         return trainSeatGroupRepository.findAllByTrainCodeAndCarCode(trainCode, carCode);
     }
@@ -34,23 +35,16 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
     @Transactional
     public List<TrainSeatGroup> createGroupsOf(@NonNull String trainCode, @NonNull String carCode) {
         List<TrainSeatGroup> groups = new ArrayList<>();
-
         // 차량 코드에서 편성번호 추출하고, 편성번호에 따라 좌석 배치 타입을 구분해서 TrainSeatGroup 엔티티 리스트 생성
-        if (this.SeatGroupChecker(carCode)) {
-            // 37773 배치의 차량을 세팅
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.ELDERLY_A));
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_A_14));
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_B_14));
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_C_14));
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.ELDERLY_B));
-        } else {
-            // 36663 배치의 차량 세팅
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.ELDERLY_A));
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_A_12));
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_B_12));
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.NORMAL_C_12));
-            groups.add(this.createTrainSeatGroup(trainCode, carCode, SeatGroupType.ELDERLY_B));
-        }
+        List<SeatGroupType> types = this.seatGroupChecker(carCode)
+                ? List.of(SeatGroupType.ELDERLY_A, SeatGroupType.NORMAL_A_14,
+                SeatGroupType.NORMAL_B_14, SeatGroupType.NORMAL_C_14,
+                SeatGroupType.ELDERLY_B)      // 37773 (true)
+                : List.of(SeatGroupType.ELDERLY_A, SeatGroupType.NORMAL_A_12,
+                SeatGroupType.NORMAL_B_12, SeatGroupType.NORMAL_C_12,
+                SeatGroupType.ELDERLY_B);     // 36663 (false)
+
+        types.forEach(t -> groups.add(createTrainSeatGroup(trainCode, carCode, t)));
         trainSeatGroupRepository.saveAll(groups);
 
         return groups;
@@ -114,9 +108,9 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
      * 2호선의 경우 1차분은 37773, 2,3,4,5차분은 편의상 36663으로 설정
      * 7호선의 경우 1,2,3,4차분은 37773, 5차분은 36663으로 설정
      * @param carCode: 차량 코드
-     * return: true -> 37773 형태, false -> 36663 형태
+     * @return true -> 37773 형태, false -> 36663 형태
      */
-    private Boolean SeatGroupChecker(String carCode) {
+    private boolean seatGroupChecker(String carCode) {
         int identifier = Integer.parseInt(carCode.charAt(0) + carCode.substring(2)); // 열차 번호가 2429이면 4를 제외한 229 -> 편성번호
         // 36663
         return (201 <= identifier && identifier <= 205) || (718 <= identifier && identifier <= 772);
