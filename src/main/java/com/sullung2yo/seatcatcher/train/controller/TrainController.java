@@ -4,7 +4,6 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
-import com.sullung2yo.seatcatcher.subway_station.dto.response.SubwayStationResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
 import com.sullung2yo.seatcatcher.subway_station.utility.StationNameMapper;
 import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
@@ -40,7 +39,7 @@ public class TrainController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "성공적으로 접근 열차 정보 반환",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SubwayStationResponse.class))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = IncomingTrainsResponse.class))
                     ),
                     @ApiResponse(
                             responseCode = "204",
@@ -76,13 +75,10 @@ public class TrainController {
             log.debug("JWT 파싱 성공");
 
             // 동일 노선에 존재하는 역 정보 조회
-            SubwayStation departure = subwayStationService.findByStationNameAndLine(
-                    dep, lineNumber
-            );
-            SubwayStation destination = subwayStationService.findByStationNameAndLine(
-                    dest, lineNumber
-            );
-            if (departure.getLine().equals(destination.getLine())) { // TODO : 이부분 따로 서비스에서 처리하거나 private 메서드로 분리해야 깔끔할 것 같음
+            SubwayStation departure = subwayStationService.findByStationNameAndLine(dep, lineNumber);
+            SubwayStation destination = subwayStationService.findByStationNameAndLine(dest, lineNumber);
+            if (departure.getLine().equals(destination.getLine())) {
+                // TODO : 이부분 따로 서비스에서 처리하거나 private 메서드로 분리해야 깔끔할 것 같음
                 // 현재는 출발역과 도착역 노선이 동일한 경우에만 처리
                 // TODO : 출발역과 도착역 노선이 다른 경우 처리 로직 추가 필요 (다익스트라 알고리즘 등...)
 

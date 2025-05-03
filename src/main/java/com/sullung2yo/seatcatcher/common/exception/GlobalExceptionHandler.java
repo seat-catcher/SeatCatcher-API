@@ -126,10 +126,10 @@ public class GlobalExceptionHandler {
          */
         log.error("TrainException", ex);
         if (ex.getErrorCode() == ErrorCode.TRAIN_NOT_FOUND) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "Train Not Found", ex.getMessage());
+            return createErrorResponse(HttpStatus.NOT_FOUND, "TrainSeatGroup Not Found", ex.getMessage());
         }
         else {
-            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Train Internal Server Error", ex.getMessage());
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "TrainSeatGroup Internal Server Error", ex.getMessage());
         }
     }
 

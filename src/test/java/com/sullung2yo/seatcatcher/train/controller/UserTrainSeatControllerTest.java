@@ -1,69 +1,51 @@
 package com.sullung2yo.seatcatcher.train.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
-import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
-import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
-import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
-import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
-import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
-import com.sullung2yo.seatcatcher.user.domain.*;
+import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
+import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
+import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
+import com.sullung2yo.seatcatcher.user.domain.Provider;
+import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import com.sullung2yo.seatcatcher.user.repository.UserTagRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @AutoConfigureMockMvc
-@Transactional
 @SpringBootTest
-@Rollback
-public class UserTrainSeatControllerTest {
+class UserTrainSeatControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @Autowired
-    private JwtTokenProviderImpl jwtTokenProvider;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private TagRepository tagRepository;
+    private TrainSeatGroupRepository trainSeatGroupRepository;
 
     @Autowired
-    private UserTagRepository userTagRepository;
+    private TokenProvider tokenProvider;
 
-    @Autowired
-    private TrainSeatGroupService trainSeatGroupService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private User user;
     private String accessToken;
-    private TrainSeat seat;
 
     @BeforeEach
     void setUp() {
-        // 일단 테스트를 하려면 DB에 샘플 좌석, 샘플 유저가 존재해야 함.
-        // 테스트할 사용자 생성
-        user = User.builder()
+        // 테스트 사용자 생성
+        User user = User.builder()
                 .provider(Provider.APPLE)
                 .providerId("testProviderId")
                 .name("testUser")
@@ -72,30 +54,33 @@ public class UserTrainSeatControllerTest {
                 .build();
         userRepository.save(user);
 
-        Tag tag = tagRepository.findByTagName(UserTagType.USERTAG_CARRIER).get();
-
-        UserTag userTag = UserTag.builder()
-                .user(user)
-                .tag(tag)
-                .build();
-        userTag.setRelationships(user, tag);
-        userTagRepository.save(userTag);
-
-        accessToken = jwtTokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
-
-        //테스트할 좌석 생성
-        seat = trainSeatGroupService.createGroupsOf("2222", "2222").stream().findFirst()
-                .orElseThrow(EntityNotFoundException::new)
-                .getTrainSeat().get(0);
+        // AccessToken 생성
+        accessToken = tokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
     }
 
     @Test
-    void testReserveSeat() throws Exception {
-        // TODO : 좌석 예약 API 테스트
+    void getSeatInformationNotExists() throws Exception {
+        mockMvc.perform(get("/user/seats")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .queryParam("trainCode", "1234")
+                        .queryParam("carCode", "2222")) // 2222 -> 222 -> 36663 타입
+                .andDo(print())
+                .andExpect(status().isOk())
+                // 응답 전체가 배열 [ … ]
+                .andExpect(jsonPath("$").isArray())
+                // seatGroup 총 5개 있어야함
+                .andExpect(jsonPath("$.length()").value(5))
+                // 첫 번째 그룹은 ELDERLY 6석
+                .andExpect(jsonPath("$[0].seatStatus.length()").value(6))
+                .andExpect(jsonPath("$[0].seatStatus[0].seatType").value("ELDERLY"))
+                // 두 번째 그룹은 NORMAL 12석
+                .andExpect(jsonPath("$[1].seatStatus.length()").value(12));
     }
 
-    @Test
-    void testReleaseSeat() throws Exception {
-        // TODO : 좌석 해제 API 테스트
+    @AfterEach
+    void tearDown() {
+        // 테스트 후 DB에서 사용자 삭제
+        trainSeatGroupRepository.deleteAll();
+        userRepository.deleteAll();
     }
 }

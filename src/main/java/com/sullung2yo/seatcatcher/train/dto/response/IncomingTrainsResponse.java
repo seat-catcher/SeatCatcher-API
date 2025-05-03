@@ -12,18 +12,21 @@ import lombok.ToString;
         description = "열차 도착 정보 응답 DTO",
         title = "열차 도착 정보 응답 DTO"
 )
-@Tag(name="Train API", description = "열차 관련 API")
+@Tag(name="TrainSeatGroup API", description = "열차 관련 API")
 @ToString
 @Builder
 public class IncomingTrainsResponse {
 
+    @JsonProperty("btrainNo")
+    @Schema(description = "지하철 ID", example = "1001")
+    private String subwayId; // btrainNo
+
     @JsonProperty("ordkey")
-    @Schema(description = "도착 예정 열차 순번", example = "11002온수0 -> 상하행코드1자리, 순번1자리, 현재역3자리, 목적지정류장, 급행코드1자리\n 12004석남0 -> 하행/두번째열차/002번역/석남행/급행아님")
+    @Schema(description = "도착 예정 열차 순번", example = "11002온수0 -> 상하행코드1자리, 순번1자리, 현재역3자리, 목적지정류장, 급행코드1자리\n 12004석남0 -> 하행/두번째열차/004번역/석남행/급행아님")
     private String arrivalTrainOrder; // ordkey
 
     @JsonProperty("barvlDt")
     @Schema(description = "도착 예정 시간", example = "180(초)")
-
     private String arrivalTime; // barvlDt
 
     @JsonProperty("bstatnNm")

@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.train.event_handler;
 
 
-import com.sullung2yo.seatcatcher.train.dto.event.SeatEvent;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -24,12 +24,12 @@ public class SeatEventListener {
     private final SimpMessagingTemplate webSocketMessagingTemplate;
 
     @RabbitListener(queues = "${rabbitmq.queue.name}")
-    public void handleSeatEvent(SeatEvent seatEvent){
-        log.info("좌석 이벤트 발생 : {}", seatEvent.toString());
-        String topic = "/topic/" + bindingPrefix + "." + seatEvent.getTrainCode() + "." + seatEvent.getCarCode();
+    public void handleSeatEvent(SeatInfoResponse seatInfoResponse){
+        log.info("좌석 이벤트 발생 : {}", seatInfoResponse.toString());
+        String topic = "/topic/" + bindingPrefix + "." + seatInfoResponse.getTrainCode() + "." + seatInfoResponse.getCarCode();
 
         try {
-            webSocketMessagingTemplate.convertAndSend(topic, seatEvent); // webSocket으로 topic 구독한 사람들에게 broadcast
+            webSocketMessagingTemplate.convertAndSend(topic, seatInfoResponse); // webSocket으로 topic 구독한 사람들에게 broadcast
             log.debug("웹소켓 메세지 전송 성공 : {}", topic);
         } catch (Exception e) {
             log.error("{}에 대한 웹소켓 메세지 전송 실패 : {}", topic, e.getMessage());

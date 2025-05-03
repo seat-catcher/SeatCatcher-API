@@ -27,8 +27,8 @@ public class TrainSeat extends BaseEntity {
     */
 
     @ManyToOne
-    @JoinColumn(name = "train_id", nullable = false)
-    private Train train;
+    @JoinColumn(name = "train_seat_group_id", nullable = false)
+    private TrainSeatGroup trainSeatGroup;
 
     @Column(name = "seat_location", nullable = false)
     private int seatLocation; // 좌석 위치와 매핑되는 정보 (Train의 SeatGroupType에 의해 최대 갯수 결정).

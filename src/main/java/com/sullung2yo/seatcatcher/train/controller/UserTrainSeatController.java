@@ -3,11 +3,17 @@ package com.sullung2yo.seatcatcher.train.controller;
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
+import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
+import com.sullung2yo.seatcatcher.train.utility.SeatInfoResponseAssembler;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +25,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -27,7 +35,60 @@ import org.springframework.web.bind.annotation.*;
 public class UserTrainSeatController {
 
     private final UserTrainSeatService userTrainSeatService;
+    private final TrainSeatGroupService trainSeatGroupService;
     private final UserService userService;
+
+    @GetMapping
+    @Operation(
+            summary = "착석 정보를 조회하는 API",
+            description = "착석 정보를 조회하는 API입니다. (Websocket 연결 후 trainCode로 구독했을 때, 이 API를 통해 초기 착석 정보를 가져올 수 있습니다.)",
+            parameters = {
+                    @Parameter(name = "trainCode", description = "열차 코드"),
+                    @Parameter(name = "carCode", description = "차량 코드"),
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 조회 완료",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = SeatInfoResponse.class)
+                                    )
+                            }
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "잘못된 요청"
+                    )
+            }
+    )
+    public ResponseEntity<List<SeatInfoResponse>> getSeatInformation(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestParam String trainCode,
+            @RequestParam String carCode
+    ) {
+        /*
+         * 착석 정보 조회 API
+         * Websocket 연결 후 trainCode로 구독했을 때,
+         * 이 API를 통해 초기 착석 정보를 가져올 수 있습니다.
+         */
+        Long userId = verifyUserAndGetId(bearerToken);
+        if (userId == null) {
+            throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
+        }
+
+        // 좌석 그룹 정보 가져오기
+        List<TrainSeatGroup> trainSeatGroups = trainSeatGroupService.findAllByTrainCodeAndCarCode(trainCode, carCode);
+        if (trainSeatGroups.isEmpty()) {
+            log.warn("해당 열차 코드 : " + trainCode + "와 차량 코드 : " + carCode + "로 생성된 좌석 그룹이 없습니다. 새로 생성합니다.");
+            trainSeatGroups = trainSeatGroupService.createGroupsOf(trainCode, carCode);
+        }
+
+        // 응답 구조 생성
+        List<SeatInfoResponse> response = trainSeatGroupService.createSeatInfoResponse(trainSeatGroups);
+        return ResponseEntity.ok().body(response);
+    }
 
     @PostMapping
     @Operation(
@@ -137,10 +198,6 @@ public class UserTrainSeatController {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-
-
-
 
     //TODO :: 지금은 이렇게 만들지만 나중에는 AOP 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.
     // 혹은 단순하게 AuthService 등에 해당 로직을 옮겨놓는 것도 좋을 듯.

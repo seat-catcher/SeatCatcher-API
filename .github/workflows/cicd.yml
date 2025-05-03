@@ -23,8 +23,7 @@ jobs:
       - name: Setup application.properties
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
-          echo "${{ secrets.PRODUCTION_PROPERTIES }}" > ./src/main/resources/prod.properties
+          echo "${{ secrets.STAGING_PROPERTIES }}" > ./src/main/resources/application.properties
 
       - name: Set AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -70,8 +69,7 @@ jobs:
       - name: Setup application.properties
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
-          echo "${{ secrets.PRODUCTION_PROPERTIES }}" > ./src/main/resources/prod.properties
+          echo "${{ secrets.STAGING_PROPERTIES }}" > ./src/main/resources/application.properties
 
       - name: Check application.properties is properly set
         run: |
