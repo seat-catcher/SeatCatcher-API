@@ -17,6 +17,9 @@ public class UserAlarm extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user; // 알람을 소유한 유저
 
+    @Column(name = "notification_type")
+    private PushNotificationType type;
+
     @Column(name = "content")
     private String content; // 알람의 내용
 

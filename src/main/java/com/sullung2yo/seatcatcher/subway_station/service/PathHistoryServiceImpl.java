@@ -77,6 +77,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
     public PathHistoryResponse.PathHistoryList getAllPathHistory(int size, Long lastPathId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();
+
         User user = userRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. providerId : " + providerId, ErrorCode.USER_NOT_FOUND));
         PageRequest pageRequest = PageRequest.of(0, size + 1);
