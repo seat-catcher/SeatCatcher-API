@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
-import com.sullung2yo.seatcatcher.train.service.TrainService;
+import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.user.domain.*;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @SpringBootTest
 @Rollback
-public class UserTrainSeatControllerTest {
+public class UserTrainSeatGroupSeatControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -45,7 +45,7 @@ public class UserTrainSeatControllerTest {
     private UserTagRepository userTagRepository;
 
     @Autowired
-    private TrainService trainService;
+    private TrainSeatGroupService trainSeatGroupService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -79,7 +79,7 @@ public class UserTrainSeatControllerTest {
         accessToken = jwtTokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
 
         //테스트할 좌석 생성
-        seat = trainService.createGroupsOf("2222", "2222").stream().findFirst()
+        seat = trainSeatGroupService.createGroupsOf("2222", "2222").stream().findFirst()
                 .orElseThrow(EntityNotFoundException::new)
                 .getTrainSeat().get(0);
     }

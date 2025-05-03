@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.train.repository;
 
-import com.sullung2yo.seatcatcher.train.domain.Train;
+import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,8 +23,8 @@ public interface TrainSeatRepository extends JpaRepository<TrainSeat, Long> {
     // Eager 로딩으로 사용해야 N+1 쿼리 문제가 발생하지 않기 때문에
     // JPQL에서 JOIN FETCH를 사용해야 합니다.
     @Query("SELECT DISTINCT ts FROM TrainSeat AS ts JOIN FETCH ts.train as t WHERE t = :train")
-    List<TrainSeat> findAllWithTrain(Train train);
+    List<TrainSeat> findAllWithTrain(TrainSeatGroup trainSeatGroup);
 
     @Query("SELECT t FROM TrainSeat ts JOIN ts.train AS t WHERE ts.id = :seatId")
-    Optional<Train> findTrainByTrainSeatId(Long seatId);
+    Optional<TrainSeatGroup> findTrainByTrainSeatId(Long seatId);
 }

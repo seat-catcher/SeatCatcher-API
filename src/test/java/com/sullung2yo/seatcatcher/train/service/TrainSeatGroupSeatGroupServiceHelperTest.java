@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
 import com.sullung2yo.seatcatcher.train.domain.SeatType;
-import com.sullung2yo.seatcatcher.train.domain.Train;
+import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class TrainServiceHelperTest {
+public class TrainSeatGroupSeatGroupServiceHelperTest {
 
     private TrainHelperService service;
 
@@ -33,7 +33,7 @@ public class TrainServiceHelperTest {
     void testCreateGroup_normal()
     {
         //when
-        Train group = service.create("2204","2111", SeatGroupType.NORMAL_A_14);
+        TrainSeatGroup group = service.create("2204","2111", SeatGroupType.NORMAL_A_14);
 
         //then
         Assertions.assertNotNull(group);
@@ -48,7 +48,7 @@ public class TrainServiceHelperTest {
         {
             TrainSeat seat = seats.get(i);
             Assertions.assertNotNull(seat);
-            Assertions.assertEquals(group, seat.getTrain());
+            Assertions.assertEquals(group, seat.getTrainSeatGroup());
             Assertions.assertEquals(i, seat.getSeatLocation());
             Assertions.assertEquals(SeatType.NORMAL, seat.getSeatType());
         }
@@ -59,7 +59,7 @@ public class TrainServiceHelperTest {
     void testCreateGroup_elderly()
     {
         //when
-        Train group = service.create("2204","2111", SeatGroupType.ELDERLY_A);
+        TrainSeatGroup group = service.create("2204","2111", SeatGroupType.ELDERLY_A);
 
         //then
         Assertions.assertNotNull(group);
@@ -74,7 +74,7 @@ public class TrainServiceHelperTest {
         {
             TrainSeat seat = seats.get(i);
             Assertions.assertNotNull(seat);
-            Assertions.assertEquals(group, seat.getTrain());
+            Assertions.assertEquals(group, seat.getTrainSeatGroup());
             Assertions.assertEquals(i, seat.getSeatLocation());
             Assertions.assertEquals(SeatType.ELDERLY, seat.getSeatType());
         }

@@ -18,9 +18,9 @@ import static reactor.core.publisher.Mono.when;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class TrainServiceTest {
+public class TrainSeatGroupSeatGroupServiceTest {
 
-    private TrainService service;
+    private TrainSeatGroupService service;
 
     @Mock
     private TrainRepository trainRepository;
@@ -30,7 +30,7 @@ public class TrainServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new TrainServiceImpl(trainRepository, helperService);
+        service = new TrainSeatGroupServiceImpl(trainRepository, helperService);
     }
 
     @Test
@@ -40,15 +40,15 @@ public class TrainServiceTest {
         String trainCode = "9999";
         String carCode = "9999";
 
-        Train mockTrain = new Train();
-        mockTrain.setTrainCode(trainCode);
-        mockTrain.setCarCode(carCode);
+        TrainSeatGroup mockTrainSeatGroup = new TrainSeatGroup();
+        mockTrainSeatGroup.setTrainCode(trainCode);
+        mockTrainSeatGroup.setCarCode(carCode);
 
-        List<Train> trains = List.of(mockTrain);
+        List<TrainSeatGroup> trainSeatGroups = List.of(mockTrainSeatGroup);
 
         // when
         System.out.println("service : " + service);
-        List<Train> result = service.findOrCreateByTrainCodeAndCarCode(trainCode, carCode);
+        List<TrainSeatGroup> result = service.findOrCreateByTrainCodeAndCarCode(trainCode, carCode);
 
         // then
         Assertions.assertNotNull(result);

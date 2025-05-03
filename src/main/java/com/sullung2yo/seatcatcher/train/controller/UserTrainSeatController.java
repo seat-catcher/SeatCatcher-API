@@ -4,10 +4,11 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
+import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
-import com.sullung2yo.seatcatcher.train.service.TrainService;
+import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -31,7 +34,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserTrainSeatController {
 
     private final UserTrainSeatService userTrainSeatService;
-    private final TrainService trainService;
+    private final TrainSeatGroupService trainSeatGroupService;
     private final UserService userService;
 
     @GetMapping
@@ -70,9 +73,11 @@ public class UserTrainSeatController {
             throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
         }
 
-        // 좌석 정보 가져와서 반환
-        SeatInfoResponse response = userTrainSeatService.f(trainCode, carCode, seatGroupType);
-        return ResponseEntity.ok().body(response);
+        // 열차 정보 가져오기
+        List<TrainSeatGroup> trainSeatGroups =
+        // 열차 정보를 통해 모든 좌석 정보 가져오기
+        // 반환
+        return ResponseEntity.ok().body(null);
     }
 
     @PostMapping

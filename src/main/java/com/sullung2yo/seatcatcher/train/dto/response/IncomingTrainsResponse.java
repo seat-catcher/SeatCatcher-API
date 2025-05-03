@@ -12,7 +12,7 @@ import lombok.ToString;
         description = "열차 도착 정보 응답 DTO",
         title = "열차 도착 정보 응답 DTO"
 )
-@Tag(name="Train API", description = "열차 관련 API")
+@Tag(name="TrainSeatGroup API", description = "열차 관련 API")
 @ToString
 @Builder
 public class IncomingTrainsResponse {
