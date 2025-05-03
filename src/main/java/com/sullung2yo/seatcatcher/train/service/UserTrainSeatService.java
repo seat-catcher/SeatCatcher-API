@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.train.service;
 
 
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 
 public interface UserTrainSeatService {
 
@@ -13,4 +14,6 @@ public interface UserTrainSeatService {
     void releaseSeat(Long id);
 
     void yieldSeat(Long seatId, Long giverID, Long takerId);
+
+    SeatInfoResponse getSeatInfo(String trainCode);
 }

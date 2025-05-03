@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.train.dto.event;
+package com.sullung2yo.seatcatcher.train.dto.response;
 
 import com.sullung2yo.seatcatcher.train.domain.SeatType;
 import lombok.Builder;

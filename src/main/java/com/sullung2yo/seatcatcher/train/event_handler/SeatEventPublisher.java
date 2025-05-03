@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.train.event_handler;
 
-import com.sullung2yo.seatcatcher.train.dto.event.SeatEvent;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -23,14 +23,14 @@ public class SeatEventPublisher {
     @Value("${rabbitmq.binding.prefix}")
     private String bindingPrefix;
 
-    public void publish(SeatEvent seatEvent) {
+    public void publish(SeatInfoResponse seatInfoResponse) {
         // RabbutMQ Exchange한테 메세지 발행
-        log.info("좌석 이벤트 발행: {}", seatEvent.toString());
-        String routingKey = bindingPrefix + "." + seatEvent.getTrainCode() + "." + seatEvent.getCarCode();
+        log.info("좌석 이벤트 발행: {}", seatInfoResponse.toString());
+        String routingKey = bindingPrefix + "." + seatInfoResponse.getTrainCode() + "." + seatInfoResponse.getCarCode();
 
         // Exchange한테 routingKey를 사용해서 seatEvent 담아서 전달
         try {
-            rabbitTemplate.convertAndSend(exchangeName, routingKey, seatEvent);
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, seatInfoResponse);
             log.debug("RabbitMQ에 좌석 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
         } catch (Exception e) {
             log.error("RabbitMQ에 좌석 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());

@@ -7,8 +7,9 @@ import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.Train;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
-import com.sullung2yo.seatcatcher.train.dto.event.SeatEvent;
-import com.sullung2yo.seatcatcher.train.event_handler.SeatEventAssembler;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.repository.TrainRepository;
+import com.sullung2yo.seatcatcher.train.utility.SeatInfoResponseAssembler;
 import com.sullung2yo.seatcatcher.train.event_handler.SeatEventPublisher;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
@@ -28,11 +29,12 @@ import java.util.Optional;
 @Slf4j
 public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
+    private final TrainRepository trainRepository;
     private final UserTrainSeatRepository userTrainSeatRepository;
     private final TrainSeatRepository trainSeatRepository;
     private final UserRepository userRepository;
     private final SeatEventPublisher seatEventPublisher;
-    private final SeatEventAssembler seatEventAssembler;
+    private final SeatInfoResponseAssembler seatInfoResponseAssembler;
     private final EntityManager entityManager;
 
     @Override
@@ -49,7 +51,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         // 모든 관련 정보를 담게 된다.
         Train train = trainSeatRepository.findTrainByTrainSeatId(seatId)
                 .orElseThrow(() -> new TrainException("해당 열차를 찾을 수 없습니다.", ErrorCode.TRAIN_NOT_FOUND));
-        SeatEvent event = seatEventAssembler.assembleSeatEvents(train);
+        SeatInfoResponse event = seatInfoResponseAssembler.assembleSeatEvents(train);
         seatEventPublisher.publish(event); // RabbitMQ에 발행
     }
 
@@ -83,8 +85,18 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         userTrainSeatRepository.deleteUserTrainSeatByUserId(userId);
 
         // 업데이트된 좌석 정보 전달
-        SeatEvent event = seatEventAssembler.assembleSeatEvents(train);
+        SeatInfoResponse event = seatInfoResponseAssembler.assembleSeatEvents(train);
         seatEventPublisher.publish(event);
+    }
+
+    @Override
+    public SeatInfoResponse getSeatInfo(String trainCode) {
+        // 열차 정보 가져오기
+        Train train = trainRepository.findTrainByTrainCode(trainCode)
+                .orElseThrow(() -> new TrainException("해당 열차를 찾을 수 없습니다.", ErrorCode.TRAIN_NOT_FOUND));
+
+        // 좌석 정보 조립해서 반환
+        return seatInfoResponseAssembler.assembleSeatEvents(train);
     }
 
     private void reserve(Long userId, Long seatId) {
