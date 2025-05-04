@@ -17,6 +17,7 @@ public enum ErrorCode {
     SUBWAY_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철을 찾을 수 없습니다."),
     SUBWAY_STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철 역을 찾을 수 없습니다."),
     PATH_HISTORY_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 이력에 접근할 수 없습니다."),
+    PATH_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "경로 이력을 찾을 수 없습니다."),
     SEAT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 좌석을 찾을 수 없습니다."),
     SEAT_ALREADY_RESERVED(HttpStatus.BAD_REQUEST, "해당 좌석은 이미 점유중입니다."),
     USER_NOT_RESERVED(HttpStatus.BAD_REQUEST, "해당 사용자는 좌석을 점유중이지 않습니다."),

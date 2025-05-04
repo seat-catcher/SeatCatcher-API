@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.common.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
     private final TaskScheduler taskScheduler;
 
     @Override
-    public void runThisAfterSeconds(int seconds, Runnable task) {
+    public void runThisAfterSeconds(long seconds, Runnable task) {
         try {
             Instant triggerTime = LocalDateTime.now().plusSeconds(seconds)
                     .atZone(ZoneId.systemDefault())
@@ -32,7 +33,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
     }
 
     @Override
-    public void runThisAfterMinutes(int minutes, Runnable task) {
+    public void runThisAfterMinutes(long minutes, Runnable task) {
         try{
             Instant triggerTime = LocalDateTime.now().plusMinutes(minutes)
                     .atZone(ZoneId.systemDefault())
@@ -44,7 +45,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
     }
 
     @Override
-    public void runThisAtBeforeSeconds(LocalDateTime stdTime, int seconds, Runnable task) {
+    public void runThisAtBeforeSeconds(LocalDateTime stdTime, long seconds, Runnable task) {
         try {
             if(stdTime == null)
             {
@@ -66,7 +67,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
     }
 
     @Override
-    public void runThisAtBeforeMinutes(LocalDateTime stdTime, int minutes, Runnable task) {
+    public void runThisAtBeforeMinutes(LocalDateTime stdTime, long minutes, Runnable task) {
         try{
             if(stdTime == null)
             {

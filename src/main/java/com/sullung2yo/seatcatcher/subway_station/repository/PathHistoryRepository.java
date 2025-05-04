@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PathHistoryRepository extends JpaRepository<PathHistory, Long> {
@@ -24,4 +25,7 @@ public interface PathHistoryRepository extends JpaRepository<PathHistory, Long> 
             @Param("lastPathId") Long lastPathId,
             Pageable pageable
     );
+
+    // TODO :: 이게 이렇게 막 써놓고 파란색 글씨 뜨니까 되는 것 같기는 한데 일단 테스트 코드 나중에 만들어서 검증해야 함.
+    Optional<PathHistory> findTopByUserIdOrderByUpdatedAtDesc(long userId);
 }

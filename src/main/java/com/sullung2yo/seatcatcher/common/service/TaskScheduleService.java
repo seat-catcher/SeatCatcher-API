@@ -20,15 +20,15 @@ public interface TaskScheduleService {
 
 
     // 이 인터페이스가 호출된 시점으로부터 seconds 초 후에 task 가 실행됩니다.
-    void runThisAfterSeconds(int seconds, Runnable task);
+    void runThisAfterSeconds(long seconds, Runnable task);
 
     // 이 인터페이스가 호출된 시점으로부터 minutes 분 후에 task 가 실행됩니다.
-    void runThisAfterMinutes(int minutes, Runnable task);
+    void runThisAfterMinutes(long minutes, Runnable task);
 
     // 입력받은 기준 시간 (ex 예상 도착 시간) 으로부터 seconds 초 전에 task 가 실행됩니다.
-    void runThisAtBeforeSeconds(LocalDateTime stdTime, int seconds, Runnable task);
+    void runThisAtBeforeSeconds(LocalDateTime stdTime, long seconds, Runnable task);
 
     // 입력받은 기준 시간 (ex 예상 도착 시간) 으로부터 minutes 분 전에 task 가 실행됩니다.
-    void runThisAtBeforeMinutes(LocalDateTime stdTime, int minutes, Runnable task);
+    void runThisAtBeforeMinutes(LocalDateTime stdTime, long minutes, Runnable task);
 
 }
