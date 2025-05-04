@@ -2,8 +2,9 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatStatus;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
-import com.sullung2yo.seatcatcher.train.utility.SeatInfoResponseAssembler;
+import com.sullung2yo.seatcatcher.train.utility.SeatStatusAssembler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ import java.util.List;
 public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
     private final TrainSeatGroupRepository trainSeatGroupRepository;
-    private final SeatInfoResponseAssembler seatInfoResponseAssembler;
+    private final SeatStatusAssembler seatStatusAssembler;
 
     /*
         trainCode를 통해서 해당 열차에 생성되어있는 모든 좌석 그룹 리스트를 반환하는 메서드
@@ -50,15 +51,44 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         return groups;
     }
 
+
     /**
-     * 응답 구조 생성해주는 메서드
-     * @param trainSeatGroups : 좌석 그룹 리스트
-     * @return 좌석 정보 응답 리스트
+     * [
+     *   {
+     *     "trainCode": "1234",
+     *     "carCode": "2001",
+     *     "seatGroupType": "...",
+     *     "seatStatus": [
+     *       {
+     *         "seatId": 1,
+     *         "seatLocation": 0,
+     *         "seatType": "...",
+     *         "occupant": {
+     *           "userId": 123123,
+     *           "nickname": "asdfasdf",
+     *           "getOffRemainingCount": 3
+     *         }
+     *       },
+     *       {...}
+     *     ]
+     *   },
+     *   {...}
+     * ]
+     * 좌석 그룹 정보를 통해서 좌석 상태 리스트를 생성하는 메서드
+     * @param trainCode: 열차 코드
+     * @param carCode: 차량 코드
+     * @param trainSeatGroups: 좌석 그룹 리스트
+     * @return 좌석 상태 리스트
      */
     @Override
-    public List<SeatInfoResponse> createSeatInfoResponse(List<TrainSeatGroup> trainSeatGroups) {
+    public List<SeatInfoResponse> createSeatInfoResponse(String trainCode, String carCode, List<TrainSeatGroup> trainSeatGroups) {
         return trainSeatGroups.stream()
-                .map(seatInfoResponseAssembler::assembleSeatResponse)
+                .map(group -> SeatInfoResponse.builder()
+                        .trainCode(trainCode)
+                        .carCode(carCode)
+                        .seatGroupType(group.getSeatGroupType())
+                        .seatStatus(seatStatusAssembler.assembleSeatResponse(group))
+                        .build())
                 .toList();
     }
 
@@ -69,6 +99,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
      * @param groupType: 좌석 그룹 타입
      * @return TrainSeatGroup 객체
      */
+    @Transactional
     public TrainSeatGroup createTrainSeatGroup(String trainCode, String carCode, SeatGroupType groupType){
         // trainCode, carCode, groupType 를 통해서 TrainSeatGroup 객체 생성
         TrainSeatGroup trainSeatGroup = TrainSeatGroup.builder()
@@ -99,7 +130,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
             trainSeatList.add(trainSeat);
         }
         trainSeatGroup.setTrainSeat(trainSeatList);
-        return trainSeatGroup;
+        return trainSeatGroupRepository.save(trainSeatGroup);
     }
 
     /**
