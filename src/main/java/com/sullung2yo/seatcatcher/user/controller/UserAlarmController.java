@@ -33,7 +33,8 @@ public class UserAlarmController {
             @RequestParam(required = false) Long cursor,
             @RequestParam(required = false) PushNotificationType type,
             @RequestParam(required = false) Boolean isRead) {
-        UserAlarmResponse.UserAlarmScrollResponse response = userAlarmService.getMyAlarms(bearerToken, size, cursor, type,isRead);
+        String token = bearerToken.replace("Bearer ", "");
+        UserAlarmResponse.UserAlarmScrollResponse response = userAlarmService.getMyAlarms(token, size, cursor, type,isRead);
         return ResponseEntity.ok(response);
     }
 
@@ -44,11 +45,13 @@ public class UserAlarmController {
             description = "사용자의 특정 알람을 불러옵니다."
 
     )
-    public ResponseEntity<?> getAlarmById(@PathVariable Long alarmId){
+    public ResponseEntity<UserAlarmResponse.UserAlarmItem> getAlarmById(
+            @RequestHeader("Authorization") String bearerToken,
+            @PathVariable Long alarmId){
+        String token = bearerToken.replace("Bearer ", "");
 
-
-
-        return ResponseEntity.ok(null);
+        UserAlarmResponse.UserAlarmItem response = userAlarmService.getAlarm(token, alarmId);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{alarmId}")
@@ -57,8 +60,12 @@ public class UserAlarmController {
             description = "사용자 알람을 삭제 합니다."
 
     )
-    public ResponseEntity<?> deleteAlarm(@PathVariable Long alarmId){
-        return ResponseEntity.ok(null);
+    public ResponseEntity<?> deleteAlarm(@RequestHeader("Authorization") String bearerToken,
+                                         @PathVariable Long alarmId){
+
+        String token = bearerToken.replace("Bearer ", "");
+        userAlarmService.deletAlarm(token, alarmId);
+        return ResponseEntity.ok("알람이 성공적으로 삭제되었습니다.");
     };
 
 //    // POST /alarm/get-off

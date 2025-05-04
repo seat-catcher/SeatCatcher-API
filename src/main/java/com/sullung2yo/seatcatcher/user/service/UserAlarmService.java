@@ -8,5 +8,6 @@ import java.util.List;
 public interface UserAlarmService {
 
     UserAlarmResponse.UserAlarmScrollResponse getMyAlarms(String token, int size, Long cursor, PushNotificationType type, Boolean isRead);
-    void deletAlarm(Long id);
+    UserAlarmResponse.UserAlarmItem getAlarm(String token, Long id);
+    void deletAlarm(String token, Long id);
 }
