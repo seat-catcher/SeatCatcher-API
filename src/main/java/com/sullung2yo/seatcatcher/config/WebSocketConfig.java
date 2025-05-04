@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -30,6 +31,24 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TokenProvider tokenProvider;
+
+    @Value("${spring.rabbitmq.host}")
+    private String rabbitMQHost;
+
+    @Value("${spring.rabbitmq.server-username}")
+    private String rabbitMQServerUsername;
+
+    @Value("${spring.rabbitmq.server-password}")
+    private String rabbitMQServerPassword;
+
+    @Value("${spring.rabbitmq.client-username}")
+    private String rabbitMQClientUsername;
+
+    @Value("${spring.rabbitmq.client-password}")
+    private String rabbitMQClientPassword;
+
+    @Value("${spring.rabbitmq.relay-port}") // Spring <-> RabbitMQ Relay 포트
+    private Integer rabbitMQRelayPort;
 
     public WebSocketConfig(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
@@ -94,21 +113,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        /*
-        Enable Simple Broker (브로커 경로 설정 - 구독 경로)
-        - 내장 메세지 브로커를 활성화
-        - 이것만으로 충분한 이유
-        - 1. MVP 규모에서는 사용자가 많이 없어서, JVM 메모리 안에서 충분히 처리 가능
-        - 2. 아래 한줄로 설정 끝 (간편함)
-         */
-        config.enableSimpleBroker("/topic")
-                .setHeartbeatValue(new long[]{10000, 10000})
-                .setTaskScheduler(brokerTaskScheduler()); // Server->Client, Client->Server의 heartbeat 주기 설정
-
-        // Heart-Beat : 클라이언트와 서버가 서로 연결이 살아있는지 확인하는 주기
-        // 우리가 개발해야하는 모바일 서비스로 Wifi연결이나 셀룰러 연결이 불안정해서 웹소켓이 끊기는 경우가 있음
-        // 따라서 Heart-Beat 주기를 설정해주면, 클라이언트와 서버가 서로 연결이 끊어졌을 때
-        // 정해진 주기 안에 신호가 오지 않으면 연결이 끊어졌다고 판단하고, 클라이언트에서 재연결을 시도
+        config.enableStompBrokerRelay("/topic") // RabbitMQ STOMP Broker 활성화
+                .setRelayHost(rabbitMQHost) // Broker 지정
+                .setRelayPort(rabbitMQRelayPort) // Spring <-> RabbitMQ Relay 포트
+                .setSystemLogin(rabbitMQServerUsername) // Spring <-> RabbitMQ Relay 포트에 로그인할 때 사용할 Username
+                .setSystemPasscode(rabbitMQServerPassword) // Spring <-> RabbitMQ Relay 포트에 로그인할 때 사용할 Password
+                .setClientLogin(rabbitMQClientUsername) // Client <-> RabbitMQ Broker 포트에 로그인할 때 사용할 Username
+                .setClientPasscode(rabbitMQClientPassword) // Client <-> RabbitMQ Broker 포트에 로그인할 때 사용할 Password
+                .setSystemHeartbeatSendInterval(10_000) // Server->Client의 heartbeat 주기 설정
+                .setSystemHeartbeatReceiveInterval(10_000); // Client->Server의 heartbeat 주기 설정
 
         /*
         - 클라이언트가 서버로 메세지 보낼 때 사용할 접두사 -> /app (destination: /app/...)
@@ -118,15 +131,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app");
     }
 
-    @Bean
-    public ThreadPoolTaskScheduler brokerTaskScheduler() {
-        /*
-         * Heartbeat을 위한 ThreadPoolTaskScheduler Bean 등록
-         */
-        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(10); // 스레드 풀 사이즈 설정
-        threadPoolTaskScheduler.setThreadNamePrefix("WebSocket-HeartBeat-");
-        threadPoolTaskScheduler.initialize(); // 스레드 풀 초기화
-        return threadPoolTaskScheduler;
-    }
 }

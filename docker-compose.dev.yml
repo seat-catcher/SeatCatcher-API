@@ -17,10 +17,13 @@ services:
   # RabbitMQ Container
   rabbitmq:
     container_name: rabbitmq
+    command: "rabbitmq-plugins enable rabbitmq_stomp" # Enable STOMP plugin in RabbitMQ
     image: rabbitmq:4.1.0-management-alpine
     ports:
       - "5672:5672" # AMQP
       - "15672:15672" # Management UI
+      - "15674:15674" # STOMP
+      - "61613:61613" # STOMP Listen
     environment:
       - RABBITMQ_DEFAULT_USER=test
       - RABBITMQ_DEFAULT_PASS=test123
