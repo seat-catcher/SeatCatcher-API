@@ -109,7 +109,6 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
                 .seatGroupType(groupType)
                 .build();
         List<TrainSeat> trainSeatList = new ArrayList<>();
-        trainSeatGroupRepository.save(trainSeatGroup);
 
         // SeatGroupType에 따라 좌석 개수 설정해서 TrainSeat 객체 생성
         for(int seatNumber = 0; seatNumber < groupType.getSeatCount(); seatNumber++) {

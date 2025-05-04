@@ -1,15 +1,15 @@
 package com.sullung2yo.seatcatcher.train.dto.request;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.ToString;
+import org.springframework.validation.annotation.Validated;
 
-@Slf4j
 @Getter
 @Setter
-@Valid
+@Validated
+@ToString
 public class SeatInfoRequest {
 
     @NotNull

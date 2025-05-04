@@ -66,7 +66,7 @@ public class UserTrainSeatController {
         log.debug("성공적으로 좌석 점유 지정 완료");
 
         // 좌석 변경 이벤트 발생
-
+        // TODO :: 좌석 변경 이벤트 발생 코드 추가 필요
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -77,7 +77,7 @@ public class UserTrainSeatController {
             description = "현재 등록된 유저에 대한 착석 정보를 제거하는 API",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
+                            responseCode = "204",
                             description = "성공적으로 좌석 점유 해제 완료"
                     ),
                     @ApiResponse(
@@ -97,10 +97,9 @@ public class UserTrainSeatController {
         userTrainSeatService.releaseSeat(userId);
         log.debug("성공적으로 좌석 점유 해제 완료");
 
-        // 좌석 변경 이벤트 발생
+        // TODO :: 좌석 변경 이벤트 발생 코드 추가 필요
 
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/yield")
@@ -143,6 +142,8 @@ public class UserTrainSeatController {
 
         userTrainSeatService.yieldSeat(yieldRequest.getSeatId(), givingUserId, takingUserId);
         log.debug("성공적으로 좌석 교환 완료");
+
+        // TODO :: 좌석 변경 이벤트 발생 코드 추가 필요
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

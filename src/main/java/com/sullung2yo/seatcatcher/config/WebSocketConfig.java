@@ -87,7 +87,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 // STOMP 헤더에서 Authorization 헤더 가져오기
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String authorizationHeader = accessor.getFirstNativeHeader("Authorization");
-                    log.debug("Authorization Header: {}", authorizationHeader);
                     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                         // Bearer 떼기
                         String token = authorizationHeader.substring(7);

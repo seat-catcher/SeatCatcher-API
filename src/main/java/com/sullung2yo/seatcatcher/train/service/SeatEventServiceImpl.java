@@ -54,6 +54,10 @@ public class SeatEventServiceImpl implements SeatEventService {
      */
     @RabbitListener(queues = "${rabbitmq.queue.name}") // RabbitMQ Queue에 메세지가 들어오면 이 메서드가 호출됩니다.
     public void handleSeatEvent(List<SeatInfoResponse> seatInfoResponses){
+        if (seatInfoResponses == null || seatInfoResponses.isEmpty()) {
+            log.warn("좌석 이벤트 처리 실패: 좌석 정보가 없습니다.");
+            return;
+        }
         log.info("좌석 이벤트 처리 시작: TrainCode :: {}, CarCode :: {}", seatInfoResponses.get(0).getTrainCode(), seatInfoResponses.get(0).getCarCode());
         String topic = "/topic/seat" + "." + seatInfoResponses.get(0).getTrainCode() + "." + seatInfoResponses.get(0).getCarCode();
 

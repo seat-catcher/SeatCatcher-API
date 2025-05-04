@@ -35,19 +35,19 @@ class SeatStatusAssemblerTest {
     @Autowired
     private EntityManager entityManager;
 
-    private TrainSeatGroup seatGroups;
+    private TrainSeatGroup seatGroup;
 
     @BeforeEach
     void setUp() {
         // createTrainSeatGroup 메서드로 테스트 데이터 생성
-        seatGroups = trainSeatGroupService.createTrainSeatGroup("1234", "7018", SeatGroupType.NORMAL_A_12);
+        seatGroup = trainSeatGroupService.createTrainSeatGroup("1234", "7018", SeatGroupType.NORMAL_A_12);
         entityManager.flush();
     }
 
     @AfterEach
     void tearDown() {
         // 테스트 데이터 삭제
-        trainSeatGroupRepository.delete(seatGroups);
+        trainSeatGroupRepository.delete(seatGroup);
         entityManager.flush();
     }
 
@@ -57,7 +57,7 @@ class SeatStatusAssemblerTest {
         // 테스트 데이터가 이미 생성되어 있음
 
         // When
-        List<SeatStatus> result = seatStatusAssembler.assembleSeatResponse(seatGroups);
+        List<SeatStatus> result = seatStatusAssembler.assembleSeatResponse(seatGroup);
 
         // Then
         assertNotNull(result);
@@ -67,6 +67,7 @@ class SeatStatusAssemblerTest {
             SeatStatus seat = result.get(i);
             assertNotNull(seat.getSeatId());
             assertNotNull(seat.getSeatLocation());
+            assertTrue(seat.getSeatLocation() >= 0 && seat.getSeatLocation() < 12, "seatLocation 범위가 잘못되었습니다.");
             assertNotNull(seat.getSeatType().name());
             assertNull(seat.getOccupant()); // occupant는 처음 TrainSeatGroup 생성 시 null로 설정되어서 null 체크
         }
