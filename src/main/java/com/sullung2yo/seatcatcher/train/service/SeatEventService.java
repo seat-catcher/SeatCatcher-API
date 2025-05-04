@@ -7,6 +7,6 @@ import java.util.List;
 public interface SeatEventService {
 
     public void issueSeatEvent(String trainCode, String carCode);
-    public void handleSeatEvent(SeatInfoResponse seatInfoResponse);
+    public void handleSeatEvent(List<SeatInfoResponse> seatInfoResponses);
     public void publishSeatEvent(List<SeatInfoResponse> seatInfoResponses);
 }

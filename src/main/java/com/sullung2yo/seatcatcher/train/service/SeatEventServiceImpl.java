@@ -50,15 +50,15 @@ public class SeatEventServiceImpl implements SeatEventService {
     /**
      * 좌석 이벤트가 RabbitMQ의 Queue에 전달되었을 때 이를 자동으로 감지해서 처리하는 메서드입니다.
      * /topic/seat.{trainCode}.{carCode}를 구독한 클라이언트 전부한테 메세지를 내려줍니다. (topic 방식)
-     * @param seatInfoResponse 좌석 정보 응답 객체
+     * @param seatInfoResponses 좌석 정보 응답 객체 리스트
      */
     @RabbitListener(queues = "${rabbitmq.queue.name}") // RabbitMQ Queue에 메세지가 들어오면 이 메서드가 호출됩니다.
-    public void handleSeatEvent(SeatInfoResponse seatInfoResponse){
-        log.info("좌석 이벤트 처리 시작 : {}", seatInfoResponse.toString());
-        String topic = "/topic/seat" + "." + seatInfoResponse.getTrainCode() + "." + seatInfoResponse.getCarCode();
+    public void handleSeatEvent(List<SeatInfoResponse> seatInfoResponses){
+        log.info("좌석 이벤트 처리 시작: TrainCode :: {}, CarCode :: {}", seatInfoResponses.get(0).getTrainCode(), seatInfoResponses.get(0).getCarCode());
+        String topic = "/topic/seat" + "." + seatInfoResponses.get(0).getTrainCode() + "." + seatInfoResponses.get(0).getCarCode();
 
         try {
-            webSocketMessagingTemplate.convertAndSend(topic, seatInfoResponse); // webSocket으로 topic 구독한 사람들에게 broadcast
+            webSocketMessagingTemplate.convertAndSend(topic, seatInfoResponses); // webSocket으로 topic 구독한 사람들에게 broadcast
             log.debug("웹소켓 메세지 전송 성공 : {}", topic);
         } catch (Exception e) {
             log.error("{}에 대한 웹소켓 메세지 전송 실패 : {}", topic, e.getMessage());
@@ -71,7 +71,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      */
     public void publishSeatEvent(List<SeatInfoResponse> seatInfoResponses) {
         // RabbutMQ Exchange한테 메세지 발행
-        log.info("좌석 이벤트 발행");
+        log.info("좌석 이벤트 발행 이벤트 발생 : TrainCode :: {}, CarCode :: {}", seatInfoResponses.get(0).getTrainCode(), seatInfoResponses.get(0).getCarCode());
         String routingKey = "seat" + "." + seatInfoResponses.get(0).getTrainCode() + "." + seatInfoResponses.get(0).getCarCode();
 
         // Exchange한테 routingKey를 사용해서 seatEvent 담아서 전달
