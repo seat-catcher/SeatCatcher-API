@@ -5,7 +5,6 @@ import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -24,9 +23,8 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 
 @Slf4j
 @Configuration
-@Profile("dev")
 @EnableWebSocketMessageBroker // WebSocket Broker 활성화 (SpringBoot가 WebSocket을 지원하도록 활성화)
-public class WebSocketDevConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TokenProvider tokenProvider;
 
@@ -45,7 +43,7 @@ public class WebSocketDevConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${spring.rabbitmq.relay-port}") // Spring <-> RabbitMQ Websocket relay 포트
     private Integer rabbitMQRelayPort;
 
-    public WebSocketDevConfig(TokenProvider tokenProvider) {
+    public WebSocketConfig(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
     }
 
@@ -59,13 +57,12 @@ public class WebSocketDevConfig implements WebSocketMessageBrokerConfigurer {
     /**
      * WebSocket Handshake 엔드포인트 등록
      * ws://localhost:8080/seatcatcher 로 웹소켓 연결 요청하면 됩니다.
-     * @param registry
+     * @param registry StompEndpointRegistry
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/seatcatcher") // WebSocket Handshake 엔드포인트 (HTTP Request로 Websocket Handshake 진행하는 경로)
                 .setAllowedOriginPatterns("*"); // CORS 허용 (모든 도메인 허용)
-        // App에서만 사용할거니까 .withSocketJS() 사용 제거
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.sullung2yo.seatcatcher.train.utility;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatOccupant;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatStatus;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SeatInfoResponseAssembler {
+public class SeatStatusAssembler {
 
     private final TrainSeatRepository trainSeatRepository;
     private final UserTrainSeatRepository userTrainSeatRepository;
@@ -30,9 +29,9 @@ public class SeatInfoResponseAssembler {
      * 열차 좌석 정보, 사용자 정보 조합해서 응답 DTO 생성하는 메서드
      *
      * @param trainSeatGroup 좌석 정보를 조회할 열차 객체
-     * @return 좌석 상태 정보가 포함된 업데이트된 SeatInfoResponse 객체
+     * @return 좌석 상태 정보가 업데이트된 SeatStatus List
      */
-    public SeatInfoResponse assembleSeatResponse(@NonNull TrainSeatGroup trainSeatGroup) {
+    public List<SeatStatus> assembleSeatResponse(@NonNull TrainSeatGroup trainSeatGroup) {
         // 1. 열차에 있는 모든 좌석 정보 조회 (Eager Load)
         List<TrainSeat> seats = trainSeatRepository.findAllWithTrain(trainSeatGroup);
 
@@ -47,27 +46,20 @@ public class SeatInfoResponseAssembler {
                         UserTrainSeat::getUser
                 ));
 
-        // 3. SeatStatus 목록 생성
-        List<SeatStatus> seatStatuses = seats.stream()
+        // 3. SeatStatus 모아서 반환
+        return seats.stream()
                 .map(seat -> SeatStatus.builder()
                         .seatId(seat.getId())
                         .seatLocation(seat.getSeatLocation())
                         .seatType(seat.getSeatType())
                         .occupant(occupants.containsKey(seat.getId())
                                 ? SeatOccupant.builder() // // 점유자 정보가 존재하는 경우
-                                    .userId(occupants.get(seat.getId()).getId())
-                                    .nickname(occupants.get(seat.getId()).getName())
-                                    .getOffRemainingCount(0) // TODO: ETA 계산 로직
-                                    .build()
+                                .userId(occupants.get(seat.getId()).getId())
+                                .nickname(occupants.get(seat.getId()).getName())
+                                .getOffRemainingCount(0) // TODO: ETA 계산 로직
+                                .build()
                                 : null) // 점유자 정보가 존재하지 않는 경우 Null
                         .build())
                 .collect(Collectors.toList());
-
-        // 4. SeatInfoResponse 조립 후 반환
-        return SeatInfoResponse.builder()
-                .trainCode(trainSeatGroup.getTrainCode())
-                .carCode(trainSeatGroup.getCarCode())
-                .seatStatus(seatStatuses)
-                .build();
     }
 }

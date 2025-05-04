@@ -14,5 +14,5 @@ import java.util.List;
 public class SeatInfoResponse {
     private String trainCode; // 기차 코드
     private String carCode; // 차량 코드
-    private List<SeatStatus> seatStatus; // 좌석 상태 리스트
+    private List<List<SeatStatus>> seatStatus; // 좌석 상태 리스트
 }

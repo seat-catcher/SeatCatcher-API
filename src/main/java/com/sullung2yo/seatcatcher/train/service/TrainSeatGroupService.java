@@ -15,6 +15,6 @@ public interface TrainSeatGroupService {
 
     List<TrainSeatGroup> findAllByTrainCodeAndCarCode(String trainCode, String carCode);
     List<TrainSeatGroup> createGroupsOf(String trainCode, String carCode);
-    List<SeatInfoResponse> createSeatInfoResponse(List<TrainSeatGroup> trainSeatGroups);
+    SeatInfoResponse createSeatInfoResponse(String trainCode, String carCode, List<TrainSeatGroup> trainSeatGroups);
     TrainSeatGroup createTrainSeatGroup(String trainCode, String carCode, SeatGroupType groupType);
 }
