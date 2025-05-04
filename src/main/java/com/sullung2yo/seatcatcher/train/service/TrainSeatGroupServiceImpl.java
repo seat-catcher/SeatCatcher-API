@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatStatus;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
 import com.sullung2yo.seatcatcher.train.utility.SeatStatusAssembler;
 import lombok.NonNull;
@@ -51,16 +52,44 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
     }
 
 
+    /**
+     * [
+     *   {
+     *     "trainCode": "1234",
+     *     "carCode": "2001",
+     *     "seatGroupType": "...",
+     *     "seatStatus": [
+     *       {
+     *         "seatId": 1,
+     *         "seatLocation": 0,
+     *         "seatType": "...",
+     *         "occupant": {
+     *           "userId": 123123,
+     *           "nickname": "asdfasdf",
+     *           "getOffRemainingCount": 3
+     *         }
+     *       },
+     *       {...}
+     *     ]
+     *   },
+     *   {...}
+     * ]
+     * 좌석 그룹 정보를 통해서 좌석 상태 리스트를 생성하는 메서드
+     * @param trainCode: 열차 코드
+     * @param carCode: 차량 코드
+     * @param trainSeatGroups: 좌석 그룹 리스트
+     * @return 좌석 상태 리스트
+     */
     @Override
-    public SeatInfoResponse createSeatInfoResponse(String trainCode, String carCode, List<TrainSeatGroup> trainSeatGroups) {
-        return SeatInfoResponse.builder()
-                .trainCode(trainCode)
-                .carCode(carCode)
-                .seatStatus(
-                        trainSeatGroups.stream().map(
-                                seatStatusAssembler::assembleSeatResponse
-                        ).toList()
-                ).build();
+    public List<SeatInfoResponse> createSeatInfoResponse(String trainCode, String carCode, List<TrainSeatGroup> trainSeatGroups) {
+        return trainSeatGroups.stream()
+                .map(group -> SeatInfoResponse.builder()
+                        .trainCode(trainCode)
+                        .carCode(carCode)
+                        .seatGroupType(group.getSeatGroupType())
+                        .seatStatus(seatStatusAssembler.assembleSeatResponse(group))
+                        .build())
+                .toList();
     }
 
     /**

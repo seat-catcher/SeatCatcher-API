@@ -43,8 +43,8 @@ public class SeatEventServiceImpl implements SeatEventService {
         }
 
         // 응답 구조 생성
-        SeatInfoResponse response = trainSeatGroupService.createSeatInfoResponse(trainCode, carCode, trainSeatGroups);
-        publishSeatEvent(response);
+        List<SeatInfoResponse> responses = trainSeatGroupService.createSeatInfoResponse(trainCode, carCode, trainSeatGroups);
+        publishSeatEvent(responses);
     }
 
     /**
@@ -67,16 +67,16 @@ public class SeatEventServiceImpl implements SeatEventService {
 
     /**
      * RabbitMQ에 좌석 이벤트를 전달하는 메서드입니다.
-     * @param seatInfoResponse 좌석 정보 응답 객체
+     * @param seatInfoResponses 좌석 정보 응답 객체 리스트
      */
-    public void publishSeatEvent(SeatInfoResponse seatInfoResponse) {
+    public void publishSeatEvent(List<SeatInfoResponse> seatInfoResponses) {
         // RabbutMQ Exchange한테 메세지 발행
-        log.info("좌석 이벤트 발행: {}", seatInfoResponse.toString());
-        String routingKey = "seat" + "." + seatInfoResponse.getTrainCode() + "." + seatInfoResponse.getCarCode();
+        log.info("좌석 이벤트 발행");
+        String routingKey = "seat" + "." + seatInfoResponses.get(0).getTrainCode() + "." + seatInfoResponses.get(0).getCarCode();
 
         // Exchange한테 routingKey를 사용해서 seatEvent 담아서 전달
         try {
-            rabbitTemplate.convertAndSend(exchangeName, routingKey, seatInfoResponse);
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, seatInfoResponses);
             log.debug("RabbitMQ에 좌석 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
         } catch (Exception e) {
             log.error("RabbitMQ에 좌석 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
