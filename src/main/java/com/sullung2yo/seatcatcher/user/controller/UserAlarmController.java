@@ -38,7 +38,6 @@ public class UserAlarmController {
         return ResponseEntity.ok(response);
     }
 
-    // GET /alarms/{alarmId}
     @GetMapping("/{alarmId}")
     @Operation(
             summary = "특정 알람 불러오기 API",
