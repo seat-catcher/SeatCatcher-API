@@ -46,9 +46,19 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
     @Override
     public void runThisAtBeforeSeconds(LocalDateTime stdTime, int seconds, Runnable task) {
         try {
+            if(stdTime == null)
+            {
+                log.error("Standard time cannot be null!");
+                return;
+            }
             Instant triggerTime = stdTime.minusSeconds(seconds)
                     .atZone(ZoneId.systemDefault())
                     .toInstant();
+            Instant now = Instant.now();
+            if(triggerTime.isBefore(now)){
+                log.warn("Trigger time is in the past. Executing task immediately.");
+                taskScheduler.schedule(task, now);
+            }
             taskScheduler.schedule(task, triggerTime);
         } catch (Exception e) {
             log.error("Error scheduling task before {} seconds of {}", seconds, stdTime, e);
@@ -58,10 +68,20 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
     @Override
     public void runThisAtBeforeMinutes(LocalDateTime stdTime, int minutes, Runnable task) {
         try{
-        Instant triggerTime = stdTime.minusMinutes(minutes)
-                .atZone(ZoneId.systemDefault())
-                .toInstant();
-        taskScheduler.schedule(task, triggerTime);
+            if(stdTime == null)
+            {
+                log.error("Standard time cannot be null!");
+                return;
+            }
+            Instant triggerTime = stdTime.minusMinutes(minutes)
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant();
+            Instant now = Instant.now();
+            if(triggerTime.isBefore(now)){
+                log.warn("Trigger time is in the past. Executing task immediately.");
+                taskScheduler.schedule(task, now);
+            }
+            taskScheduler.schedule(task, triggerTime);
         } catch (Exception e) {
             log.error("Error scheduling task before {} minutes of {}", minutes, stdTime, e);
         }
