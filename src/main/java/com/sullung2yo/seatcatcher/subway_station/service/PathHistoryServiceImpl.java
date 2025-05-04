@@ -46,6 +46,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
                 .orElseThrow(() -> new SubwayException("해당 id를 가진 역을 찾을 수 없습니다. : "+request.getEndStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
 
 
+
         PathHistory newPathHistory = pathHistoryConverter.toPathHistory(user, startStation, endStation);
         pathHistoryRepository.save(newPathHistory);
 
@@ -102,6 +103,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
 
         PathHistory pathHistory = pathHistoryRepository.findById(pathId)
                 .orElseThrow(() -> new SubwayException("해당 id를 가진 경로 이력을 찾을 수 없습니다. : "+pathId,ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+
 
         if(!pathHistory.getUser().equals(user))
             throw new SubwayException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
