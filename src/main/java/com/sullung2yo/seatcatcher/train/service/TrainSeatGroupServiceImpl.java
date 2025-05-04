@@ -99,6 +99,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
      * @param groupType: 좌석 그룹 타입
      * @return TrainSeatGroup 객체
      */
+    @Transactional
     public TrainSeatGroup createTrainSeatGroup(String trainCode, String carCode, SeatGroupType groupType){
         // trainCode, carCode, groupType 를 통해서 TrainSeatGroup 객체 생성
         TrainSeatGroup trainSeatGroup = TrainSeatGroup.builder()
@@ -108,6 +109,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
                 .seatGroupType(groupType)
                 .build();
         List<TrainSeat> trainSeatList = new ArrayList<>();
+        trainSeatGroupRepository.save(trainSeatGroup);
 
         // SeatGroupType에 따라 좌석 개수 설정해서 TrainSeat 객체 생성
         for(int seatNumber = 0; seatNumber < groupType.getSeatCount(); seatNumber++) {
@@ -129,7 +131,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
             trainSeatList.add(trainSeat);
         }
         trainSeatGroup.setTrainSeat(trainSeatList);
-        return trainSeatGroup;
+        return trainSeatGroupRepository.save(trainSeatGroup);
     }
 
     /**
