@@ -20,13 +20,10 @@ public class SeatEventPublisher {
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
 
-    @Value("${rabbitmq.binding.prefix}")
-    private String bindingPrefix;
-
     public void publish(SeatInfoResponse seatInfoResponse) {
         // RabbutMQ Exchange한테 메세지 발행
         log.info("좌석 이벤트 발행: {}", seatInfoResponse.toString());
-        String routingKey = bindingPrefix + "." + seatInfoResponse.getTrainCode() + "." + seatInfoResponse.getCarCode();
+        String routingKey = "seat" + "." + seatInfoResponse.getTrainCode() + "." + seatInfoResponse.getCarCode();
 
         // Exchange한테 routingKey를 사용해서 seatEvent 담아서 전달
         try {

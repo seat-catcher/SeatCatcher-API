@@ -17,24 +17,28 @@ services:
   # RabbitMQ Container
   rabbitmq:
     container_name: rabbitmq
-    command: "rabbitmq-plugins enable rabbitmq_stomp" # Enable STOMP plugin in RabbitMQ
+    command: >
+      sh -c "
+        rabbitmq-plugins enable --offline rabbitmq_stomp rabbitmq_web_stomp &&
+        rabbitmq-server
+      "
     image: rabbitmq:4.1.0-management-alpine
     ports:
-      - "5672:5672" # AMQP
+      - "5672:5672" # AMQP (Spring AMQP 사용 포트)
       - "15672:15672" # Management UI
-      - "15674:15674" # STOMP
-      - "61613:61613" # STOMP Listen
+      - "15674:15674" # 브라우저나 앱에서 직접 RabbitMQ에 접속할 때 사용하는 포트
+      - "61613:61613" # STOMP TCP (Spring에서 RabbitMQ로 WebSocket Relay시 사용)
     environment:
-      - RABBITMQ_DEFAULT_USER=test
-      - RABBITMQ_DEFAULT_PASS=test123
-      - RABBITMQ_DEFAULT_VHOST=seatcatcher
+      RABBITMQ_DEFAULT_USER: server
+      RABBITMQ_DEFAULT_PASS: test123
+      RABBITMQ_DEFAULT_VHOST: seatcatcher
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 10s
       timeout: 5s
       retries: 3
     networks:
-        - dev-network
+      - dev-network
 
 networks:
   dev-network:

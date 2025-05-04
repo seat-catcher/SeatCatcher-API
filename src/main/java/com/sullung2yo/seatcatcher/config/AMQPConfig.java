@@ -25,7 +25,7 @@ public class AMQPConfig {
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
 
-    @Value("${rabbitmq.binding.prefix}")
+    @Value("${rabbitmq.binding.key}")
     private String bindingKey;
 
     // RabbitMQ에서 Seatcatcher 서비스에 사용할 큐
@@ -41,18 +41,18 @@ public class AMQPConfig {
     public TopicExchange topicExchange() {
         // Exchange : 메세지 받았을 때 어떤 큐로 전달할지 결정해주는 역할
         // durable 설정하면 서버가 재시작되더라도 큐가 유지된다.
-        return ExchangeBuilder.topicExchange(exchangeName).durable(true).build();
+        return new TopicExchange(exchangeName, true, false);
     }
 
     // Binding 선언
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
+    public Binding binding() {
         /*
          * Binding Key를 사용해서 queue와 Exchange를 연결해주고,
          * Routing Key를 사용해서 Binding bean을 생성해주는 메서드
          * 즉, Exchange와 Queue를 연결해주는 역할이라고 이해하면 됨
          */
-        return BindingBuilder.bind(queue).to(exchange).with(bindingKey);
+        return BindingBuilder.bind(queue()).to(topicExchange()).with(bindingKey);
     }
 
     // 응답 반환할 때 사용할 MessageConverter (JSON 직렬화)

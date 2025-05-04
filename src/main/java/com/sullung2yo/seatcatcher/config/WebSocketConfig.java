@@ -35,19 +35,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${spring.rabbitmq.host}")
     private String rabbitMQHost;
 
-    @Value("${spring.rabbitmq.server-username}")
-    private String rabbitMQServerUsername;
+    @Value("${spring.rabbitmq.username}")
+    private String rabbitMQUsername;
 
-    @Value("${spring.rabbitmq.server-password}")
-    private String rabbitMQServerPassword;
+    @Value("${spring.rabbitmq.password}")
+    private String rabbitMQPassword;
 
-    @Value("${spring.rabbitmq.client-username}")
-    private String rabbitMQClientUsername;
+    @Value("${spring.rabbitmq.virtual-host}")
+    private String rabbitMQVirtualHost;
 
-    @Value("${spring.rabbitmq.client-password}")
-    private String rabbitMQClientPassword;
-
-    @Value("${spring.rabbitmq.relay-port}") // Spring <-> RabbitMQ Relay 포트
+    @Value("${spring.rabbitmq.relay-port}") // Spring <-> RabbitMQ Websocket relay 포트
     private Integer rabbitMQRelayPort;
 
     public WebSocketConfig(TokenProvider tokenProvider) {
@@ -61,6 +58,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setSendTimeLimit(60000); // 메세지 전송 시 Timeout 설정
     }
 
+    /**
+     * WebSocket Handshake 엔드포인트 등록
+     * ws://localhost:8080/seatcatcher 로 웹소켓 연결 요청하면 됩니다.
+     * @param registry
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/seatcatcher") // WebSocket Handshake 엔드포인트 (HTTP Request로 Websocket Handshake 진행하는 경로)
@@ -116,17 +118,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableStompBrokerRelay("/topic") // RabbitMQ STOMP Broker 활성화
                 .setRelayHost(rabbitMQHost) // Broker 지정
                 .setRelayPort(rabbitMQRelayPort) // Spring <-> RabbitMQ Relay 포트
-                .setSystemLogin(rabbitMQServerUsername) // Spring <-> RabbitMQ Relay 포트에 로그인할 때 사용할 Username
-                .setSystemPasscode(rabbitMQServerPassword) // Spring <-> RabbitMQ Relay 포트에 로그인할 때 사용할 Password
-                .setClientLogin(rabbitMQClientUsername) // Client <-> RabbitMQ Broker 포트에 로그인할 때 사용할 Username
-                .setClientPasscode(rabbitMQClientPassword) // Client <-> RabbitMQ Broker 포트에 로그인할 때 사용할 Password
+                .setVirtualHost(rabbitMQVirtualHost) // RabbitMQ Virtual Host
+                .setSystemLogin(rabbitMQUsername) // Spring <-> RabbitMQ Relay 포트에 로그인할 때 사용할 Username
+                .setSystemPasscode(rabbitMQPassword) // Spring <-> RabbitMQ Relay 포트에 로그인할 때 사용할 Password
+                .setClientLogin(rabbitMQUsername) // Client <-> RabbitMQ Broker 포트에 로그인할 때 사용할 Username
+                .setClientPasscode(rabbitMQPassword) // Client <-> RabbitMQ Broker 포트에 로그인할 때 사용할 Password
                 .setSystemHeartbeatSendInterval(10_000) // Server->Client의 heartbeat 주기 설정
                 .setSystemHeartbeatReceiveInterval(10_000); // Client->Server의 heartbeat 주기 설정
 
         /*
-        - 클라이언트가 서버로 메세지 보낼 때 사용할 접두사 -> /app (destination: /app/...)
-        - STOMP 메세지 보낼 때 DESTINATION:/app/... 형식으로 경로 설정
-        - 서버가 클라이언트에게 반환할때는 /topic/... 형식으로 메세지 전달한다. (클라이언트가 /topic/... 을 구독했으니까)
+        - @MessageMapping 메서드로 전달되는 경로
          */
         config.setApplicationDestinationPrefixes("/app");
     }

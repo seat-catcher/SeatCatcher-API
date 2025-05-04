@@ -5,7 +5,6 @@ import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,15 +17,12 @@ public class SeatEventListener {
      * 좌석 이벤트가 RabbitMQ가 관리하는 Queue에 들어왔을 때 처리해주는 클래스
      */
 
-    @Value("${rabbitmq.binding.prefix}")
-    private String bindingPrefix;
-
     private final SimpMessagingTemplate webSocketMessagingTemplate;
 
     @RabbitListener(queues = "${rabbitmq.queue.name}")
     public void handleSeatEvent(SeatInfoResponse seatInfoResponse){
         log.info("좌석 이벤트 발생 : {}", seatInfoResponse.toString());
-        String topic = "/topic/" + bindingPrefix + "." + seatInfoResponse.getTrainCode() + "." + seatInfoResponse.getCarCode();
+        String topic = "/topic/seat" + "." + seatInfoResponse.getTrainCode() + "." + seatInfoResponse.getCarCode();
 
         try {
             webSocketMessagingTemplate.convertAndSend(topic, seatInfoResponse); // webSocket으로 topic 구독한 사람들에게 broadcast
