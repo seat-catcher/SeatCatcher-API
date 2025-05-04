@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -23,22 +24,23 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 
 @Slf4j
 @Configuration
+@Profile("!test")
 @EnableWebSocketMessageBroker // WebSocket Broker 활성화 (SpringBoot가 WebSocket을 지원하도록 활성화)
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TokenProvider tokenProvider;
 
     @Value("${spring.rabbitmq.host}")
-    private String rabbitMQHost;
+    private String rabbitMQHost; // RabbitMQ 연결 경로
 
     @Value("${spring.rabbitmq.username}")
-    private String rabbitMQUsername;
+    private String rabbitMQUsername; // RabbitMQ 사용자 이름
 
     @Value("${spring.rabbitmq.password}")
-    private String rabbitMQPassword;
+    private String rabbitMQPassword; // RabbitMQ 비밀번호
 
     @Value("${spring.rabbitmq.virtual-host}")
-    private String rabbitMQVirtualHost;
+    private String rabbitMQVirtualHost; // RabbitMQ Virtual Host
 
     @Value("${spring.rabbitmq.relay-port}") // Spring <-> RabbitMQ Websocket relay 포트
     private Integer rabbitMQRelayPort;

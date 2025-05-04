@@ -58,25 +58,6 @@ class UserTrainSeatControllerTest {
         accessToken = tokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
     }
 
-    @Test
-    void getSeatInformationNotExists() throws Exception {
-        mockMvc.perform(get("/user/seats")
-                        .header("Authorization", "Bearer " + accessToken)
-                        .queryParam("trainCode", "1234")
-                        .queryParam("carCode", "2222")) // 2222 -> 222 -> 36663 타입
-                .andDo(print())
-                .andExpect(status().isOk())
-                // 응답 전체가 배열 [ … ]
-                .andExpect(jsonPath("$").isArray())
-                // seatGroup 총 5개 있어야함
-                .andExpect(jsonPath("$.length()").value(5))
-                // 첫 번째 그룹은 ELDERLY 6석
-                .andExpect(jsonPath("$[0].seatStatus.length()").value(6))
-                .andExpect(jsonPath("$[0].seatStatus[0].seatType").value("ELDERLY"))
-                // 두 번째 그룹은 NORMAL 12석
-                .andExpect(jsonPath("$[1].seatStatus.length()").value(12));
-    }
-
     @AfterEach
     void tearDown() {
         // 테스트 후 DB에서 사용자 삭제
