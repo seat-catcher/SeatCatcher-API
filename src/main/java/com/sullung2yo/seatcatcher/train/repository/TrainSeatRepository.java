@@ -26,5 +26,5 @@ public interface TrainSeatRepository extends JpaRepository<TrainSeat, Long> {
     List<TrainSeat> findAllWithTrain(TrainSeatGroup trainSeatGroup);
 
     @Query("SELECT t FROM TrainSeat ts JOIN ts.trainSeatGroup AS t WHERE ts.id = :seatId")
-    Optional<TrainSeatGroup> findTrainByTrainSeatId(Long seatId);
+    List<TrainSeatGroup> findAllTrainSeatGroupByTrainSeatId(Long seatId);
 }

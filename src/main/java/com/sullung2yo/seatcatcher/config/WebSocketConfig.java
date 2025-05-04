@@ -1,12 +1,11 @@
 package com.sullung2yo.seatcatcher.config;
 
 
-import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -16,7 +15,6 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -26,10 +24,26 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 
 @Slf4j
 @Configuration
+@Profile("!test")
 @EnableWebSocketMessageBroker // WebSocket Broker 활성화 (SpringBoot가 WebSocket을 지원하도록 활성화)
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final TokenProvider tokenProvider;
+
+    @Value("${spring.rabbitmq.host}")
+    private String rabbitMQHost; // RabbitMQ 연결 경로
+
+    @Value("${spring.rabbitmq.username}")
+    private String rabbitMQUsername; // RabbitMQ 사용자 이름
+
+    @Value("${spring.rabbitmq.password}")
+    private String rabbitMQPassword; // RabbitMQ 비밀번호
+
+    @Value("${spring.rabbitmq.virtual-host}")
+    private String rabbitMQVirtualHost; // RabbitMQ Virtual Host
+
+    @Value("${spring.rabbitmq.relay-port}") // Spring <-> RabbitMQ Websocket relay 포트
+    private Integer rabbitMQRelayPort;
 
     public WebSocketConfig(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
@@ -42,11 +56,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setSendTimeLimit(60000); // 메세지 전송 시 Timeout 설정
     }
 
+    /**
+     * WebSocket Handshake 엔드포인트 등록
+     * ws://localhost:8080/seatcatcher 로 웹소켓 연결 요청하면 됩니다.
+     * @param registry StompEndpointRegistry
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/seatcatcher") // WebSocket Handshake 엔드포인트 (HTTP Request로 Websocket Handshake 진행하는 경로)
                 .setAllowedOriginPatterns("*"); // CORS 허용 (모든 도메인 허용)
-        // App에서만 사용할거니까 .withSocketJS() 사용 제거
     }
 
     @Override
@@ -69,7 +87,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 // STOMP 헤더에서 Authorization 헤더 가져오기
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String authorizationHeader = accessor.getFirstNativeHeader("Authorization");
-                    log.debug("Authorization Header: {}", authorizationHeader);
                     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                         // Bearer 떼기
                         String token = authorizationHeader.substring(7);
@@ -94,39 +111,21 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        /*
-        Enable Simple Broker (브로커 경로 설정 - 구독 경로)
-        - 내장 메세지 브로커를 활성화
-        - 이것만으로 충분한 이유
-        - 1. MVP 규모에서는 사용자가 많이 없어서, JVM 메모리 안에서 충분히 처리 가능
-        - 2. 아래 한줄로 설정 끝 (간편함)
-         */
-        config.enableSimpleBroker("/topic")
-                .setHeartbeatValue(new long[]{10000, 10000})
-                .setTaskScheduler(brokerTaskScheduler()); // Server->Client, Client->Server의 heartbeat 주기 설정
-
-        // Heart-Beat : 클라이언트와 서버가 서로 연결이 살아있는지 확인하는 주기
-        // 우리가 개발해야하는 모바일 서비스로 Wifi연결이나 셀룰러 연결이 불안정해서 웹소켓이 끊기는 경우가 있음
-        // 따라서 Heart-Beat 주기를 설정해주면, 클라이언트와 서버가 서로 연결이 끊어졌을 때
-        // 정해진 주기 안에 신호가 오지 않으면 연결이 끊어졌다고 판단하고, 클라이언트에서 재연결을 시도
+        config.enableStompBrokerRelay("/topic") // RabbitMQ STOMP Broker 활성화
+                .setRelayHost(rabbitMQHost) // Broker 지정
+                .setRelayPort(rabbitMQRelayPort) // Spring <-> RabbitMQ Relay 포트
+                .setVirtualHost(rabbitMQVirtualHost) // RabbitMQ Virtual Host
+                .setSystemLogin(rabbitMQUsername) // Spring <-> RabbitMQ Relay 포트에 로그인할 때 사용할 Username
+                .setSystemPasscode(rabbitMQPassword) // Spring <-> RabbitMQ Relay 포트에 로그인할 때 사용할 Password
+                .setClientLogin(rabbitMQUsername) // Client <-> RabbitMQ Broker 포트에 로그인할 때 사용할 Username
+                .setClientPasscode(rabbitMQPassword) // Client <-> RabbitMQ Broker 포트에 로그인할 때 사용할 Password
+                .setSystemHeartbeatSendInterval(10_000) // Server->Client의 heartbeat 주기 설정
+                .setSystemHeartbeatReceiveInterval(10_000); // Client->Server의 heartbeat 주기 설정
 
         /*
-        - 클라이언트가 서버로 메세지 보낼 때 사용할 접두사 -> /app (destination: /app/...)
-        - STOMP 메세지 보낼 때 DESTINATION:/app/... 형식으로 경로 설정
-        - 서버가 클라이언트에게 반환할때는 /topic/... 형식으로 메세지 전달한다. (클라이언트가 /topic/... 을 구독했으니까)
+        - @MessageMapping 메서드로 전달되는 경로
          */
         config.setApplicationDestinationPrefixes("/app");
     }
 
-    @Bean
-    public ThreadPoolTaskScheduler brokerTaskScheduler() {
-        /*
-         * Heartbeat을 위한 ThreadPoolTaskScheduler Bean 등록
-         */
-        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(10); // 스레드 풀 사이즈 설정
-        threadPoolTaskScheduler.setThreadNamePrefix("WebSocket-HeartBeat-");
-        threadPoolTaskScheduler.initialize(); // 스레드 풀 초기화
-        return threadPoolTaskScheduler;
-    }
 }
