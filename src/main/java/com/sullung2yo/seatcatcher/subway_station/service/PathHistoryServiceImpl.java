@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -105,5 +107,12 @@ public class PathHistoryServiceImpl implements PathHistoryService{
             throw new SubwayException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
 
         pathHistoryRepository.delete(pathHistory);
+    }
+
+
+    @Override
+    public long getRemainingMinutes(LocalDateTime expectedArrivalTime) {
+        LocalDateTime now = LocalDateTime.now();
+        return Duration.between(now, expectedArrivalTime).toMinutes();
     }
 }
