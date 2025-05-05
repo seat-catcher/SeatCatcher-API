@@ -5,7 +5,6 @@ import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
-import com.sullung2yo.seatcatcher.train.service.FcmService;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
@@ -33,7 +32,6 @@ public class UserTrainSeatController {
     private final UserTrainSeatService userTrainSeatService;
     private final UserService userService;
     private final SeatEventService seatEventService;
-    private final FcmService fcmService;
 
     @PostMapping
     @Operation(
@@ -178,7 +176,7 @@ public class UserTrainSeatController {
 
         // FCM data push
         // 양보를 요청 받은 사용자에게 푸시 알림 전송
-        fcmService.sendSeatYieldRequestNotification(occupantId, "양보 요청", "양보 요청이 도착했습니다.", seatId);
+        // TODO :: FCM 푸시 알림 전송 로직 추가 필요
         log.debug("양보 요청 FCM 푸시 알림 전송 완료");
 
         return ResponseEntity.ok().build();
