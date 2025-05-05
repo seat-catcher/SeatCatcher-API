@@ -67,20 +67,6 @@ public class UserAlarmController {
         return ResponseEntity.ok("알람이 성공적으로 삭제되었습니다.");
     };
 
-//    // POST /alarm/get-off
-//    public ResponseEntity<?> notifySubwayStop(@RequestBody GetOffAlarmRequest request){
-//
-//    }
-
-//    // POST /alarm/system
-//    public ResponseEntity<Void> sendSystemAlarm(@RequestBody SystemAlarmRequest request){
-//
-//    }
-
-//    // POST /alarm/seat-offer
-//    public ResponseEntity<Void> sendSeatOfferAlarm(@RequestBody SeatOfferAlarmRequest request){
-//
-//    }
 
     // GET /alarms
     @GetMapping("/")
