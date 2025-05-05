@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 
-public class UserAlarmServicerImpl implements UserAlarmService {
+public class UserAlarmServiceImpl implements UserAlarmService {
 
     private final UserService userService;
     private final UserAlarmRepository userAlarmRepository;
