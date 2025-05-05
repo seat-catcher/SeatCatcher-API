@@ -5,6 +5,8 @@ import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
+import com.sullung2yo.seatcatcher.train.service.FcmService;
+import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +32,8 @@ public class UserTrainSeatController {
 
     private final UserTrainSeatService userTrainSeatService;
     private final UserService userService;
+    private final SeatEventService seatEventService;
+    private final FcmService fcmService;
 
     @PostMapping
     @Operation(
@@ -151,7 +155,10 @@ public class UserTrainSeatController {
     /**
      * 양보 요청 시 호출하는 API
      * 양보 요청을 보낸 사용자의 정보는 JWT에서 추출해서 사용하면 되고,
-     * 양보 요청을 받은 사용자의 정보는 쿼리파라미터에서 넘어옵니다.
+     * 양보 요청을 받은 사용자의 정보는 쿼리 파라미터로 전달받습니다.
+     * 클라이언트 측에서 이 API를 호출 후, topic seat.seat_id로 구독을 수행해야 합니다.
+     * 이 때, 좌석을 차지하고 있는 사람은, 이미 topic seat.seat_id를 구독한 상태입니다.
+     * 즉, 좌석을 점유할 때 topic을 구독해야 합니다.
      * @param bearerToken JWT
      * @param seatId 양보 대상 좌석 ID
      * @return ResponseEntity
@@ -159,8 +166,20 @@ public class UserTrainSeatController {
     @GetMapping("/{seatId}/yield-request")
     public ResponseEntity<?> seatYieldRequest(
             @RequestHeader("Authorization") String bearerToken,
-            @NonNull @PathVariable("seatId") Long seatId
+            @NonNull @PathVariable("seatId") Long seatId, // 양보 대상 좌석 ID
+            @RequestParam(value = "occupantId") Long occupantId // 양보 요청을 받은 사용자 ID
     ) {
+        // 양보를 요청한 사용자 정보 획득
+        Long requestUserId = verifyUserAndGetId(bearerToken);
+
+        // 양보를 요청 받은 사용자에게 토스트 메세지 띄우도록 웹소켓 메세지 전송 ()
+        seatEventService.issueSeatYieldRequestEvent(seatId, requestUserId);
+        log.debug("좌석 점유자에게 양보 요청 WebSocket 메세지 전송 완료");
+
+        // FCM data push
+        // 양보를 요청 받은 사용자에게 푸시 알림 전송
+        fcmService.sendSeatYieldRequestNotification(occupantId, "양보 요청", "양보 요청이 도착했습니다.", seatId);
+        log.debug("양보 요청 FCM 푸시 알림 전송 완료");
 
         return ResponseEntity.ok().build();
     }

@@ -31,6 +31,12 @@ public class UserServiceImpl implements UserService {
     private final UserTagRepository userTagRepository;
 
     @Override
+    public User getUserWithId(Long userId) throws RuntimeException {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        return optionalUser.orElse(null);
+    }
+
+    @Override
     public User getUserWithToken(String token) throws RuntimeException {
         // 1. 토큰 검증
         jwtTokenProvider.validateToken(token, TokenType.ACCESS);

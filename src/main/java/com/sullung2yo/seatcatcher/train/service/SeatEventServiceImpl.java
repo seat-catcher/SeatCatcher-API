@@ -2,6 +2,9 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
+import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -18,6 +21,7 @@ import java.util.List;
 public class SeatEventServiceImpl implements SeatEventService {
 
     private final RabbitTemplate rabbitTemplate;
+    private final UserService userService;
 
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
@@ -84,6 +88,30 @@ public class SeatEventServiceImpl implements SeatEventService {
             log.debug("RabbitMQ에 좌석 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
         } catch (Exception e) {
             log.error("RabbitMQ에 좌석 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
+        }
+    }
+
+    /**
+     * 양보 요청 이벤트를 발행하는 메서드입니다.
+     * @param seatId
+     * @param requestUserId
+     */
+    @Override
+    public void issueSeatYieldRequestEvent(Long seatId, Long requestUserId) {
+        User requestUser = userService.getUserWithId(requestUserId);
+        SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
+                .requestUserId(requestUser.getId())
+                .requestUserNickname(requestUser.getName())
+                .requestUserProfileImageNum(requestUser.getProfileImageNum())
+                .requestUserTags(requestUser.getUserTag())
+                .build(); // 좌석 양보 요청에 대한 응답 객체 생성
+        String routingKey = "seat" + "." + seatId;
+
+        try {
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, seatYieldRequestResponse);
+            log.debug("RabbitMQ에 좌석 양보 요청 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
+        } catch (Exception e) {
+            log.error("RabbitMQ에 좌석 양보 요청 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
         }
     }
 }
