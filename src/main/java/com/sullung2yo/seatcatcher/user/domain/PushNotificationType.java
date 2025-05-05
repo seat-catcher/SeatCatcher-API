@@ -1,4 +1,5 @@
-@Getter
+package com.sullung2yo.seatcatcher.user.domain;
+
 public enum PushNotificationType {
     MOST_USED_TIME_ALERT(
             "지하철에 타셨나요?",

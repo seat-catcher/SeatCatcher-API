@@ -37,6 +37,7 @@ public class PathHistoryServiceImplTest {
     @Autowired
     private PathHistoryService pathHistoryService;
 
+    @Autowired
     private JwtTokenProviderImpl tokenProvider;
 
     @Autowired
