@@ -37,6 +37,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String name; // 사용자 이름 -> Random Nickname
 
+    @Column(nullable = false, unique = true)
+    private String fcmToken; // FCM Token (Firebase가 발급한 사용자 기기 식별자)
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

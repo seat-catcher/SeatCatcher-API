@@ -58,6 +58,7 @@ public class AuthController {
             }
             log.debug("Authenticate with Apple: {}", appleAuthRequest);
 
+            // 인증 로직 수행 후 토큰 생성
             List<String> tokens = authServiceImpl.authenticate(appleAuthRequest, Provider.APPLE);
 
             return returnAfterTokenValidation(tokens);
@@ -91,6 +92,7 @@ public class AuthController {
                 throw new IllegalArgumentException("Kakao 인증 요청에 필요한 accessToken이 제공되지 않았습니다.");
             }
 
+            // 인증 로직 수행 후 토큰 생성
             List<String> tokens = authServiceImpl.authenticate(kakaoAuthRequest, Provider.KAKAO);
 
             return returnAfterTokenValidation(tokens);
