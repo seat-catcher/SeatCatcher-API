@@ -1,7 +1,6 @@
 package com.sullung2yo.seatcatcher.train.controller;
 
 import com.sullung2yo.seatcatcher.train.domain.Train;
-import com.sullung2yo.seatcatcher.train.dto.response.TrainSeatGroupResponse;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
