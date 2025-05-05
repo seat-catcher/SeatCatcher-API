@@ -15,7 +15,7 @@ public enum PushNotificationType {
     ),
     SEAT_REQUEST_ACCEPTED(
             "좌석 요청 수락",
-            "%s님이 좌석 요청을 수락하였어요. (%s역)에 도착한 후 자동 하차됩니다."
+            "%s님이 좌석 요청을 수락하였어요. %s역에 도착한 후 자동 하차됩니다."
     ),
     SEAT_REQUEST_REJECTED(
             "좌석 요청 거절",
@@ -24,6 +24,10 @@ public enum PushNotificationType {
     SEAT_REQUEST_ACCEPTED_ARRIVA(
             "앞자리에 도달",
             "%s님과 자리를 교환해주세요."
+    ),
+    SEAT_EXCHANGE_SUCCESS(
+    "%d 크레딧 획득",
+            "%s님에게 자리를 양보하여 %d 크레딧을 획득했어요!"
     );
 
     private final String titleTemplate;

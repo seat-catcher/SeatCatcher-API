@@ -1,17 +1,15 @@
 package com.sullung2yo.seatcatcher.user.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 public class FcmRequest {
 
     @Getter
     @Setter
+    @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public class Notification{
+    public static class Notification{
         private String targetToken;
         private String title;
         private String body;

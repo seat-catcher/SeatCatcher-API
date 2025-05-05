@@ -20,8 +20,11 @@ public class UserAlarm extends BaseEntity {
     @Column(name = "notification_type")
     private PushNotificationType type;
 
-    @Column(name = "content")
-    private String content; // 알람의 내용
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "body")
+    private String body;
 
     @Column(name = "is_read")
     private boolean isRead; // 사용자의 열람 여부

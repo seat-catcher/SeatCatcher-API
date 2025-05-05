@@ -16,7 +16,8 @@ public class UserAlarmConverter {
         return UserAlarmResponse.UserAlarmItem.builder()
                 .id(userAlarm.getId())
                 .type(userAlarm.getType())
-                .content(userAlarm.getContent())
+                .title(userAlarm.getTitle())
+                .body(userAlarm.getBody())
                 .isRead(userAlarm.isRead())
                 .localDateTime(userAlarm.getCreatedAt())
                 .build();

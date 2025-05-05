@@ -40,8 +40,11 @@ public class UserAlarmResponse {
         @Schema(description = "읽음 여부")
         private boolean isRead;
 
-        @Schema(description = "알람 내용")
-        private String content;
+        @Schema(description = "title")
+        private String title;
+
+        @Schema(description = "body")
+        private String body;
 
         @Schema(description = "시간")
         private LocalDateTime localDateTime;
