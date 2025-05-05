@@ -52,12 +52,12 @@ public class FcmController {
         return ResponseEntity.ok("token을 저장하였습니다.");
     }
 
-    @PostMapping("/pushMessage")
-    @Operation(
-            summary = "[수정필요] FCM 알람 요청 API"
-    )
-    public ResponseEntity<String> pushMessage(@RequestBody FcmRequest.Notification request)  throws IOException {
-        fcmService.sendMessageTo(request);
-        return ResponseEntity.ok("알람을 성공적으로 전송하였습니다.");
-    }
+//    @PostMapping("/pushMessage")
+//    @Operation(
+//            summary = "[수정필요] FCM 알람 요청 API"
+//    )
+//    public ResponseEntity<String> pushMessage(@RequestBody FcmRequest.Notification request)  throws IOException {
+//        fcmService.sendMessageTo(request);
+//        return ResponseEntity.ok("알람을 성공적으로 전송하였습니다.");
+//    }
 }
