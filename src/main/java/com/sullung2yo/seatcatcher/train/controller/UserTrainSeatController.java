@@ -13,13 +13,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -146,6 +146,23 @@ public class UserTrainSeatController {
         // TODO :: 좌석 변경 이벤트 발생 코드 추가 필요
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 양보 요청 시 호출하는 API
+     * 양보 요청을 보낸 사용자의 정보는 JWT에서 추출해서 사용하면 되고,
+     * 양보 요청을 받은 사용자의 정보는 쿼리파라미터에서 넘어옵니다.
+     * @param bearerToken JWT
+     * @param seatId 양보 대상 좌석 ID
+     * @return ResponseEntity
+     */
+    @GetMapping("/{seatId}/yield-request")
+    public ResponseEntity<?> seatYieldRequest(
+            @RequestHeader("Authorization") String bearerToken,
+            @NonNull @PathVariable("seatId") Long seatId
+    ) {
+
+        return ResponseEntity.ok().build();
     }
 
     //TODO :: 지금은 이렇게 만들지만 나중에는 AOP 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.

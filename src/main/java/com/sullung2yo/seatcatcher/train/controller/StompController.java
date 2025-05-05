@@ -18,11 +18,20 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-public class SeatRequestController {
+public class StompController {
 
     private final SeatEventService seatEventService;
 
-    @MessageMapping("/seat/request") // 클라이언트가 좌석 정보 요청할 때 -> /app/seat/request << 이 경로로 WebSocket SEND
+    /**
+     * 클라이언트에서, 차량의 전체 좌석 정보를 요청할 때 호출되는 메서드 입니다.
+     * WebSocket을 통해 서버와 연결한 뒤,
+     * /app/seat/request 경로로 WebSocket SEND를 요청하면
+     * 좌석 관련 이벤트가 발생해서 /topic/seat.{trainCode}.{carCode} 경로를 구독한 모든 클라이언트들에게
+     * 좌석 정보를 전송합니다.
+     * @param payload 좌석 정보 요청 DTO
+     * @param accessor SimpMessageHeaderAccessor
+     */
+    @MessageMapping("/seat/request")
     public void handleSeatRequest(@NonNull @Payload SeatInfoRequest payload, SimpMessageHeaderAccessor accessor) {
         try {
             if (accessor.getUser() == null) {
