@@ -53,6 +53,9 @@ public class User extends BaseEntity {
     @Builder.Default
     private UserRole role = UserRole.ROLE_USER; // 권한 레벨
 
+    @Column
+    private String fcmToken; // 기기별 고유의 fcm 토큰입니다.
+
     @Column(nullable = false)
     @ColumnDefault("0")
     @Min(value = 0L, message = "크레딧은 0 이상이어야 합니다.")

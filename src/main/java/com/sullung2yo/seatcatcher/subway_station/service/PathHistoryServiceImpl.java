@@ -13,12 +13,14 @@ import com.sullung2yo.seatcatcher.subway_station.repository.SubwayStationReposit
 import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -30,20 +32,21 @@ import java.util.List;
 public class PathHistoryServiceImpl implements PathHistoryService{
 
     private final UserRepository userRepository;
+    private final UserService userService;
     private final PathHistoryRepository pathHistoryRepository;
     private final SubwayStationRepository subwayStationRepository;
     private final PathHistoryConverter pathHistoryConverter;
 
     @Override
-    public void addPathHistory(PathHistoryRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + request.getUserId(), ErrorCode.USER_NOT_FOUND));
+    public void addPathHistory(String token, PathHistoryRequest request) {
+        User user = userService.getUserWithToken(token);
 
         SubwayStation startStation = subwayStationRepository.findById(request.getStartStationId())
                 .orElseThrow(() -> new SubwayException("해당 id를 가진 역을 찾을 수 없습니다. : "+request.getStartStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
 
         SubwayStation endStation = subwayStationRepository.findById(request.getEndStationId())
                 .orElseThrow(() -> new SubwayException("해당 id를 가진 역을 찾을 수 없습니다. : "+request.getEndStationId(),ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+
 
 
         PathHistory newPathHistory = pathHistoryConverter.toPathHistory(user, startStation, endStation);
@@ -76,6 +79,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
     public PathHistoryResponse.PathHistoryList getAllPathHistory(int size, Long lastPathId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();
+
         User user = userRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. providerId : " + providerId, ErrorCode.USER_NOT_FOUND));
         PageRequest pageRequest = PageRequest.of(0, size + 1);
@@ -102,6 +106,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
 
         PathHistory pathHistory = pathHistoryRepository.findById(pathId)
                 .orElseThrow(() -> new SubwayException("해당 id를 가진 경로 이력을 찾을 수 없습니다. : "+pathId,ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+
 
         if(!pathHistory.getUser().equals(user))
             throw new SubwayException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);

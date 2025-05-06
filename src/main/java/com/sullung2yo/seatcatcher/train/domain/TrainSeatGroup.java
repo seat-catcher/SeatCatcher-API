@@ -14,10 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name="train_seat_groups",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"train_code", "car_code", "seat_group_type"})
-            // 우리는 좌석 타입도 ELDERLY_A , B 이렇게 철저하게 구분을 하기 때문에 이런 constraint 를 추가할 수 있음.
-    }
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"train_code", "car_code", "seat_group_type"})
+                // 우리는 좌석 타입도 ELDERLY_A , B 이렇게 철저하게 구분을 하기 때문에 이런 constraint 를 추가할 수 있음.
+        }
 )
 public class TrainSeatGroup extends BaseEntity {
 
