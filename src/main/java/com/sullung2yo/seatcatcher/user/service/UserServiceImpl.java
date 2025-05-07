@@ -62,11 +62,12 @@ public class UserServiceImpl implements UserService {
         log.debug("사용자 정보 업데이트 요청: {}", userInformationUpdateRequest.toString());
         User user = this.getUserWithToken(token);
         log.debug(
-                "업데이트할 사용자 : {}, {}, {}, {}, {}",
+                "업데이트할 사용자 : {}, {}, {}, {}, {}, {}",
                 user.getProviderId(),
                 user.getName(),
                 user.getCredit(),
                 user.getProfileImageNum(),
+                user.getDeviceStatus(),
                 user.getUserTag().stream().map(userTag -> userTag.getTag().getTagName()).toList()
         );
 
@@ -89,15 +90,22 @@ public class UserServiceImpl implements UserService {
             }
             user.setCredit(userInformationUpdateRequest.getCredit());
         }
+        if (userInformationUpdateRequest.getIsActive() != null) {
+            log.debug("사용자 기기 활성 상태 업데이트: {}", userInformationUpdateRequest.getIsActive());
+            user.setDeviceStatus(userInformationUpdateRequest.getIsActive());
+        }
+        if (userInformationUpdateRequest.getHasOnBoarded() != null) {
+            log.debug("온보딩 진행 여부 업데이트: {}", userInformationUpdateRequest.getHasOnBoarded());
+            user.setHasOnBoarded(userInformationUpdateRequest.getHasOnBoarded());
+        }
 
         // 태그 정보 업데이트
         List<UserTagType> tags = userInformationUpdateRequest.getTags();
-
-        // 기존 태그 관계 제거 -> 새로 생성
-        userTagRepository.deleteAll(user.getUserTag());
-        user.getUserTag().clear();
-
         if (tags != null) {
+            // 기존 태그 관계 제거 -> 새로 생성
+            userTagRepository.deleteAll(user.getUserTag());
+            user.getUserTag().clear();
+
             log.debug("사용자 태그 업데이트 개수: {}", tags.size());
             // 새 태그 관계 설정
             for (UserTagType userTagType : tags) {
@@ -117,13 +125,6 @@ public class UserServiceImpl implements UserService {
                 // 저장
                 userTagRepository.save(userTag);
             }
-        }
-
-        // 온보딩 진행 여부 업데이트
-        Boolean hasOnBoarded = userInformationUpdateRequest.getHasOnBoarded();
-        if (hasOnBoarded != null) {
-            log.debug("온보딩 진행 여부 업데이트: {}", hasOnBoarded);
-            user.setHasOnBoarded(hasOnBoarded);
         }
 
         // 2. DB에 업데이트된 사용자 정보 저장
