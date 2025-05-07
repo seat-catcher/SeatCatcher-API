@@ -30,19 +30,6 @@ public class UserController {
 
     private final UserService userService;
 
-    /**
-     * 사용자 기기 상태 업데이트 API
-     * foreground의 경우에는 true, background의 경우에는 false로 업데이트하는 API
-     * @return
-     */
-    @PatchMapping("/me/device-status")
-    public ResponseEntity<?> updateDeviceStatus(
-            @RequestHeader("Authorization") String bearerToken,
-            @RequestBody UserDeviceStatusUpdateRequest userDeviceStatusUpdateRequest
-    ) {
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
     @GetMapping("/me")
     @Operation(
             summary = "사용자 정보 조회 API",
