@@ -154,7 +154,7 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            userAlarmService.sendSeatRequestReceivedAlarm();
+            userAlarmService.sendSeatRequestReceivedAlarm(requestUser.getFcmToken(), requestUser.getName());
             log.debug("좌석 요청 푸시 알람 전송 성공");
         }
     }
@@ -194,7 +194,7 @@ public class SeatEventServiceImpl implements SeatEventService {
         } else {
             // FCM 푸시 알림 전송
             if (isAccepted) {
-                userAlarmService.sendSeatRequestAcceptedAlarm(requestUser.getFcmToken(), requestUser.getName());
+                userAlarmService.sendSeatRequestAcceptedAlarm(requestUser.getFcmToken(), requestUser.getName(), "WTF");
                 log.debug("수락 푸시 알람 전송 성공");
             } else {
                 userAlarmService.sendSeatRequestRejectedAlarm(requestUser.getFcmToken(), requestUser.getName());
@@ -230,7 +230,7 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            userAlarmService.sendSeatRequestCanceledAlarm(requestUser.getFcmToken(), requestUser.getName());
+            // userAlarmService.sendSeatRequestCanceledAlarm(requestUser.getFcmToken(), requestUser.getName());
             log.debug("취소 푸시 알람 전송 성공");
         }
     }
