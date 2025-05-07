@@ -3,6 +3,8 @@ package com.sullung2yo.seatcatcher.train.controller;
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
+import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
@@ -35,7 +37,7 @@ public class UserTrainSeatController {
 
     @PostMapping
     @Operation(
-            summary = "착석 정보를 생성하는 API",
+            summary = "양보X, 그냥 좌석에 앉을 때 해당 정보를 생성하는 API",
             description = "좌석 id와 유저 id를 이용하여 착석 정보(매핑 정보)를 만들어줍니다.",
             requestBody = @RequestBody(
                     description = "",
@@ -45,7 +47,7 @@ public class UserTrainSeatController {
             responses = {
                     @ApiResponse(
                             responseCode = "201",
-                            description = "성공적으로 생성 완료"
+                            description = "성공적으로 좌석 정보 생성 완료"
                     ),
                     @ApiResponse(
                             responseCode = "404",
@@ -53,7 +55,7 @@ public class UserTrainSeatController {
                     )
             }
     )
-    public ResponseEntity<Void> createSittingInfo(
+    public ResponseEntity<Void> createSeat(
             @RequestHeader("Authorization") String bearerToken,
             @RequestBody UserTrainSeatRequest userTrainSeatRequest
     )
@@ -64,19 +66,21 @@ public class UserTrainSeatController {
             throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
         }
 
-        userTrainSeatService.reserveSeat(userId, userTrainSeatRequest.getSeatId());
+        UserTrainSeat userSeat = userTrainSeatService.reserveSeat(userId, userTrainSeatRequest.getSeatId());
         log.debug("성공적으로 좌석 점유 지정 완료");
 
-        // 좌석 변경 이벤트 발생
-        // TODO :: 좌석 변경 이벤트 발생 코드 추가 필요
+        // 좌석 변경 이벤트 생성
+        TrainSeatGroup trainSeatGroup = userSeat.getTrainSeat().getTrainSeatGroup();
+        seatEventService.issueSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
+        log.debug("좌석 변경 이벤트 생성 완료");
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping
     @Operation(
-            summary = "착석 정보를 제거하는 API",
-            description = "현재 등록된 유저에 대한 착석 정보를 제거하는 API",
+            summary = "양보X, 좌석 정보를 제거하는 API",
+            description = "유저가 앉아있던 좌석의 정보를 제거하는 API",
             responses = {
                     @ApiResponse(
                             responseCode = "204",
@@ -88,7 +92,7 @@ public class UserTrainSeatController {
                     )
             }
     )
-    public ResponseEntity<Void> deleteSittingInfo(@RequestHeader("Authorization") String bearerToken)
+    public ResponseEntity<Void> deleteSeat(@RequestHeader("Authorization") String bearerToken)
     {
         // Bearer 토큰 검증
         Long userId = verifyUserAndGetId(bearerToken);
@@ -96,58 +100,14 @@ public class UserTrainSeatController {
             throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
         }
 
-        userTrainSeatService.releaseSeat(userId);
+        TrainSeatGroup trainSeatGroup = userTrainSeatService.releaseSeat(userId);
         log.debug("성공적으로 좌석 점유 해제 완료");
 
-        // TODO :: 좌석 변경 이벤트 발생 코드 추가 필요
+        // 좌석 변경 이벤트 생성
+        seatEventService.issueSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
+        log.debug("좌석 변경 이벤트 생성 완료");
 
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/yield")
-    @Operation(
-            summary = "유저간의 자리 교환을 수행하는 API",
-            description = "좌석 id와 유저 id를 이용하여 자리 교환을 수행합니다. 반드시!! 좌석을 양보하는 쪽에서만 최초 한 번 요청되어야 합니다.",
-            requestBody = @RequestBody(
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = SeatYieldRequest.class))
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공적으로 교환 (새로운 좌석 점유 정보 생성) 완료"
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "잘못된 요청"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "해당 유저, 혹은 좌석 ID를 찾을 수 없음"
-                    )
-            }
-    )
-    public ResponseEntity<Void> yieldSeat(
-            @RequestHeader("Authorization") String bearerToken,
-            @RequestBody SeatYieldRequest yieldRequest
-    )
-    {
-        // Bearer 토큰 검증
-        Long givingUserId;
-        Long takingUserId;
-
-        givingUserId = verifyUserAndGetId(bearerToken);
-        if (givingUserId == null) {
-            throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
-        }
-        takingUserId = yieldRequest.getTakerId();
-
-        userTrainSeatService.yieldSeat(yieldRequest.getSeatId(), givingUserId, takingUserId);
-        log.debug("성공적으로 좌석 교환 완료");
-
-        // TODO :: 좌석 변경 이벤트 발생 코드 추가 필요
-
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
@@ -161,7 +121,7 @@ public class UserTrainSeatController {
      * @param seatId 양보 대상 좌석 ID
      * @return ResponseEntity
      */
-    @GetMapping("/{seatId}/yield-request")
+    @PostMapping("/{seatId}/yield")
     public ResponseEntity<?> seatYieldRequest(
             @RequestHeader("Authorization") String bearerToken,
             @NonNull @PathVariable("seatId") Long seatId, // 양보 대상 좌석 ID
@@ -169,19 +129,12 @@ public class UserTrainSeatController {
     ) {
         // 양보를 요청한 사용자 정보 획득
         Long requestUserId = verifyUserAndGetId(bearerToken);
-        // 양보를 요청한 사용자는 /topic/seat.{seatId}.requester 구독
 
-        // 좌석을 현재 점유하고 있는 사용자의 경우
-        // 기기의 상태값에 따라서 웹소켓 메세지를 보내거나 FCM 푸시 알림을 보내야 함
+        // 양보 요청 로직 처리
         seatEventService.issueSeatYieldRequestEvent(seatId, requestUserId);
-        log.debug("좌석 점유자에게 양보 요청 WebSocket 메세지 전송 완료");
+        log.debug("좌석 점유자에게 양보 요청 완료");
 
-        // FCM data push
-        // 양보를 요청 받은 사용자에게 푸시 알림 전송
-        // TODO :: FCM 푸시 알림 전송 로직 추가 필요
-        log.debug("양보 요청 FCM 푸시 알림 전송 완료");
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
     //TODO :: 지금은 이렇게 만들지만 나중에는 AOP 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.

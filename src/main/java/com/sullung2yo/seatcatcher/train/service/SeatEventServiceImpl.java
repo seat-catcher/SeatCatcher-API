@@ -48,7 +48,17 @@ public class SeatEventServiceImpl implements SeatEventService {
 
         // 응답 구조 생성
         List<SeatInfoResponse> responses = trainSeatGroupService.createSeatInfoResponse(trainCode, carCode, trainSeatGroups);
-        publishSeatEvent(responses);
+        // RabbutMQ Exchange한테 메세지 발행
+        log.info("좌석 이벤트 발행 이벤트 발생 : TrainCode :: {}, CarCode :: {}", responses.get(0).getTrainCode(), responses.get(0).getCarCode());
+        String routingKey = "seat" + "." + responses.get(0).getTrainCode() + "." + responses.get(0).getCarCode();
+
+        // Exchange한테 routingKey를 사용해서 seatEvent 담아서 전달
+        try {
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, responses);
+            log.debug("RabbitMQ에 좌석 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
+        } catch (Exception e) {
+            log.error("RabbitMQ에 좌석 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
+        }
     }
 
     /**
@@ -74,44 +84,38 @@ public class SeatEventServiceImpl implements SeatEventService {
     }
 
     /**
-     * RabbitMQ에 좌석 이벤트를 전달하는 메서드입니다.
-     * @param seatInfoResponses 좌석 정보 응답 객체 리스트
-     */
-    public void publishSeatEvent(List<SeatInfoResponse> seatInfoResponses) {
-        // RabbutMQ Exchange한테 메세지 발행
-        log.info("좌석 이벤트 발행 이벤트 발생 : TrainCode :: {}, CarCode :: {}", seatInfoResponses.get(0).getTrainCode(), seatInfoResponses.get(0).getCarCode());
-        String routingKey = "seat" + "." + seatInfoResponses.get(0).getTrainCode() + "." + seatInfoResponses.get(0).getCarCode();
-
-        // Exchange한테 routingKey를 사용해서 seatEvent 담아서 전달
-        try {
-            rabbitTemplate.convertAndSend(exchangeName, routingKey, seatInfoResponses);
-            log.debug("RabbitMQ에 좌석 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
-        } catch (Exception e) {
-            log.error("RabbitMQ에 좌석 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
-        }
-    }
-
-    /**
      * 양보 요청 이벤트를 발행하는 메서드입니다.
      * @param seatId
      * @param requestUserId
      */
     @Override
     public void issueSeatYieldRequestEvent(Long seatId, Long requestUserId) {
-        User requestUser = userService.getUserWithId(requestUserId);
-        SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
-                .requestUserId(requestUser.getId())
-                .requestUserNickname(requestUser.getName())
-                .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                .requestUserTags(requestUser.getUserTag())
-                .build(); // 좌석 양보 요청에 대한 응답 객체 생성
-        String routingKey = "seat" + "." + seatId;
+        // 양보를 요청한 사용자는 /topic/seat.{seatId}.requester 구독
+        // 좌석을 현재 점유하고 있는 사용자의 경우 /topic/seat.{seatId}.owner 구독
 
-        try {
-            rabbitTemplate.convertAndSend(exchangeName, routingKey, seatYieldRequestResponse);
-            log.debug("RabbitMQ에 좌석 양보 요청 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
-        } catch (Exception e) {
-            log.error("RabbitMQ에 좌석 양보 요청 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
+        // 기기의 상태값에 따라서 웹소켓 메세지를 보내거나 FCM 푸시 알림을 보내야 함
+        User requestUser = userService.getUserWithId(requestUserId);
+        if (requestUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
+            SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
+                    .requestUserId(requestUser.getId())
+                    .requestUserNickname(requestUser.getName())
+                    .requestUserProfileImageNum(requestUser.getProfileImageNum())
+                    .requestUserTags(requestUser.getUserTag())
+                    .build(); // 좌석 양보 요청에 대한 응답 객체 생성
+
+            // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
+            String routingKey = "seat" + "." + seatId + "." + "owner"; // 양보 요청을 받은 사용자의 routingKey로 전달해야함
+
+            try {
+                rabbitTemplate.convertAndSend(exchangeName, routingKey, seatYieldRequestResponse);
+                log.debug("RabbitMQ에 좌석 양보 요청 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
+            } catch (Exception e) {
+                log.error("RabbitMQ에 좌석 양보 요청 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
+            }
+        } else {
+            // FCM 푸시 알림 전송
+            // TODO :: FCM 푸시 알림 전송 로직 추가 필요
+            log.debug("FCM 푸시 알림 전송 로직 추가 필요");
         }
     }
 }
