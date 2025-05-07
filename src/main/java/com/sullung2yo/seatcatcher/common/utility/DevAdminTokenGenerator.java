@@ -41,6 +41,7 @@ public class DevAdminTokenGenerator {
                     .providerId(adminSubject)
                     .provider(Provider.LOCAL)
                     .role(UserRole.ROLE_ADMIN)
+                    .deviceStatus(true)
                     .build();
             userRepository.save(user);
         }

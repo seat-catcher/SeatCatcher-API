@@ -4,7 +4,6 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
-import com.sullung2yo.seatcatcher.user.dto.request.UserDeviceStatusUpdateRequest;
 import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.user.dto.response.UserInformationResponse;
 import com.sullung2yo.seatcatcher.user.service.UserService;

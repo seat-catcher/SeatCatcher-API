@@ -53,8 +53,9 @@ public class User extends BaseEntity {
     private String fcmToken; // 기기별 고유의 fcm 토큰입니다.
 
     @Column(nullable = false)
+    @Builder.Default
     @ColumnDefault("true") // 회원 가입 시 -> 기기 상태는 foreground 이므로 기본값을 true로 설정
-    private Boolean deviceStatus; // 기기 상태 (true: foreground, false: background)
+    private Boolean deviceStatus = true; // 기기 상태 (true: foreground, false: background)
 
     @Column(nullable = false)
     @ColumnDefault("0")
