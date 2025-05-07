@@ -10,6 +10,7 @@ import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectRespon
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCancledResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
 import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class SeatEventServiceImpl implements SeatEventService {
     private final RabbitTemplate rabbitTemplate;
     private final UserService userService;
     private final UserTrainSeatService userTrainSeatService;
+    private final UserAlarmService userAlarmService;
 
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
@@ -152,8 +154,8 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            // TODO :: FCM 푸시 알림 전송 로직 추가 필요
-            log.debug("FCM 푸시 알림 전송 로직 추가 필요");
+            userAlarmService.sendSeatRequestReceivedAlarm();
+            log.debug("좌석 요청 푸시 알람 전송 성공");
         }
     }
 
@@ -191,8 +193,13 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            // TODO :: FCM 푸시 알림 전송 로직 추가 필요
-            log.debug("FCM 푸시 알림 전송 로직 추가 필요");
+            if (isAccepted) {
+                userAlarmService.sendSeatRequestAcceptedAlarm(requestUser.getFcmToken(), requestUser.getName());
+                log.debug("수락 푸시 알람 전송 성공");
+            } else {
+                userAlarmService.sendSeatRequestRejectedAlarm(requestUser.getFcmToken(), requestUser.getName());
+                log.debug("거절 푸시 알람 전송 성공");
+            }
         }
     }
 
@@ -223,8 +230,8 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            // TODO :: FCM 푸시 알림 전송 로직 추가 필요
-            log.debug("FCM 푸시 알림 전송 로직 추가 필요");
+            userAlarmService.sendSeatRequestCanceledAlarm(requestUser.getFcmToken(), requestUser.getName());
+            log.debug("취소 푸시 알람 전송 성공");
         }
     }
 }

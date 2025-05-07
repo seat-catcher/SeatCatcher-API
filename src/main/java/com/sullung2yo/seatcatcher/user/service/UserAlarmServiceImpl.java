@@ -109,32 +109,39 @@ public class UserAlarmServiceImpl implements UserAlarmService {
         userAlarmRepository.save(userAlarm);
 
     }
+
     // 자동 하차 처리 알람
+    @Override
     public void sendArrivalHandledAlarm(String receiverToken) {
         send(receiverToken, PushNotificationType.ARRIVAL_HANDLED);
     }
 
     // 좌석 요청 도착 알림
+    @Override
     public void sendSeatRequestReceivedAlarm(String receiverToken, String nickname) {
         send(receiverToken, PushNotificationType.SEAT_REQUEST_RECEIVED, nickname, nickname);
     }
 
     // 앞자리에 도달 알림
+    @Override
     public void sendArrivedAtFrontAlarm(String receiverToken, String nickname) {
         send(receiverToken, PushNotificationType.SEAT_REQUEST_ACCEPTED_ARRIVA, nickname);
     }
 
     // 좌석 요청 거절 알림
+    @Override
     public void sendSeatRequestRejectedAlarm(String receiverToken, String nickname) {
         send(receiverToken, PushNotificationType.SEAT_REQUEST_REJECTED, nickname);
     }
 
     // 좌석 요청 수락 알림
+    @Override
     public void sendSeatRequestAcceptedAlarm(String receiverToken, String nickname, String stationName) {
         send(receiverToken, PushNotificationType.SEAT_REQUEST_ACCEPTED, nickname, stationName);
     }
 
     // 자리 교환 성공 알림
+    @Override
     public void sendSeatExchangeSuccessAlarm(String receiverToken, String nickname, int creditAmount) {
         send(receiverToken, PushNotificationType.SEAT_EXCHANGE_SUCCESS, creditAmount, nickname, creditAmount);
     }
