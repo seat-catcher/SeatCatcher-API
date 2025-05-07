@@ -169,8 +169,10 @@ public class UserTrainSeatController {
     ) {
         // 양보를 요청한 사용자 정보 획득
         Long requestUserId = verifyUserAndGetId(bearerToken);
+        // 양보를 요청한 사용자는 /topic/seat.{seatId}.requester 구독
 
-        // 양보를 요청 받은 사용자에게 토스트 메세지 띄우도록 웹소켓 메세지 전송 ()
+        // 좌석을 현재 점유하고 있는 사용자의 경우
+        // 기기의 상태값에 따라서 웹소켓 메세지를 보내거나 FCM 푸시 알림을 보내야 함
         seatEventService.issueSeatYieldRequestEvent(seatId, requestUserId);
         log.debug("좌석 점유자에게 양보 요청 WebSocket 메세지 전송 완료");
 

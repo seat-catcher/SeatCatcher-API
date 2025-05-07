@@ -4,7 +4,6 @@ import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
-import org.hibernate.annotations.Check;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -37,9 +36,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String name; // 사용자 이름 -> Random Nickname
 
-    @Column(nullable = false, unique = true)
-    private String fcmToken; // FCM Token (Firebase가 발급한 사용자 기기 식별자)
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Provider provider; // 인증 제공자 (Enum)
@@ -55,6 +51,10 @@ public class User extends BaseEntity {
 
     @Column
     private String fcmToken; // 기기별 고유의 fcm 토큰입니다.
+
+    @Column(nullable = false)
+    @ColumnDefault("true") // 회원 가입 시 -> 기기 상태는 foreground 이므로 기본값을 true로 설정
+    private Boolean deviceStatus; // 기기 상태 (true: foreground, false: background)
 
     @Column(nullable = false)
     @ColumnDefault("0")
