@@ -21,7 +21,6 @@ public class SubwayInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // TODO : 추후 이걸 Production에도 올릴 때 실행시킬지 말지 결정해야 함
         int numberOfLines = 8; // 서울 지하철 노선 수 (서울 공공데이터가 9호선은 제공 안함)
         String filePath = "src/main/resources/json/seoul_subway_info.json";
 
