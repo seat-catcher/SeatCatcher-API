@@ -5,6 +5,7 @@ import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
+import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
 import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
@@ -22,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 @Slf4j
@@ -114,8 +117,8 @@ public class UserTrainSeatController {
      * 양보 요청 시 호출하는 API
      * 양보 요청을 보낸 사용자의 정보는 JWT에서 추출해서 사용하면 되고,
      * 양보 요청을 받은 사용자의 정보는 쿼리 파라미터로 전달받습니다.
-     * 클라이언트 측에서 이 API를 호출 후, topic seat.seat_id로 구독을 수행해야 합니다.
-     * 이 때, 좌석을 차지하고 있는 사람은, 이미 topic seat.seat_id를 구독한 상태입니다.
+     * 클라이언트 측에서 이 API를 호출 후, topic seat.{seat_id}.requester.{user_id}로 구독을 수행해야 합니다.
+     * 이 때, 좌석을 차지하고 있는 사람은, topic seat.{seat_id}와 seat.{seat_id}.owner를 구독한 상태입니다.
      * 즉, 좌석을 점유할 때 topic을 구독해야 합니다.
      * @param bearerToken JWT
      * @param seatId 양보 대상 좌석 ID
@@ -125,16 +128,22 @@ public class UserTrainSeatController {
     public ResponseEntity<?> seatYieldRequest(
             @RequestHeader("Authorization") String bearerToken,
             @NonNull @PathVariable("seatId") Long seatId, // 양보 대상 좌석 ID
-            @RequestParam(value = "occupantId") Long occupantId // 양보 요청을 받은 사용자 ID
+            @RequestParam(value = "type") YieldRequestType requestType, // 양보 요청 타입 (양보 요청: request, 양보 수락: approve, 양보 거절: reject)
+            @RequestParam(value = "oppositeUserId", required = false) Optional<Long> oppositeUserId // 상대방 사용자 ID
     ) {
-        // 양보를 요청한 사용자 정보 획득
+        // API 호출한 사람 ID 가져오기
         Long requestUserId = verifyUserAndGetId(bearerToken);
 
-        // 양보 요청 로직 처리
-        seatEventService.issueSeatYieldRequestEvent(seatId, requestUserId);
+        // 양보 로직 처리
+        seatEventService.issueSeatYieldEvent(
+                seatId,
+                requestType,
+                requestUserId,
+                oppositeUserId
+        );
         log.debug("좌석 점유자에게 양보 요청 완료");
 
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 
     //TODO :: 지금은 이렇게 만들지만 나중에는 AOP 등으로 자동으로 인증이 필요한 API 에 대해서 해당 로직을 수행할 수 있으면 좋을 듯.

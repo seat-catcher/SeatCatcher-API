@@ -59,14 +59,14 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     }
 
     @Override
-    public UserTrainSeat findUserTrainSeatByUserId(Long id) {
-        return userTrainSeatRepository.findUserTrainSeatByUserId(id)
+    public UserTrainSeat findUserTrainSeatByUserId(Long userId) {
+        return userTrainSeatRepository.findUserTrainSeatByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("UserTrainSeat not found"));
     }
 
     @Override
-    public UserTrainSeat findUserTrainSeatBySeatId(Long id) {
-        return userTrainSeatRepository.findUserTrainSeatByTrainSeatId(id)
+    public UserTrainSeat findUserTrainSeatBySeatId(Long seatId) {
+        return userTrainSeatRepository.findUserTrainSeatByTrainSeatId(seatId)
                 .orElseThrow(() -> new EntityNotFoundException("UserTrainSeat not found"));
     }
 
