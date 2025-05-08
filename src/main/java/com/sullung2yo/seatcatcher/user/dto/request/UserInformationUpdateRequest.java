@@ -4,17 +4,12 @@ import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @Builder
-@ToString
 @Schema(description = "사용자 정보 수정 요청 DTO")
 public class UserInformationUpdateRequest {
 
@@ -34,7 +29,9 @@ public class UserInformationUpdateRequest {
     @Min(value = 0, message = "크레딧은 0 이상이어야 합니다.")
     private Long credit;
 
-    @Schema(description = "온보딩 진행 여부", example = "false, true")
+    @Schema(description = "온보딩 진행 여부", example = "true, false")
     private Boolean hasOnBoarded; // 온보딩 진행 여부
 
+    @Schema(description = "디바이스 Foreground/Background 여부", example = "true, false")
+    private Boolean isActive; // 디바이스 Foreground/Background 여부
 }

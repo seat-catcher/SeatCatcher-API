@@ -84,8 +84,8 @@ public class PathHistoryController {
     @ApiResponse(responseCode = "200", description = "path history 삭제 성공")
     @ApiResponse(responseCode = "403", description = "user가 pathHistory에 접근할 권한이 없음")
     @ApiResponse(responseCode = "404", description = "path history를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public ResponseEntity<?> deletPathHistory(@PathVariable("path_id") Long pathtId) {
-        pathHistoryService.deletPathHistory(pathtId);
+    public ResponseEntity<?> deletePathHistory(@PathVariable("path_id") Long pathtId) {
+        pathHistoryService.deletePathHistory(pathtId);
         return ResponseEntity.ok("해당 pathHistory를 삭제했습니다.");
     }
 

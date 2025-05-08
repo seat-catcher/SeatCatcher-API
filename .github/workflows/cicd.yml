@@ -75,6 +75,10 @@ jobs:
           mkdir -p ./src/main/resources
           echo "${{ secrets.SWAGGER_PROPERTIES }}" > ./src/main/resources/application.properties
 
+      - name: Setup firebase-adminsdk-fbsvc-5d0ae449ec.json
+        run: |
+          echo "${{ secrets.FIREBASE_KEY_JSON }}" | base64 --decode > ./src/main/resources/seat-catcher-firebase-adminsdk-fbsvc-5d0ae449ec.json
+
       - name: Check application.properties is properly set
         run: |
           if [ -s ./src/main/resources/application.properties ]; then
