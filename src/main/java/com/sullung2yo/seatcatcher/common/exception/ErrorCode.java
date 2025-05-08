@@ -27,7 +27,10 @@ public enum ErrorCode {
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "알람을 찾을 수 없습니다."),
     ALARM_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 이력에 접근할 수 없습니다."),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
-    YIELD_ACCEPT_FAILED(HttpStatus.BAD_REQUEST, "양도 요청 수락에 실패했습니다.");
+    YIELD_ACCEPT_FAILED(HttpStatus.BAD_REQUEST, "양도 요청 수락에 실패했습니다."),
+    AUTH_INVALID_PROVIDER(HttpStatus.BAD_REQUEST, "유효하지 않은 인증 제공자입니다."),
+    AUTH_KAKAO_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 서버 오류"),
+    AUTH_PARSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "인증 정보 파싱 오류");
 
     private final HttpStatus httpStatus;
     private final String message;
