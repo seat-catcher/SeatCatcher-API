@@ -73,7 +73,7 @@ public class UserTrainSeatController {
 
         // 좌석 변경 이벤트 생성
         TrainSeatGroup trainSeatGroup = userSeat.getTrainSeat().getTrainSeatGroup();
-        seatEventService.issueSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
+        seatEventService.publishSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
         log.debug("좌석 변경 이벤트 생성 완료");
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -106,7 +106,7 @@ public class UserTrainSeatController {
         log.debug("성공적으로 좌석 점유 해제 완료");
 
         // 좌석 변경 이벤트 생성
-        seatEventService.issueSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
+        seatEventService.publishSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
         log.debug("좌석 변경 이벤트 생성 완료");
 
         return ResponseEntity.noContent().build();

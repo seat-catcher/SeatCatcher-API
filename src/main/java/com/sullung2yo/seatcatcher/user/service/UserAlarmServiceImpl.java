@@ -125,12 +125,6 @@ public class UserAlarmServiceImpl implements UserAlarmService {
         send(receiverToken, PushNotificationType.SEAT_REQUEST_RECEIVED, nickname);
     }
 
-    // 앞자리에 도달 알림
-    @Override
-    public void sendArrivedAtFrontAlarm(String receiverToken, String nickname) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_ACCEPTED_ARRIVA, nickname);
-    }
-
     // 좌석 요청 거절 알림
     @Override
     public void sendSeatRequestRejectedAlarm(String receiverToken) {

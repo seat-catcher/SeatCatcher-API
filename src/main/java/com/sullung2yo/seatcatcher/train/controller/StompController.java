@@ -45,7 +45,7 @@ public class StompController {
             String carCode = payload.getCarCode();
             log.debug("요청한 차량 carCode : {}", carCode);
 
-            seatEventService.issueSeatEvent(trainCode, carCode);
+            seatEventService.publishSeatEvent(trainCode, carCode);
         } catch (UserException e) {
             log.error(e.getMessage());
             throw new UserException("WebSocket에 연결된 사용자 정보가 서버에 없습니다.", ErrorCode.USER_NOT_FOUND);
