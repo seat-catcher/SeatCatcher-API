@@ -106,7 +106,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param oppositeUserId : 양보 요청을 받은 사용자 ID or 수락/거절 시 양보 요청을 보낸 사용자 ID
      */
     @Override
-    public void publishSeatYieldEvent(
+    public void publishSeatYieldEvent( // TODO :: 테스트코드 작성 필요 (switch문 테스트만)
             Long seatId,
             YieldRequestType requestType,
             Long requestUserId,
@@ -141,7 +141,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param seatId : 좌석 ID
      * @param requestUserId : 양보 요청을 보낸 사용자 ID
      */
-    private void handleYieldRequest(Long seatId, Long requestUserId) {
+    private void handleYieldRequest(Long seatId, Long requestUserId) { // TODO :: 테스트코드 작성 필요
 
         UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
         User owner = seat.getUser();
@@ -177,7 +177,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param requestUserId : 양보 요청을 수락한 사용자 ID
      * @param oppositeUserId : 양보 요청을 보냈던 사용자 ID
      */
-    private void handleAcceptRejectYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId, boolean isAccepted) {
+    private void handleAcceptRejectYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId, boolean isAccepted) { // TODO :: 테스트코드 작성 필요
         // requestUserId가 seatId를 점유하고 있는지 검증
         UserTrainSeat userTrainSeat = userTrainSeatService.findUserTrainSeatBySeatId(seatId);
         if (!Objects.equals(userTrainSeat.getUser().getId(), requestUserId)) {
@@ -220,7 +220,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * 좌석 양보를 취소했을 때 호출되는 메서드 입니다.
      * 취소 요청 시 프론트엔드는 구독한 웹소켓 토픽을 구독 해제 해야 합니다.
      */
-    private void handleCancleYieldRequest(Long seatId, Long requestUserId) {
+    private void handleCancleYieldRequest(Long seatId, Long requestUserId) { // TODO :: 테스트코드 작성 필요
         // 취소 요청했을 때 -> 좌석에 앉아있는 사용자에게 해당 사용자는 양보 요청을 취소했습니다. 라는 메세지를 보내야 함
         UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
         User owner = seat.getUser();
