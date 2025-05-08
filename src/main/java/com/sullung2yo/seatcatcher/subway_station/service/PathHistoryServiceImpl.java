@@ -71,8 +71,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
         if(!pathHistory.getUser().equals(user))
             throw new SubwayException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
 
-        PathHistoryResponse.PathHistoryInfoResponse response = pathHistoryConverter.toResponse(pathHistory);
-        return response;
+        return pathHistoryConverter.toResponse(pathHistory);
     }
 
     @Override
@@ -91,14 +90,12 @@ public class PathHistoryServiceImpl implements PathHistoryService{
                 .map(pathHistoryConverter::toResponse)
                 .toList();
 
-        PathHistoryResponse.PathHistoryList response = pathHistoryConverter.toResponseList(pathHistoriesCursor,pathHistoryList);
-
-        return response;
+        return pathHistoryConverter.toResponseList(pathHistoriesCursor,pathHistoryList);
 
     }
 
     @Override
-    public void deletPathHistory(Long pathId) {
+    public void deletePathHistory(Long pathId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();
         User user = userRepository.findByProviderId(providerId)
@@ -112,6 +109,12 @@ public class PathHistoryServiceImpl implements PathHistoryService{
             throw new SubwayException("해당 경로 이력에 접근할 권한이 없습니다.",ErrorCode.PATH_HISTORY_FORBIDDEN);
 
         pathHistoryRepository.delete(pathHistory);
+    }
+
+    @Override
+    public String getUserDestination(User user) {
+        SubwayStation destination = pathHistoryRepository.findEndStationByUser(user);
+        return destination.getStationName();
     }
 
 

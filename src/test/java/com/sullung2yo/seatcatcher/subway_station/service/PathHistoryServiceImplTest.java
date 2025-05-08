@@ -290,7 +290,7 @@ public class PathHistoryServiceImplTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // when
-        pathHistoryService.deletPathHistory(pathHistory.getId());
+        pathHistoryService.deletePathHistory(pathHistory.getId());
 
         // then
         boolean exists = pathHistoryRepository.existsById(pathHistory.getId());

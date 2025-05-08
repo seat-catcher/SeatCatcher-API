@@ -19,7 +19,7 @@ public enum PushNotificationType {
     ),
     SEAT_REQUEST_REJECTED(
             "좌석 요청 거절",
-            "%s님이 좌석 요청을 거절하였어요. 다른 유저에게 다시 시도해보세요."
+            "좌석 요청이 거절됐어요."
     ),
     SEAT_REQUEST_ACCEPTED_ARRIVA(
             "앞자리에 도달",
@@ -28,6 +28,10 @@ public enum PushNotificationType {
     SEAT_EXCHANGE_SUCCESS(
     "%d 크레딧 획득",
             "%s님에게 자리를 양보하여 %d 크레딧을 획득했어요!"
+    ),
+    SEAT_REQUEST_CANCELED(
+            "좌석 요청 취소",
+            "%s님이 좌석 요청을 취소하였어요."
     );
 
     private final String titleTemplate;

@@ -133,11 +133,16 @@ public class UserAlarmServiceImpl implements UserAlarmService {
 
     // 좌석 요청 거절 알림
     @Override
-    public void sendSeatRequestRejectedAlarm(String receiverToken, String nickname) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_REJECTED, nickname);
+    public void sendSeatRequestRejectedAlarm(String receiverToken) {
+        send(receiverToken, PushNotificationType.SEAT_REQUEST_REJECTED);
     }
 
-    // 좌석 요청 수락 알림
+    /** 좌석 요청 수락 알림
+     *
+     * @param receiverToken : 좌석 양보 요청을 한 사람의 FCM 토큰
+     * @param nickname : 좌석에 앉아있는 사람의 닉네임
+     * @param stationName : 좌석에 앉아있는 사람의 목적지 역 이름
+     */
     @Override
     public void sendSeatRequestAcceptedAlarm(String receiverToken, String nickname, String stationName) {
         send(receiverToken, PushNotificationType.SEAT_REQUEST_ACCEPTED, nickname, stationName);
@@ -147,5 +152,15 @@ public class UserAlarmServiceImpl implements UserAlarmService {
     @Override
     public void sendSeatExchangeSuccessAlarm(String receiverToken, String nickname, int creditAmount) {
         send(receiverToken, PushNotificationType.SEAT_EXCHANGE_SUCCESS, creditAmount, nickname, creditAmount);
+    }
+
+    /**
+     * 좌석 요청 취소 알림
+     * @param receiverToken : 자리에 앉아있는 사람의 FCM 토큰
+     * @param nickname : 좌석 양보를 요청한 사람의 닉네임
+     */
+    @Override
+    public void sendSeatRequestCanceledAlarm(String receiverToken, String nickname) {
+        send(receiverToken, PushNotificationType.SEAT_REQUEST_CANCELED, nickname);
     }
 }

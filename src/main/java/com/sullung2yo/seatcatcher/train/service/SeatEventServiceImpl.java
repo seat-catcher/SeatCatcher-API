@@ -2,6 +2,8 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.SeatException;
+import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
+import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
@@ -33,6 +35,7 @@ public class SeatEventServiceImpl implements SeatEventService {
     private final UserService userService;
     private final UserTrainSeatService userTrainSeatService;
     private final UserAlarmService userAlarmService;
+    private final PathHistoryService pathHistoryService;
 
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
@@ -169,13 +172,12 @@ public class SeatEventServiceImpl implements SeatEventService {
     }
 
     /**
-     * 양보 요청을 수락했을 때 호출되는 메서드입니다.
+     * 양보 요청을 수락 또는 거절했을 때 호출되는 메서드입니다.
      * @param seatId : 대상 좌석 ID
      * @param requestUserId : 양보 요청을 수락한 사용자 ID
      * @param oppositeUserId : 양보 요청을 보냈던 사용자 ID
      */
     private void handleAcceptRejectYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId, boolean isAccepted) {
-        // 양보 수락 시
         // requestUserId가 seatId를 점유하고 있는지 검증
         UserTrainSeat userTrainSeat = userTrainSeatService.findUserTrainSeatBySeatId(seatId);
         if (!Objects.equals(userTrainSeat.getUser().getId(), requestUserId)) {
@@ -203,10 +205,12 @@ public class SeatEventServiceImpl implements SeatEventService {
         } else {
             // FCM 푸시 알림 전송
             if (isAccepted) {
-                userAlarmService.sendSeatRequestAcceptedAlarm(requestUser.getFcmToken(), requestUser.getName(), "WTF");
+                // 좌석에 앉아있는 사람의 목적지
+                String destination = pathHistoryService.getUserDestination(requestUser);
+                userAlarmService.sendSeatRequestAcceptedAlarm(requestUser.getFcmToken(), requestUser.getName(), destination);
                 log.debug("수락 푸시 알람 전송 성공");
             } else {
-                userAlarmService.sendSeatRequestRejectedAlarm(requestUser.getFcmToken(), requestUser.getName());
+                userAlarmService.sendSeatRequestRejectedAlarm(requestUser.getFcmToken());
                 log.debug("거절 푸시 알람 전송 성공");
             }
         }
@@ -218,16 +222,18 @@ public class SeatEventServiceImpl implements SeatEventService {
      */
     private void handleCancleYieldRequest(Long seatId, Long requestUserId) {
         // 취소 요청했을 때 -> 좌석에 앉아있는 사용자에게 해당 사용자는 양보 요청을 취소했습니다. 라는 메세지를 보내야 함
-        User requestUser = userService.getUserWithId(requestUserId);
-        if (requestUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
+        UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
+        User owner = seat.getUser();
+
+        if (owner.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 취소하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
             // 기존에 좌석 양보 요청 메세지는 알아서 프론트에서 처리?
             // 구독 해제도 프론트에서 해제
             SeatYieldCancledResponse seatYieldCancledResponse = SeatYieldCancledResponse.builder()
-                    .requestUserId(requestUser.getId())
-                    .requestUserNickname(requestUser.getName())
-                    .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                    .requestUserTags(requestUser.getUserTag())
+                    .requestUserId(owner.getId())
+                    .requestUserNickname(owner.getName())
+                    .requestUserProfileImageNum(owner.getProfileImageNum())
+                    .requestUserTags(owner.getUserTag())
                     .build(); // 좌석 양보 요청 취소 응답 객체 생성
 
             String routingKey = "seat" + "." + seatId + "." + "owner"; // 양보 요청을 받았던 사용자의 routingKey로 취소 메세지 전달해야함
@@ -239,7 +245,8 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            // userAlarmService.sendSeatRequestCanceledAlarm(requestUser.getFcmToken(), requestUser.getName());
+            User requestUser = userService.getUserWithId(requestUserId);
+            userAlarmService.sendSeatRequestCanceledAlarm(owner.getFcmToken(), requestUser.getName());
             log.debug("취소 푸시 알람 전송 성공");
         }
     }
