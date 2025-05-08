@@ -11,8 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PathHistoryRequest {
-    @Schema(description = "사용자 id")
-    Long userId;
 
     @Schema(description = "시작역 id")
     Long startStationId;

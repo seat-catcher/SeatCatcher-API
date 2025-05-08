@@ -64,6 +64,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	//firebase
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 test {
