@@ -49,7 +49,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param trainCode 기차 코드
      * @param carCode 차량 코드
      */
-    public void issueSeatEvent(String trainCode, String carCode) {
+    public void publishSeatEvent(String trainCode, String carCode) {
         // 좌석 그룹 정보 가져오기
         List<TrainSeatGroup> trainSeatGroups = trainSeatGroupService.findAllByTrainCodeAndCarCode(trainCode, carCode);
         if (trainSeatGroups.isEmpty()) {
@@ -103,7 +103,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param oppositeUserId : 양보 요청을 받은 사용자 ID or 수락/거절 시 양보 요청을 보낸 사용자 ID
      */
     @Override
-    public void issueSeatYieldEvent(
+    public void publishSeatYieldEvent(
             Long seatId,
             YieldRequestType requestType,
             Long requestUserId,
@@ -130,21 +130,29 @@ public class SeatEventServiceImpl implements SeatEventService {
         }
     }
 
+    /**
+     * 양보 요청 시 호출되는 메서드.
+     * 양보를 요청한 사용자는 /topic/seat.{seatId}.requester.{userId} 구독 -> 프론트에서 수행
+     * 좌석을 현재 점유하고 있는 사용자의 경우 /topic/seat.{seatId}.owner 구독 -> 좌석 점유 시 구독
+     * 기기의 상태값에 따라서 웹소켓 메세지를 보내거나 FCM 푸시 알림을 보내야 함
+     * @param seatId : 좌석 ID
+     * @param requestUserId : 양보 요청을 보낸 사용자 ID
+     */
     private void handleYieldRequest(Long seatId, Long requestUserId) {
-        // 양보를 요청한 사용자는 /topic/seat.{seatId}.requester 구독 -> 프론트에서 수행
-        // 좌석을 현재 점유하고 있는 사용자의 경우 /topic/seat.{seatId}.owner 구독 -> 좌석 점유 시 구독
-        // 기기의 상태값에 따라서 웹소켓 메세지를 보내거나 FCM 푸시 알림을 보내야 함
-        User requestUser = userService.getUserWithId(requestUserId);
-        if (requestUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
+
+        UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
+        User owner = seat.getUser();
+
+        if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
             SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
-                    .requestUserId(requestUser.getId())
-                    .requestUserNickname(requestUser.getName())
-                    .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                    .requestUserTags(requestUser.getUserTag())
+                    .requestUserId(owner.getId())
+                    .requestUserNickname(owner.getName())
+                    .requestUserProfileImageNum(owner.getProfileImageNum())
+                    .requestUserTags(owner.getUserTag())
                     .build(); // 좌석 양보 요청에 대한 응답 객체 생성
 
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
-            String routingKey = "seat" + "." + seatId + "." + "owner"; // 양보 요청을 받은 사용자의 routingKey로 전달해야함
+            String routingKey = "seat" + "." + seatId + "." + "owner"; // 좌석 점유자가 구독한 경로 전달해야함
 
             try {
                 rabbitTemplate.convertAndSend(exchangeName, routingKey, seatYieldRequestResponse);
@@ -154,7 +162,8 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            userAlarmService.sendSeatRequestReceivedAlarm(requestUser.getFcmToken(), requestUser.getName());
+            User requestUser = userService.getUserWithId(requestUserId);
+            userAlarmService.sendSeatRequestReceivedAlarm(owner.getFcmToken(), requestUser.getName());
             log.debug("좌석 요청 푸시 알람 전송 성공");
         }
     }

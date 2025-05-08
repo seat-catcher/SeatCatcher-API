@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface SeatEventService {
 
-    void issueSeatEvent(String trainCode, String carCode);
+    void publishSeatEvent(String trainCode, String carCode);
     void handleSeatEvent(List<SeatInfoResponse> seatInfoResponses);
-    void issueSeatYieldEvent(Long seatId, YieldRequestType requestType, Long requestUserId, Optional<Long> oppositeUserId);
+    void publishSeatYieldEvent(Long seatId, YieldRequestType requestType, Long requestUserId, Optional<Long> oppositeUserId);
 }

@@ -6,7 +6,6 @@ import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
-import com.sullung2yo.seatcatcher.train.dto.request.SeatYieldRequest;
 import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
@@ -135,7 +134,7 @@ public class UserTrainSeatController {
         Long requestUserId = verifyUserAndGetId(bearerToken);
 
         // 양보 로직 처리
-        seatEventService.issueSeatYieldEvent(
+        seatEventService.publishSeatYieldEvent(
                 seatId,
                 requestType,
                 requestUserId,
