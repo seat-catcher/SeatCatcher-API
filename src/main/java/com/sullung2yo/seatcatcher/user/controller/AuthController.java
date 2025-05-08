@@ -51,20 +51,16 @@ public class AuthController {
             }
     )
     public ResponseEntity<?> authenticateApple(@Valid @RequestBody AppleAuthRequest appleAuthRequest) {
-        try {
-            // RequestBody로 제대로 들어왔는지 검증
-            if (appleAuthRequest.getIdentityToken() == null || appleAuthRequest.getIdentityToken().isEmpty()) {
-                throw new IllegalArgumentException("Apple 인증 요청에 필요한 identityToken이 제공되지 않았습니다.");
-            }
-            log.debug("Authenticate with Apple: {}", appleAuthRequest);
-
-            // 인증 로직 수행 후 토큰 생성
-            List<String> tokens = authServiceImpl.authenticate(appleAuthRequest, Provider.APPLE);
-
-            return returnAfterTokenValidation(tokens);
-        } catch (Exception e) {
-            throw new RuntimeException("애플 인증 처리 중 오류가 발생했습니다: " + e.getMessage(), e);
+        // RequestBody로 제대로 들어왔는지 검증
+        if (appleAuthRequest.getIdentityToken() == null || appleAuthRequest.getIdentityToken().isEmpty()) {
+            throw new IllegalArgumentException("Apple 인증 요청에 필요한 identityToken이 제공되지 않았습니다.");
         }
+        log.debug("Authenticate with Apple: {}", appleAuthRequest);
+
+        // 인증 로직 수행 후 토큰 생성
+        List<String> tokens = authServiceImpl.authenticate(appleAuthRequest, Provider.APPLE);
+
+        return returnAfterTokenValidation(tokens);
     }
 
 
