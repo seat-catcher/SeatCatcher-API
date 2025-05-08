@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -112,9 +113,9 @@ public class PathHistoryServiceImpl implements PathHistoryService{
     }
 
     @Override
-    public String getUserDestination(User user) {
+    public Optional<String> getUserDestination(User user) {
         SubwayStation destination = pathHistoryRepository.findEndStationByUser(user);
-        return destination.getStationName();
+        return Optional.of(destination.getStationName());
     }
 
 

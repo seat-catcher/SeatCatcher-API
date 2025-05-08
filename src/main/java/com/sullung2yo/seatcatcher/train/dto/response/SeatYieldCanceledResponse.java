@@ -12,7 +12,7 @@ import java.util.Set;
 @Data
 @Builder
 @Schema(description = "좌석 양보 요청 취소 응답 객체", title = "SeatYieldCanceledResponse")
-public class SeatYieldCancledResponse {
+public class SeatYieldCanceledResponse {
 
     @NotNull
     @Schema(description = "좌석 양보 요청을 취소한 사람의 User Id", example = "1")

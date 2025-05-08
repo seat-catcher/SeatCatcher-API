@@ -2,14 +2,13 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.SeatException;
-import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCancledResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
@@ -114,7 +113,7 @@ public class SeatEventServiceImpl implements SeatEventService {
     {
         switch (requestType) {
             case request -> {this.handleYieldRequest(seatId, requestUserId);}
-            case cancel -> {this.handleCancleYieldRequest(seatId, requestUserId);}
+            case cancel -> {this.handleCancelYieldRequest(seatId, requestUserId);}
             case accept -> {
                 if (oppositeUserId.isPresent()) {
                     this.handleAcceptRejectYieldRequest(seatId, requestUserId, oppositeUserId.get(), true);
@@ -144,18 +143,20 @@ public class SeatEventServiceImpl implements SeatEventService {
     private void handleYieldRequest(Long seatId, Long requestUserId) { // TODO :: 테스트코드 작성 필요
 
         UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
+        User requestUser = userService.getUserWithId(requestUserId);
         User owner = seat.getUser();
 
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
-            SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
-                    .requestUserId(owner.getId())
-                    .requestUserNickname(owner.getName())
-                    .requestUserProfileImageNum(owner.getProfileImageNum())
-                    .requestUserTags(owner.getUserTag())
-                    .build(); // 좌석 양보 요청에 대한 응답 객체 생성
 
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
-            String routingKey = "seat" + "." + seatId + "." + "owner"; // 좌석 점유자가 구독한 경로 전달해야함
+            SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
+                    .requestUserId(requestUserId)
+                    .requestUserNickname(requestUser.getName())
+                    .requestUserProfileImageNum(requestUser.getProfileImageNum())
+                    .requestUserTags(requestUser.getUserTag())
+                    .build(); // 좌석 양보 요청에 대한 응답 객체 생성
+
+            String routingKey = "seat" + "." + seatId + "." + "owner"; // 좌석 점유자가 구독한 경로에다 전달
 
             try {
                 rabbitTemplate.convertAndSend(exchangeName, routingKey, seatYieldRequestResponse);
@@ -165,7 +166,6 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            User requestUser = userService.getUserWithId(requestUserId);
             userAlarmService.sendSeatRequestReceivedAlarm(owner.getFcmToken(), requestUser.getName());
             log.debug("좌석 요청 푸시 알람 전송 성공");
         }
@@ -174,27 +174,30 @@ public class SeatEventServiceImpl implements SeatEventService {
     /**
      * 양보 요청을 수락 또는 거절했을 때 호출되는 메서드입니다.
      * @param seatId : 대상 좌석 ID
-     * @param requestUserId : 양보 요청을 수락한 사용자 ID
-     * @param oppositeUserId : 양보 요청을 보냈던 사용자 ID
+     * @param requestUserId : 양보 요청을 수락한 사용자(좌석 점유자) ID
+     * @param oppositeUserId : 양보 요청을 보낸 사용자 ID
      */
     private void handleAcceptRejectYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId, boolean isAccepted) { // TODO :: 테스트코드 작성 필요
         // requestUserId가 seatId를 점유하고 있는지 검증
         UserTrainSeat userTrainSeat = userTrainSeatService.findUserTrainSeatBySeatId(seatId);
-        if (!Objects.equals(userTrainSeat.getUser().getId(), requestUserId)) {
+        User owner = userTrainSeat.getUser();
+
+        if (!Objects.equals(owner.getId(), requestUserId)) {
             log.error("양보 수락/거절 실패: 양보를 수락/거절한 사람이 좌석을 점유하고 있지 않습니다.");
             throw new SeatException("양보 수락/거절 실패: 양보를 수락/거절한 사람이 좌석을 점유하고 있지 않습니다.", ErrorCode.YIELD_ACCEPT_FAILED);
         }
 
         // 검증이 되었으므로, 양보를 수락했다는 메세지 생성 후, 양보를 요청한 사람(oppositeUser)한테 전달
-        User requestUser = userService.getUserWithId(requestUserId);
-        if (requestUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
+        User oppositeUser = userService.getUserWithId(oppositeUserId);
+        if (oppositeUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 수락/거절하셨어요 -> 이 메세지는 양보 요청을 보낸 사용자가 볼 수 있어야 함
             SeatYieldAcceptRejectResponse response = SeatYieldAcceptRejectResponse.builder()
-                    .ownerId(requestUser.getId())
-                    .ownerNickname(requestUser.getName())
-                    .ownerProfileImageNum(requestUser.getProfileImageNum())
+                    .ownerId(requestUserId) // owner ID
+                    .ownerNickname(owner.getName())
+                    .ownerProfileImageNum(owner.getProfileImageNum())
                     .isAccepted(isAccepted)
                     .build();
+
             String routingKey = "seat." + seatId + "." + "requester." + oppositeUserId;
             try {
                 rabbitTemplate.convertAndSend(exchangeName, routingKey, response);
@@ -203,14 +206,19 @@ public class SeatEventServiceImpl implements SeatEventService {
                 log.error("RabbitMQ에 좌석 양보 수락/거절 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
             }
         } else {
-            // FCM 푸시 알림 전송
+            // 좌석 양보 요청자에게 FCM 푸시 알림 전송
             if (isAccepted) {
                 // 좌석에 앉아있는 사람의 목적지
-                String destination = pathHistoryService.getUserDestination(requestUser);
-                userAlarmService.sendSeatRequestAcceptedAlarm(requestUser.getFcmToken(), requestUser.getName(), destination);
+                Optional<String> destination = pathHistoryService.getUserDestination(owner);
+                if (destination.isEmpty()) {
+                    log.error("양보 수락 실패: 양보를 수락한 사람(좌석 점유자)의 목적지를 찾을 수 없습니다.");
+                    throw new SeatException("양보 수락 실패: 양보를 수락한 사람(좌석 점유자)의 목적지를 찾을 수 없습니다.", ErrorCode.YIELD_ACCEPT_FAILED);
+                }
+                // 양보를 요청한 사람의 FCM 토큰을 통해 좌석 점유자가 양보를 수락/거절했다는 푸시 알림 전송
+                userAlarmService.sendSeatRequestAcceptedAlarm(oppositeUser.getFcmToken(), owner.getName(), destination.get());
                 log.debug("수락 푸시 알람 전송 성공");
             } else {
-                userAlarmService.sendSeatRequestRejectedAlarm(requestUser.getFcmToken());
+                userAlarmService.sendSeatRequestRejectedAlarm(oppositeUser.getFcmToken());
                 log.debug("거절 푸시 알람 전송 성공");
             }
         }
@@ -220,32 +228,32 @@ public class SeatEventServiceImpl implements SeatEventService {
      * 좌석 양보를 취소했을 때 호출되는 메서드 입니다.
      * 취소 요청 시 프론트엔드는 구독한 웹소켓 토픽을 구독 해제 해야 합니다.
      */
-    private void handleCancleYieldRequest(Long seatId, Long requestUserId) { // TODO :: 테스트코드 작성 필요
+    private void handleCancelYieldRequest(Long seatId, Long requestUserId) { // TODO :: 테스트코드 작성 필요
         // 취소 요청했을 때 -> 좌석에 앉아있는 사용자에게 해당 사용자는 양보 요청을 취소했습니다. 라는 메세지를 보내야 함
         UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
+        User requestUser = userService.getUserWithId(requestUserId); // 양보 요청을 보낸 사용자
         User owner = seat.getUser();
 
         if (owner.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 취소하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
             // 기존에 좌석 양보 요청 메세지는 알아서 프론트에서 처리?
             // 구독 해제도 프론트에서 해제
-            SeatYieldCancledResponse seatYieldCancledResponse = SeatYieldCancledResponse.builder()
-                    .requestUserId(owner.getId())
-                    .requestUserNickname(owner.getName())
-                    .requestUserProfileImageNum(owner.getProfileImageNum())
-                    .requestUserTags(owner.getUserTag())
+            SeatYieldCanceledResponse seatYieldCanceledResponse = SeatYieldCanceledResponse.builder()
+                    .requestUserId(requestUserId)
+                    .requestUserNickname(requestUser.getName())
+                    .requestUserProfileImageNum(requestUser.getProfileImageNum())
+                    .requestUserTags(requestUser.getUserTag())
                     .build(); // 좌석 양보 요청 취소 응답 객체 생성
 
-            String routingKey = "seat" + "." + seatId + "." + "owner"; // 양보 요청을 받았던 사용자의 routingKey로 취소 메세지 전달해야함
+            String routingKey = "seat" + "." + seatId + "." + "owner"; // 좌석에 앉아있는 사용자의 routingKey로 취소 메세지 전달해야함
             try {
-                rabbitTemplate.convertAndSend(exchangeName, routingKey, seatYieldCancledResponse);
+                rabbitTemplate.convertAndSend(exchangeName, routingKey, seatYieldCanceledResponse);
                 log.debug("RabbitMQ에 좌석 양보 요청 취소 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
             } catch (Exception e) {
                 log.error("RabbitMQ에 좌석 양보 요청 취소 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
             }
         } else {
             // FCM 푸시 알림 전송
-            User requestUser = userService.getUserWithId(requestUserId);
             userAlarmService.sendSeatRequestCanceledAlarm(owner.getFcmToken(), requestUser.getName());
             log.debug("취소 푸시 알람 전송 성공");
         }

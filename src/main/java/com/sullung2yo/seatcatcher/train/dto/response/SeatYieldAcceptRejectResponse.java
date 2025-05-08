@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-@Schema(description = "좌석 양보 수락 응답 객체", title = "SeatYieldAcceptResponse")
+@Schema(description = "좌석 양보 수락/거절 응답 객체", title = "SeatYieldAcceptRejectResponse")
 public class SeatYieldAcceptRejectResponse {
 
     @NotNull

@@ -143,6 +143,7 @@ public class UserAlarmServiceImpl implements UserAlarmService {
     }
 
     // 자리 교환 성공 알림
+    // TODO : 알람 제목, 인자 이름 명확하게 수정, 로직 수정 필요
     @Override
     public void sendSeatExchangeSuccessAlarm(String receiverToken, String nickname, int creditAmount) {
         send(receiverToken, PushNotificationType.SEAT_EXCHANGE_SUCCESS, creditAmount, nickname, creditAmount);

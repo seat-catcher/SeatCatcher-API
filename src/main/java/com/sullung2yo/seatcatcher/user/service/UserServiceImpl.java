@@ -32,8 +32,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserWithId(Long userId) throws RuntimeException {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        return optionalUser.orElse(null);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
     }
 
     @Override

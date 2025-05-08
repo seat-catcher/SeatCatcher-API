@@ -11,6 +11,7 @@ import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -124,10 +125,28 @@ public class UserTrainSeatController {
      * @return ResponseEntity
      */
     @PostMapping("/{seatId}/yield")
+    @Operation(
+            summary = "양보 요청, 양보 수락, 양보 거절, 양보 요청 취소를 처리하는 API",
+            description = "쿼리 파라미터를 통해서 수행하려는 동작을 명시해주세요.",
+            parameters = {
+                    @Parameter(name = "type", description = "양보 요청 타입 (양보 요청: request, 양보 수락: accept, 양보 거절: reject, 요청 취소 : cancel)", required = true),
+                    @Parameter(name = "oppositeUserId", description = "상대방 사용자 ID (양보 수락/거절 시 필수적으로 전달해야하고, 그 이외에는 전달 X)", required = false)
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "성공적으로 좌석 점유 해제 완료"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "사용자를 찾을 수 없거나, 사용자가 앉은 좌석 정보가 데이터베이스에 없는 경우"
+                    )
+            }
+    )
     public ResponseEntity<?> seatYieldRequest(
             @RequestHeader("Authorization") String bearerToken,
             @NonNull @PathVariable("seatId") Long seatId, // 양보 대상 좌석 ID
-            @RequestParam(value = "type") YieldRequestType requestType, // 양보 요청 타입 (양보 요청: request, 양보 수락: approve, 양보 거절: reject)
+            @RequestParam(value = "type") YieldRequestType requestType, // 양보 요청 타입 (양보 요청: request, 양보 수락: accept, 양보 거절: reject, 요청 취소 : cancel)
             @RequestParam(value = "oppositeUserId", required = false) Optional<Long> oppositeUserId // 상대방 사용자 ID
     ) {
         // API 호출한 사람 ID 가져오기
