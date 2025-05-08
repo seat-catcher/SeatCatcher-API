@@ -105,7 +105,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param oppositeUserId : 양보 요청을 받은 사용자 ID or 수락/거절 시 양보 요청을 보낸 사용자 ID
      */
     @Override
-    public void publishSeatYieldEvent( // TODO :: 테스트코드 작성 필요 (switch문 테스트만)
+    public void publishSeatYieldEvent(
             Long seatId,
             YieldRequestType requestType,
             Long requestUserId,
@@ -140,7 +140,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param seatId : 좌석 ID
      * @param requestUserId : 양보 요청을 보낸 사용자 ID
      */
-    private void handleYieldRequest(Long seatId, Long requestUserId) { // TODO :: 테스트코드 작성 필요
+    private void handleYieldRequest(Long seatId, Long requestUserId) {
 
         UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
         User requestUser = userService.getUserWithId(requestUserId);
