@@ -2,6 +2,8 @@ package com.sullung2yo.seatcatcher.subway_station.service;
 
 import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
 import com.sullung2yo.seatcatcher.subway_station.converter.PathHistoryConverter;
+import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
+import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.subway_station.domain.Line;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,6 +52,9 @@ import static org.mockito.Mockito.*;
 public class PathHistoryServiceImplTest {
     @Autowired
     private PathHistoryServiceImpl pathHistoryService;
+
+    @Autowired
+    private JwtTokenProviderImpl tokenProvider;
 
     @Autowired
     private UserRepository userRepository;
@@ -99,10 +105,16 @@ public class PathHistoryServiceImplTest {
         SubwayStation startStation = subwayStationRepository.save(SubwayStation.builder().stationName("출발역").line(Line.LINE_2).distance(0).accumulateDistance(0).timeMinSec("0:0").accumulateTime(100).build());
         SubwayStation endStation = subwayStationRepository.save(SubwayStation.builder().stationName("도착역").line(Line.LINE_2).distance(0).accumulateDistance(0).timeMinSec("0:0").accumulateTime(180).build());
 
-        PathHistoryRequest request = new PathHistoryRequest(user.getId(), startStation.getId(), endStation.getId());
+        String accessToken = tokenProvider.createToken(
+                user.getProviderId(),
+                Map.of("role", user.getRole().toString()),
+                TokenType.ACCESS
+        );
+
+        PathHistoryRequest request = new PathHistoryRequest(startStation.getId(), endStation.getId());
 
         // when
-        pathHistoryService.addPathHistory(request);
+        pathHistoryService.addPathHistory(accessToken, request);
 
         // then
         List<PathHistory> histories = pathHistoryRepository.findAll();
@@ -325,7 +337,7 @@ public class PathHistoryServiceImplTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // when
-        pathHistoryService.deletPathHistory(pathHistory.getId());
+        pathHistoryService.deletePathHistory(pathHistory.getId());
 
         // then
         boolean exists = pathHistoryRepository.existsById(pathHistory.getId());

@@ -1,5 +1,6 @@
 package com.sullung2yo.seatcatcher.auth;
 
+import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
@@ -145,10 +146,11 @@ class AppleAuthTest {
         // Given
         AppleAuthRequest request = new AppleAuthRequest();
         request.setIdentityToken("invalid.token");
+        request.setFcmToken("fcmToken");
 
         // When/Then
-        Exception exception = assertThrows(Exception.class, () ->
+        Exception exception = assertThrows(TokenException.class, () ->
                 authService.authenticate(request, Provider.APPLE));
-        assertTrue(exception.getMessage().contains("애플 IdentityToken 검증 오류"));
+        assertTrue(exception.getMessage().contains("올바르지 않은 IdentityToken"));
     }
 }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -49,20 +50,17 @@ public class AuthController {
                     )
             }
     )
-    public ResponseEntity<?> authenticateApple(@RequestBody AppleAuthRequest appleAuthRequest) {
-        try {
-            // RequestBody로 제대로 들어왔는지 검증
-            if (appleAuthRequest.getIdentityToken() == null || appleAuthRequest.getIdentityToken().isEmpty()) {
-                throw new IllegalArgumentException("Apple 인증 요청에 필요한 identityToken이 제공되지 않았습니다.");
-            }
-            log.debug("Authenticate with Apple: {}", appleAuthRequest);
-
-            List<String> tokens = authServiceImpl.authenticate(appleAuthRequest, Provider.APPLE);
-
-            return returnAfterTokenValidation(tokens);
-        } catch (Exception e) {
-            throw new RuntimeException("애플 인증 처리 중 오류가 발생했습니다: " + e.getMessage(), e);
+    public ResponseEntity<?> authenticateApple(@Valid @RequestBody AppleAuthRequest appleAuthRequest) {
+        // RequestBody로 제대로 들어왔는지 검증
+        if (appleAuthRequest.getIdentityToken() == null || appleAuthRequest.getIdentityToken().isEmpty()) {
+            throw new IllegalArgumentException("Apple 인증 요청에 필요한 identityToken이 제공되지 않았습니다.");
         }
+        log.debug("Authenticate with Apple: {}", appleAuthRequest);
+
+        // 인증 로직 수행 후 토큰 생성
+        List<String> tokens = authServiceImpl.authenticate(appleAuthRequest, Provider.APPLE);
+
+        return returnAfterTokenValidation(tokens);
     }
 
 
@@ -83,13 +81,14 @@ public class AuthController {
                     )
             }
     )
-    public ResponseEntity<?> authenticateKakao(@RequestBody KakaoAuthRequest kakaoAuthRequest) {
+    public ResponseEntity<?> authenticateKakao(@Valid @RequestBody KakaoAuthRequest kakaoAuthRequest) {
         try {
             // RequestBody로 제대로 들어왔는지 검증
             if (kakaoAuthRequest.getAccessToken() == null || kakaoAuthRequest.getAccessToken().isEmpty()) {
                 throw new IllegalArgumentException("Kakao 인증 요청에 필요한 accessToken이 제공되지 않았습니다.");
             }
 
+            // 인증 로직 수행 후 토큰 생성
             List<String> tokens = authServiceImpl.authenticate(kakaoAuthRequest, Provider.KAKAO);
 
             return returnAfterTokenValidation(tokens);
@@ -97,15 +96,6 @@ public class AuthController {
             throw new RuntimeException("카카오 인증 처리 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
     }
-
-
-    @PostMapping("/local")
-    @ApiResponse(responseCode = "501", description = "아직 구현하지 않았습니다.")
-    public ResponseEntity<?> authenticateLocal() {
-        // TODO: Implement local authentication
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
-    }
-
 
     private ResponseEntity<?> returnAfterTokenValidation(List<String> tokens) {
         if (tokens == null) {

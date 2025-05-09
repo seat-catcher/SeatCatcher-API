@@ -47,6 +47,7 @@ public class SubwayStationServiceImpl implements SubwayStationService {
     @Transactional
     public void saveSubwayData(List<SubwayStationData> stations) {
         // Json에 들어있는 데이터 개수가 250개 언저리라 배치처리 안해도 될 듯 합니다.
+        subwayStationRepository.deleteAll(); // 기존 데이터 삭제
         List<SubwayStation> subwayStations = new ArrayList<>();
 
         for (SubwayStationData station : stations) {

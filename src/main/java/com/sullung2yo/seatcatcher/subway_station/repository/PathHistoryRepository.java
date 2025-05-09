@@ -1,6 +1,7 @@
 package com.sullung2yo.seatcatcher.subway_station.repository;
 
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
+import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,7 @@ public interface PathHistoryRepository extends JpaRepository<PathHistory, Long> 
 
     // TODO :: 이게 이렇게 막 써놓고 파란색 글씨 뜨니까 되는 것 같기는 한데 일단 테스트 코드 나중에 만들어서 검증해야 함.
     Optional<PathHistory> findTopByUserIdOrderByUpdatedAtDesc(long userId);
+    
+    @Query("SELECT ph.endStation FROM PathHistory ph WHERE ph.user = :user")
+    SubwayStation findEndStationByUser(User user);
 }

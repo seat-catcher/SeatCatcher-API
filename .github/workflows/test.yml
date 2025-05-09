@@ -31,5 +31,9 @@ jobs:
           mkdir -p ./src/main/resources
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
 
+      - name: Setup firebase-adminsdk-fbsvc-5d0ae449ec.json
+        run: |
+          echo "${{ secrets.FIREBASE_KEY_JSON }}" | base64 --decode > ./src/main/resources/seat-catcher-firebase-adminsdk-fbsvc-5d0ae449ec.json
+
       - name: Run tests # 전체 테스트 실행
         run: ./gradlew test

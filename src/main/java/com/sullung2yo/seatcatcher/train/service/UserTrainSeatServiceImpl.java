@@ -29,7 +29,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
     @Override
     @Transactional
-    public void reserveSeat(Long userId, Long seatId) { // TODO :: 테스트코드 작성 필요
+    public UserTrainSeat reserveSeat(Long userId, Long seatId) { // TODO :: 테스트코드 작성 필요
         // 사용자 정보 가져오기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException("userId에 해당하는 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
@@ -55,23 +55,24 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
                 .user(user)
                 .trainSeat(seat).build();
         userTrainSeatRepository.save(userSeat);
+        return userSeat;
     }
 
     @Override
-    public UserTrainSeat findUserTrainSeatByUserId(Long id) {
-        return userTrainSeatRepository.findUserTrainSeatByUserId(id)
+    public UserTrainSeat findUserTrainSeatByUserId(Long userId) {
+        return userTrainSeatRepository.findUserTrainSeatByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("UserTrainSeat not found"));
     }
 
     @Override
-    public UserTrainSeat findUserTrainSeatBySeatId(Long id) {
-        return userTrainSeatRepository.findUserTrainSeatByTrainSeatId(id)
+    public UserTrainSeat findUserTrainSeatBySeatId(Long seatId) {
+        return userTrainSeatRepository.findUserTrainSeatByTrainSeatId(seatId)
                 .orElseThrow(() -> new EntityNotFoundException("UserTrainSeat not found"));
     }
 
     @Override
     @Transactional
-    public void releaseSeat(Long userId) { // TODO :: 테스트코드 작성 필요
+    public TrainSeatGroup releaseSeat(Long userId) { // TODO :: 테스트코드 작성 필요
         // 사용자가 점유한 좌석 정보 찾아오기
         UserTrainSeat userSeat = userTrainSeatRepository.findUserTrainSeatByUserId(userId)
                 .orElseThrow(() -> new SeatException("해당 사용자는 좌석을 점유하고 있지 않습니다.", ErrorCode.USER_NOT_RESERVED));
@@ -87,6 +88,8 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         log.info("좌석 해제 요청: 사용자 ID={}, 좌석 ID={}", userId, userSeat.getTrainSeat().getId());
         userTrainSeatRepository.deleteUserTrainSeatByUserId(userId);
         log.debug("좌석 해제 완료: 사용자 ID={}", userId);
+
+        return trainSeatGroup;
     }
 
     @Override

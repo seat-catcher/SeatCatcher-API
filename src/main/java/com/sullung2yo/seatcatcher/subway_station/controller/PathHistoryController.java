@@ -49,15 +49,16 @@ public class PathHistoryController {
                             @ExampleObject(
                                     name = "PathHistory 생성 예시",
                                     summary = "기본 요청 예시",
-                                    value = "{ \"userId\": 1, \"startStationId\": 10, \"endStationId\": 20 }"
+                                    value = "{ \"startStationId\": 10, \"endStationId\": 20 }"
                             )
                     }
             )
             )
     )
     @ApiResponse(responseCode = "200", description = "path history 생성 성공")
-    public ResponseEntity<?> postPathHistory(@Valid @RequestBody PathHistoryRequest request) {
-        pathHistoryService.addPathHistory(request);
+    public ResponseEntity<?> postPathHistory(@RequestHeader("Authorization") String bearerToken, @Valid @RequestBody PathHistoryRequest request) {
+        String token = bearerToken.replace("Bearer ", "");
+        pathHistoryService.addPathHistory(token, request);
         return ResponseEntity.ok("pathHistory가 생성되었습니다.");
     }
     @GetMapping("/")
@@ -94,8 +95,8 @@ public class PathHistoryController {
     @ApiResponse(responseCode = "200", description = "path history 삭제 성공")
     @ApiResponse(responseCode = "403", description = "user가 pathHistory에 접근할 권한이 없음")
     @ApiResponse(responseCode = "404", description = "path history를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public ResponseEntity<?> deletPathHistory(@PathVariable("path_id") Long pathtId) {
-        pathHistoryService.deletPathHistory(pathtId);
+    public ResponseEntity<?> deletePathHistory(@PathVariable("path_id") Long pathtId) {
+        pathHistoryService.deletePathHistory(pathtId);
         return ResponseEntity.ok("해당 pathHistory를 삭제했습니다.");
     }
 

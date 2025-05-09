@@ -18,11 +18,20 @@ public enum ErrorCode {
     SUBWAY_STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "지하철 역을 찾을 수 없습니다."),
     PATH_HISTORY_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 이력에 접근할 수 없습니다."),
     PATH_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "경로 이력을 찾을 수 없습니다."),
+    INVALID_REQUEST_URI(HttpStatus.BAD_REQUEST,"잘못된 FCM 요청"),
+    FIREBASE_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"Firebase 서버 오류"),
     SEAT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 좌석을 찾을 수 없습니다."),
     SEAT_ALREADY_RESERVED(HttpStatus.BAD_REQUEST, "해당 좌석은 이미 점유중입니다."),
     USER_NOT_RESERVED(HttpStatus.BAD_REQUEST, "해당 사용자는 좌석을 점유중이지 않습니다."),
     USER_ALREADY_RESERVED(HttpStatus.BAD_REQUEST, "이미 다른 좌석을 예약한 사용자입니다."),
-    TRAIN_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 열차를 찾을 수 없습니다.");
+    TRAIN_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 열차를 찾을 수 없습니다."),
+    ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "알람을 찾을 수 없습니다."),
+    ALARM_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 이력에 접근할 수 없습니다."),
+    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    YIELD_ACCEPT_FAILED(HttpStatus.BAD_REQUEST, "양도 요청 수락에 실패했습니다."),
+    AUTH_INVALID_PROVIDER(HttpStatus.BAD_REQUEST, "유효하지 않은 인증 제공자입니다."),
+    AUTH_KAKAO_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 서버 오류"),
+    AUTH_PARSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "인증 정보 파싱 오류");
 
     private final HttpStatus httpStatus;
     private final String message;

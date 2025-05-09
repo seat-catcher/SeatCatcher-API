@@ -9,6 +9,10 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
+import com.sullung2yo.seatcatcher.common.exception.AuthException;
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.TagException;
+import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
@@ -23,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.net.URL;
@@ -57,13 +60,9 @@ public class AuthServiceImpl implements AuthService {
         this.nameGenerator = nameGenerator;
     }
 
-    public List<String> authenticate(Object request, Provider provider) throws Exception {
+    public List<String> authenticate(Object request, Provider provider) {
 
-        if (provider == Provider.LOCAL) {
-            // TODO: 로컬 인증 구현 필요 시 구현예정
-            throw new UnsupportedOperationException("로컬 인증 미구현");
-        }
-        else if (provider == Provider.KAKAO) {
+        if (provider == Provider.KAKAO) {
             // 카카오에 사용자 정보 요청
             KakaoAuthRequest kakaoAuthRequest = (KakaoAuthRequest) request;
             User user = kakaoAuthenticator(kakaoAuthRequest);
@@ -102,9 +101,8 @@ public class AuthServiceImpl implements AuthService {
             );
             log.info("JWT 토큰 생성 완료: accessToken={}, refreshToken={}", accessToken, refreshToken);
             return List.of(accessToken, refreshToken);
-        }
-        else {
-            throw new Exception("Invalid provider");
+        } else {
+            throw new AuthException("지원하지 않는 Provider 입니다.", ErrorCode.AUTH_INVALID_PROVIDER);
         }
     }
 
@@ -118,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
         return jwtTokenProvider.validateToken(token, TokenType.ACCESS);
     }
 
-    private User kakaoAuthenticator(KakaoAuthRequest kakaoAuthRequest) throws Exception {
+    private User kakaoAuthenticator(KakaoAuthRequest kakaoAuthRequest) {
         String kakaoDataUrl = "https://kapi.kakao.com/v2/user/me";
 
         KakaoUserDataResponse response = webClient.get()
@@ -130,7 +128,7 @@ public class AuthServiceImpl implements AuthService {
                 .block();
 
         if (response == null) {
-            throw new Exception("카카오 서버에서 사용자 정보를 가져오는데 실패했습니다.");
+            throw new AuthException("카카오 서버에서 사용자 정보를 가져오는데 실패했습니다.", ErrorCode.AUTH_KAKAO_SERVER_ERROR);
         }
 
         // Check if the user is already registered
@@ -141,6 +139,7 @@ public class AuthServiceImpl implements AuthService {
             user = User.builder()
                     .name(nameGenerator.generateRandomName())
                     .providerId(providerId)
+                    .fcmToken(kakaoAuthRequest.getFcmToken())
                     .provider(Provider.KAKAO)
                     .role(UserRole.ROLE_USER)
                     .credit(0L)
@@ -155,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
         return user;
     }
 
-    private User appleAuthenticator(AppleAuthRequest appleAuthRequest) throws Exception {
+    private User appleAuthenticator(AppleAuthRequest appleAuthRequest) {
         log.debug("appleAuthenticator 메서드 호출됨");
 
         String providerId = validateAppleIdentityToken(appleAuthRequest.getIdentityToken());
@@ -164,6 +163,7 @@ public class AuthServiceImpl implements AuthService {
             user = User.builder()
                     .name(nameGenerator.generateRandomName())
                     .providerId(providerId)
+                    .fcmToken(appleAuthRequest.getFcmToken())
                     .provider(Provider.APPLE)
                     .role(UserRole.ROLE_USER)
                     .credit(0L)
@@ -179,7 +179,7 @@ public class AuthServiceImpl implements AuthService {
         return user;
     }
 
-    public String validateAppleIdentityToken(String identityToken) throws Exception {
+    public String validateAppleIdentityToken(String identityToken) {
         try {
             log.debug("validateAppleIdentityToken 메서드 호출됨 -> IdentityToken 검증 시작 : {}", identityToken);
 
@@ -195,19 +195,19 @@ public class AuthServiceImpl implements AuthService {
             // 1. exp 검증
             Date expirationTime = claimsSet.getExpirationTime();
             if (expirationTime == null || expirationTime.before(new Date())) {
-                throw new Exception("This identity token is expired");
+                throw new TokenException("This identity token is expired", ErrorCode.EXPIRED_TOKEN);
             }
             log.debug("성공적으로 exp 검증 완료");
 
             // 2. iss 검증
             if (!claimsSet.getIssuer().equals(issuer)) {
-                throw new Exception("This identity token is not issued by Apple");
+                throw new TokenException("This identity token is not issued by Apple", ErrorCode.INVALID_TOKEN);
             }
             log.debug("성공적으로 iss 검증 완료");
 
             // 3. aud 검증 ( Apple Developer 계정의 Client ID와 일치하는지 검증)
             if (!claimsSet.getAudience().contains(appleClientId)) {
-                throw new Exception("This identity token is not intended for this client");
+                throw new TokenException("This identity token is not intended for this client", ErrorCode.INVALID_TOKEN);
             }
             log.debug("성공적으로 aud 검증 완료");
 
@@ -229,19 +229,19 @@ public class AuthServiceImpl implements AuthService {
                         break;
                     } catch (Exception e) {
                         log.error("키 매칭 중 에러 발생: {}", e.getMessage());
-                        throw new Exception("키 매칭 중 에러 발생 : " + e.getMessage());
+                        throw new TokenException("키 매칭 중 에러 발생 : " + e.getMessage(), ErrorCode.INVALID_TOKEN);
                     }
                 }
             }
 
             if (publicKey == null) {
-                throw new Exception("identityToken에서 추출한 keyId와 애플에서 제공하는 Public KeyId가 일치하지 않습니다.");
+                throw new TokenException("identityToken에서 추출한 keyId와 애플에서 제공하는 Public KeyId가 일치하지 않습니다.", ErrorCode.INVALID_TOKEN);
             }
 
             RSASSAVerifier verifier = new RSASSAVerifier(publicKey.toRSAPublicKey());
             if (!signedJWT.verify(verifier)) {
                 log.error("identityToken의 signature 검증 실패");
-                throw new Exception("identityToken의 signature 검증 실패");
+                throw new TokenException("identityToken의 signature 검증 실패", ErrorCode.INVALID_TOKEN);
             }
 
             // 최종적으로 애플이 제공한 사용자 ID를 반환한다
@@ -250,22 +250,22 @@ public class AuthServiceImpl implements AuthService {
 
         } catch (ParseException e) {
             log.error("Parse error during token validation", e);
-            throw new Exception("애플 IdentityToken 검증 오류: " + e.getMessage());
+            throw new TokenException("애플 IdentityToken 검증 오류: " + e.getMessage(), ErrorCode.INVALID_TOKEN);
         } catch (JOSEException e) {
             log.error("JOSE error during token validation", e);
-            throw new Exception("애플 IdentityToken 검증 오류: " + e.getMessage());
-        } catch (Exception e) {
-            log.error("Unexpected error during token validation", e);
-            throw new Exception("애플 IdentityToken 검증 오류: " + e.getMessage());
+            throw new TokenException("애플 IdentityToken 검증 오류: " + e.getMessage(), ErrorCode.INVALID_TOKEN);
+        } catch (IllegalArgumentException e) {
+            log.error("IllegalArgumentException during token validation", e);
+            throw new TokenException("올바르지 않은 IdentityToken입니다: " + e.getMessage(), ErrorCode.INVALID_TOKEN);
         }
     }
 
-    private JWKSet loadApplePublicKeys() throws Exception {
+    private JWKSet loadApplePublicKeys() {
         try {
             String applePublicKeyUrl = "https://appleid.apple.com/auth/keys";
             return JWKSet.load(new URL(applePublicKeyUrl));
-        } catch (IOException e) {
-            throw new Exception("애플 PublicKey를 가져오는데 실패했습니다", e);
+        } catch (ParseException | IOException e) {
+            throw new AuthException("애플 PublicKey를 파싱하는데 실패했습니다", ErrorCode.AUTH_PARSE_ERROR);
         }
     }
 }
