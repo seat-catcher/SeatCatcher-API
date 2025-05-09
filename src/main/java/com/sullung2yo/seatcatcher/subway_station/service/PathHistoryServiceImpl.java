@@ -159,7 +159,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
         long scheduleThreshold = 5; // 다음 스케줄
 
         long realtimeRemainingSeconds = -1;
-        long expectedRemainingTime = Duration.between(pathHistory.getExpectedArrivalTime(), LocalDateTime.now()).toSeconds();
+        long expectedRemainingTime = Duration.between(LocalDateTime.now(), pathHistory.getExpectedArrivalTime()).toSeconds();
         int currentStateCode = TrainArrivalState.STATE_NOT_FOUND.getStateCode();
 
 

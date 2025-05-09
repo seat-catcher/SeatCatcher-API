@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,14 +26,15 @@ public class SubwayStationServiceImplSpringBootTest {
 
     @Test
     @DisplayName("getPreviousStation Service 가 실제로 전역을 잘 반환하는지 테스트.")
-    void getPreviousStationTest()
-    {
+    void getPreviousStationTest(){
         //given
-        SubwayStation departure = subwayStationService.findWith("강남구청", Line.LINE_7, null)
-                .get(0);
+        List<SubwayStation> departureStations = subwayStationService.findWith("강남구청", Line.LINE_7, null);
+        assertThat(departureStations.size()).isEqualTo(1);
+        SubwayStation departure = departureStations.get(0);
 
-        SubwayStation end = subwayStationService.findWith("고속터미널", Line.LINE_7, null)
-                .get(0);
+        List<SubwayStation> endStations = subwayStationService.findWith("고속터미널", Line.LINE_7, null);
+        assertThat(endStations.size()).isEqualTo(1);
+        SubwayStation end = endStations.get(0);
 
         //when
         SubwayStation previousStation = subwayStationService.getPreviousStation(departure, end);
@@ -40,13 +43,13 @@ public class SubwayStationServiceImplSpringBootTest {
         assertThat(departure).isNotNull();
         assertThat(end).isNotNull();
         assertThat(previousStation).isNotNull();
-        assertEquals("반포", previousStation.getStationName());
+        assertThat(previousStation.getStationName()).isEqualTo("반포");
 
         //when
         previousStation = subwayStationService.getPreviousStation(end, departure);
 
         //then
         assertThat(previousStation).isNotNull();
-        assertEquals("학동", previousStation.getStationName());
+        assertThat(previousStation.getStationName()).isEqualTo("학동");
     }
 }

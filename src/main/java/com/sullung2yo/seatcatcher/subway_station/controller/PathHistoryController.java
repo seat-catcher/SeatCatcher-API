@@ -124,6 +124,7 @@ public class PathHistoryController {
             description = "해당 API 호출 시점부터 차량에 탑승한 것으로 판단, 도착까지 남은 시간을 주기적으로 계산하여 갱신합니다."
     )
     @ApiResponse(responseCode = "200", description = "스케줄링 성공")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
     public ResponseEntity<Void> startJourney(
             @RequestHeader("Authorization") String bearerToken,
             @RequestBody StartJourneyRequest request
@@ -141,6 +142,11 @@ public class PathHistoryController {
 
         // 해당 PathHistory 의 expectedArrivalTime 을 이용해서 남은 시간이 정확히 몇 초인지 계산.
         long remainingSeconds = pathHistoryService.getRemainingSeconds(latestPathHistory.getExpectedArrivalTime());
+
+        if(remainingSeconds < 0)
+        { // 과거 값이 들어온 경우
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
         // 그리고 이걸 이용해서 언제 스케줄링되어야 하는지를 계산.
         long nextScheduleTime = pathHistoryService.getNextScheduleTime(remainingSeconds);
