@@ -188,7 +188,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
         if(isArrived) return; // 만약 모두 끝난 경우 스케줄링을 따로 안 해줘도 됨.
         else
         {
-            expectedRemainingTime = Duration.between(pathHistory.getExpectedArrivalTime(), LocalDateTime.now()).toSeconds();
+            expectedRemainingTime = Duration.between(LocalDateTime.now(), pathHistory.getExpectedArrivalTime()).toSeconds();
             long nextScheduleTime = getNextScheduleTime(expectedRemainingTime);
             if(nextScheduleTime < scheduleThreshold) // 너무 심하게 작다!
             {
