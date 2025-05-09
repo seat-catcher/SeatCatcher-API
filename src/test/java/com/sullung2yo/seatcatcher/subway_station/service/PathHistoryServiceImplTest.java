@@ -18,6 +18,7 @@ import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,11 +85,14 @@ public class PathHistoryServiceImplTest {
     private UserTrainSeatService mockUserTrainSeatService;
 
     private PathHistoryServiceImpl pathHistoryServiceWithMock;
+    @Autowired
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
         pathHistoryServiceWithMock = new PathHistoryServiceImpl(
                 userRepository,
+                userService,
                 mockPathHistoryRepository,
                 subwayStationRepository,
                 pathHistoryConverter,
