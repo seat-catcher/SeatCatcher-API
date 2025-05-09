@@ -337,7 +337,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
                     log.error("Error parsing arrival message: " + response.getArrivalMessage());
                     throw new PathHistoryException(
                         "도착 메시지 파싱 중 오류 발생: " + response.getArrivalMessage(),
-                        ErrorCode.INVALID_TRAIN_ARRIVAL_DATA
+                        ErrorCode.UNKNOWN_INCOMING_TRAINS_RESPONSE_MESSAGE
                     );
                 }
             }

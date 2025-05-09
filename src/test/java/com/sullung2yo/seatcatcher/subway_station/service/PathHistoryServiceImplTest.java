@@ -47,7 +47,7 @@ import static org.mockito.Mockito.*;
 @Transactional // 테스트 이후 롤백되게 함
 @Slf4j
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // H2 설정 유지
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class) // TODO :: 당장 버그는 없으나 나중에 단위 테스트, 통합 테스트 따로 분리해서 클래스 작성할 것.
 public class PathHistoryServiceImplTest {
     @Autowired
     private PathHistoryServiceImpl pathHistoryService;
