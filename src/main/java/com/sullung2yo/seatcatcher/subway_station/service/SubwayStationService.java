@@ -17,4 +17,7 @@ public interface SubwayStationService {
     List<SubwayStation> findWith(String keyword, Line line, String order);
     Optional<String> fetchIncomingTrains(String lineNumber, String departureStation);
     List<IncomingTrainsResponse> parseIncomingResponse(String lineNumber, SubwayStation departure, SubwayStation destination, String response);
+
+    SubwayStation getPreviousStation(SubwayStation morePreviousStation, SubwayStation targetStation);
+    long calculateRemainingSeconds(SubwayStation departure, SubwayStation destination);
 }

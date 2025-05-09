@@ -162,6 +162,30 @@ public class SubwayStationServiceImpl implements SubwayStationService {
         }
     }
 
+    @Override
+    public SubwayStation getPreviousStation(SubwayStation morePreviousStation, SubwayStation targetStation) {
+        String upDown = calculateUpDown(morePreviousStation, targetStation);
+        if(upDown.equals("0"))
+        {
+            // 0 : 상행선.
+            return subwayStationRepository.findTopByLineAndAccumulateDistanceGreaterThanOrderByAccumulateDistanceAsc
+                    (targetStation.getLine(), targetStation.getAccumulateDistance())
+                    .orElse(null);
+        }
+        else
+        {
+            // 하행선.
+            return subwayStationRepository.findTopByLineAndAccumulateDistanceLessThanOrderByAccumulateDistanceDesc
+                    (targetStation.getLine(), targetStation.getAccumulateDistance())
+                    .orElse(null);
+        }
+    }
+
+    @Override
+    public long calculateRemainingSeconds(SubwayStation departure, SubwayStation destination) {
+        return Math.abs(departure.getAccumulateTime() - destination.getAccumulateTime());
+    }
+
     /**
      * 상행선과 하행선을 계산하는 메서드
      * getAccumulateDistance() 기준으로 start역의 누적거리가 end역의 누적거리보다 크면 상행선
