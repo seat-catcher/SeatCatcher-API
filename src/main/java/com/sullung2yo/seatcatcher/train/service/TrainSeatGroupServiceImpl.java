@@ -1,10 +1,13 @@
 package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.train.domain.*;
+import com.sullung2yo.seatcatcher.train.dto.TrainCarDTO;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatStatus;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
 import com.sullung2yo.seatcatcher.train.utility.SeatStatusAssembler;
+import com.sullung2yo.seatcatcher.user.domain.User;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,7 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
 
     private final TrainSeatGroupRepository trainSeatGroupRepository;
     private final SeatStatusAssembler seatStatusAssembler;
+    private final UserTrainSeatService userTrainSeatService;
 
     /*
         trainCode를 통해서 해당 열차에 생성되어있는 모든 좌석 그룹 리스트를 반환하는 메서드
@@ -131,6 +135,32 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         }
         trainSeatGroup.setTrainSeat(trainSeatList);
         return trainSeatGroupRepository.save(trainSeatGroup);
+    }
+
+    @Override
+    public TrainCarDTO getSittingTrainCarInfo(User user) {
+        try
+        {
+            // TODO :: 지금 상황에서는 잘 작동할거임. fetch 전략이 default 인 EAGER 이기 때문. 그러나 정책이 바뀌면 이 코드도 바뀌어야 함.
+
+            UserTrainSeat sittingInfo = userTrainSeatService.findUserTrainSeatByUserId(user.getId());
+
+            TrainSeat seat = sittingInfo.getTrainSeat();
+
+            TrainSeatGroup group = seat.getTrainSeatGroup();
+
+            return new TrainCarDTO(group.getTrainCode(), group.getCarCode());
+        }
+        catch(EntityNotFoundException e)
+        {
+            return null; // 유저가 앉아있지 않다면
+        }
+        catch(NullPointerException e)
+        {
+            String errorMessage = "Domain 에 대한 Fetch 전략 이슈로 인해 빈 객체를 참조하고 있습니다.";
+            log.error(errorMessage, e);
+            throw new NullPointerException(errorMessage);
+        }
     }
 
     /**

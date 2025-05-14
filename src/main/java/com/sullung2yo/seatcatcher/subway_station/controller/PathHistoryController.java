@@ -9,6 +9,8 @@ import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.StartJourneyRequest;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
+import com.sullung2yo.seatcatcher.subway_station.dto.response.StartJourneyResponse;
+import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryRealtimeUpdateService;
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
 import com.sullung2yo.seatcatcher.user.service.UserService;
@@ -36,6 +38,7 @@ public class PathHistoryController {
     private final PathHistoryService pathHistoryService;
     private final UserService userService;
     private final TaskScheduleService scheduleService;
+    private final PathHistoryRealtimeUpdateService pathHistoryRealtimeUpdateService;
 
     @PostMapping("/")
     @Operation(
@@ -120,14 +123,14 @@ public class PathHistoryController {
 
     @PostMapping("/start-journey")
     @Operation(
-            summary = "[미완성] 도착까지 남은 시간 주기적 갱신 API",
+            summary = "도착까지 남은 시간 주기적 갱신 API",
             description = "해당 API 호출 시점부터 차량에 탑승한 것으로 판단, 도착까지 남은 시간을 주기적으로 계산하여 갱신합니다."
     )
-    @ApiResponse(responseCode = "200", description = "스케줄링 성공")
-    @ApiResponse(responseCode = "400", description = "잘못된 요청")
-    public ResponseEntity<Void> startJourney(
+    @ApiResponse(responseCode = "201", description = "성공적으로 PathHistory 생성 & 스케줄링 완료.")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청.")
+    public ResponseEntity<StartJourneyResponse> startJourney(
             @RequestHeader("Authorization") String bearerToken,
-            @RequestBody StartJourneyRequest request
+            @Valid @RequestBody StartJourneyRequest request
     )
     {
         // 토큰에서 유저 ID 를 추출
@@ -138,7 +141,11 @@ public class PathHistoryController {
         }
 
         //해당 유저의 제일 최신의 PathHistory 를 가져오기
-        PathHistory latestPathHistory = pathHistoryService.getUsersLatestPathHistory(uid);
+        //PathHistory latestPathHistory = pathHistoryService.getUsersLatestPathHistory(uid);
+
+        // 직접 입력받은 정보를 토대로 PathHistory 생성
+        String token = bearerToken.replace("Bearer ", "");
+        PathHistory latestPathHistory = pathHistoryService.addPathHistory(token, new PathHistoryRequest(request.getStartStationId(), request.getEndStationId()));
 
         // 해당 PathHistory 의 expectedArrivalTime 을 이용해서 남은 시간이 정확히 몇 초인지 계산.
         long remainingSeconds = pathHistoryService.getRemainingSeconds(latestPathHistory.getExpectedArrivalTime());
@@ -149,16 +156,15 @@ public class PathHistoryController {
         }
 
         // 그리고 이걸 이용해서 언제 스케줄링되어야 하는지를 계산.
-        long nextScheduleTime = pathHistoryService.getNextScheduleTime(remainingSeconds);
+        long nextScheduleTime = pathHistoryRealtimeUpdateService.getNextScheduleTime(remainingSeconds);
 
         // expected arrival time 이 되기 전 N초 전에 해당 스케줄을 실행.
         scheduleService.runThisAtBeforeSeconds(latestPathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
         {
-
-            pathHistoryService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
+            pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
         });
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new StartJourneyResponse(latestPathHistory.getId()));
     }
 
 
