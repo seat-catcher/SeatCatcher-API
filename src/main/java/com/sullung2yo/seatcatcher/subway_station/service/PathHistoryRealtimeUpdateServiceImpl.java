@@ -44,6 +44,11 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
     private final UserTrainSeatRepository userTrainSeatRepository;
     private final UserAlarmService userAlarmService;
 
+    //TODO :: 환경변수화할 것
+    private static final long refreshThreshold = 40; // 40초 이상 차이가 나는 경우 갱신
+    private static final long scheduleThreshold = 5; // 다음 스케줄
+    private static final long delayDetectThreshold = 10 * 60; // 열차가 탐지되지 않는 상황에서 지연 상황임을 인식하는 남은 시간
+
     @Override
     public long getNextScheduleTime(long seconds) {
         return seconds / 5;
@@ -52,12 +57,8 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
     @Override
     public void updateArrivalTimeAndSchedule(PathHistory pathHistory, String trainCode, TrainArrivalState beforeState) {
 
-        //TODO :: 환경변수화할 것
-        long refreshThreshold = 40; // 40초 이상 차이가 나는 경우 갱신
-        long scheduleThreshold = 5; // 다음 스케줄
-
         long realtimeRemainingSeconds = -1;
-        long expectedRemainingTime = Duration.between(LocalDateTime.now(), pathHistory.getExpectedArrivalTime()).toSeconds();
+        long expectedRemainingTime = getRemainingSeconds(pathHistory.getExpectedArrivalTime());
         int currentStateCode = TrainArrivalState.STATE_NOT_FOUND.getStateCode();
 
 
@@ -86,7 +87,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         if(isArrived) return; // 만약 모두 끝난 경우 스케줄링을 따로 안 해줘도 됨.
         else
         {
-            expectedRemainingTime = Duration.between(LocalDateTime.now(), pathHistory.getExpectedArrivalTime()).toSeconds();
+            expectedRemainingTime = getRemainingSeconds(pathHistory.getExpectedArrivalTime());
             long nextScheduleTime = getNextScheduleTime(expectedRemainingTime);
             if(nextScheduleTime < scheduleThreshold) // 너무 심하게 작다!
             {
@@ -159,6 +160,13 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
                 // 전에도 못 찾았다. 즉 그냥 엄청나게 긴 거리를 여행하는 승객이라 아직 열차를 못 찾은거임.
                 /*Do Nothing*/
                 // 이 경우 expected = 기존 값, realtime = -1 이 됨.
+
+                // 근데 이 경우! 만약 시간이 한참 지났는데도 못 찾은거라면 delayedDetectThreshold 값으로 갱신해야 함.
+                if(expectedRemainingTime < delayDetectThreshold)
+                {
+                    onShouldRefreshPathHistory(pathHistory, LocalDateTime.now().plusSeconds(delayDetectThreshold));
+                }
+
             }
             else // beforeState 는 STATE_NOT_FOUND 가 아니라, 확실히 탐지되고 있었다!
             {
@@ -289,5 +297,10 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         // 만약 사용자가 좌석에 앉아 있다면 Seat Event Publish 가 일어나야 함.
         TrainCarDTO dto = trainSeatGroupService.getSittingTrainCarInfo(pathHistory.getUser());
         if(dto != null) seatEventService.publishSeatEvent(dto.getTrainCode(), dto.getCarCode());
+    }
+
+    private long getRemainingSeconds(LocalDateTime time)
+    {
+        return Duration.between(LocalDateTime.now(), time).toSeconds();
     }
 }
