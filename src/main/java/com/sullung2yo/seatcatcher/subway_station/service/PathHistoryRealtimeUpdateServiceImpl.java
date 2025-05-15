@@ -3,16 +3,21 @@ package com.sullung2yo.seatcatcher.subway_station.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.PathHistoryException;
+import com.sullung2yo.seatcatcher.common.exception.SeatException;
+import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
+import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.TrainCarDTO;
 import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
+import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
+import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +41,8 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
     private final PathHistoryEventService pathHistoryEventService;
     private final TrainSeatGroupService trainSeatGroupService;
     private final SeatEventService seatEventService;
+    private final UserTrainSeatRepository userTrainSeatRepository;
+    private final UserAlarmService userAlarmService;
 
     @Override
     public long getNextScheduleTime(long seconds) {
@@ -155,7 +163,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
             else // beforeState 는 STATE_NOT_FOUND 가 아니라, 확실히 탐지되고 있었다!
             {
                 // 이 경우 열차가 이미 하차역을 지나가서 승객이 하차를 마친 상태임. 따라서 하차처리를 해야 함.
-                useReleaseSeatService(pathHistory);
+                automaticDropOff(pathHistory);
                 isArrived = true;
             }
         }
@@ -168,7 +176,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
                     || currentStateCode == TrainArrivalState.STATE_ARRIVED.getStateCode()
                     || currentStateCode == TrainArrivalState.STATE_DEPARTED.getStateCode()) {
                 //하차처리
-                useReleaseSeatService(pathHistory);
+                automaticDropOff(pathHistory);
                 isArrived = true;
             }
             else
@@ -259,11 +267,15 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         return realtimeRemainingSeconds;
     }
 
-    public void useReleaseSeatService(PathHistory pathHistory)
+    public void automaticDropOff(PathHistory pathHistory)
     {
-        pathHistory.setExpectedArrivalTime(LocalDateTime.now());
         //TODO :: 자동하차 처리를 수행하게 되는데, 나중에 설정을 통해 자동으로 하차처리가 안 되게 해야 할 수도 있음.
-        userTrainSeatService.releaseSeat(pathHistory.getUser().getId());
+        // 일단 그 부분이 없으니까 하차할 타이밍이 되면 무지성으로 하차하게 해놓겠음.
+        long userId = pathHistory.getUser().getId();
+        if(userTrainSeatService.isUserSitting(userId)) {
+            userTrainSeatService.releaseSeat(userId);
+            userAlarmService.sendArrivalHandledAlarm(pathHistory.getUser().getFcmToken()); // 이야 만들어놓으셨네요?? 좋습니다!
+        }
     }
 
     private void onShouldRefreshPathHistory(PathHistory pathHistory, LocalDateTime value)

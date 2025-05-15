@@ -122,7 +122,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
 
         //then
         assertThat(isArrived).isFalse();
-        verify(spyService, never()).useReleaseSeatService(any());
+        verify(spyService, never()).automaticDropOff(any());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
         // isArrived 는 True 여야 하며, 하차 처리가 일어나야 함.
         //given
         PathHistoryRealtimeUpdateServiceImpl spyService = Mockito.spy(pathHistoryRealtimeUpdateServiceWithMock);
-        doNothing().when(spyService).useReleaseSeatService(any());
+        doNothing().when(spyService).automaticDropOff(any());
 
         //when
         boolean isArrived = spyService.processTrainStateAndRefresh(
@@ -144,7 +144,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
 
         //then
         assertThat(isArrived).isTrue();
-        verify(spyService).useReleaseSeatService(any());
+        verify(spyService).automaticDropOff(any());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
         // ARRIVED , ENTERING , DEPARTED 이 세 가지 경우에 대해서는 하차 처리가 잘 수행되어야 함.
         //given
         PathHistoryRealtimeUpdateServiceImpl spyService = Mockito.spy(pathHistoryRealtimeUpdateServiceWithMock);
-        doNothing().when(spyService).useReleaseSeatService(any());
+        doNothing().when(spyService).automaticDropOff(any());
 
         //when
         boolean isArrived = spyService.processTrainStateAndRefresh(
@@ -166,7 +166,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
 
         //then
         assertThat(isArrived).isTrue();
-        verify(spyService).useReleaseSeatService(any());
+        verify(spyService).automaticDropOff(any());
     }
 
     @Test
@@ -176,7 +176,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
         // ARRIVED , ENTERING , DEPARTED 이 세 가지 경우에 대해서는 하차 처리가 잘 수행되어야 함.
         //given
         PathHistoryRealtimeUpdateServiceImpl spyService = Mockito.spy(pathHistoryRealtimeUpdateServiceWithMock);
-        doNothing().when(spyService).useReleaseSeatService(any());
+        doNothing().when(spyService).automaticDropOff(any());
 
         //when
         boolean isArrived = spyService.processTrainStateAndRefresh(
@@ -188,7 +188,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
 
         //then
         assertThat(isArrived).isTrue();
-        verify(spyService).useReleaseSeatService(any());
+        verify(spyService).automaticDropOff(any());
     }
 
     @Test
@@ -198,7 +198,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
         // ARRIVED , ENTERING , DEPARTED 이 세 가지 경우에 대해서는 하차 처리가 잘 수행되어야 함.
         //given
         PathHistoryRealtimeUpdateServiceImpl spyService = Mockito.spy(pathHistoryRealtimeUpdateServiceWithMock);
-        doNothing().when(spyService).useReleaseSeatService(any());
+        doNothing().when(spyService).automaticDropOff(any());
 
         //when
         boolean isArrived = spyService.processTrainStateAndRefresh(
@@ -210,7 +210,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
 
         //then
         assertThat(isArrived).isTrue();
-        verify(spyService).useReleaseSeatService(any());
+        verify(spyService).automaticDropOff(any());
     }
 
     @Test

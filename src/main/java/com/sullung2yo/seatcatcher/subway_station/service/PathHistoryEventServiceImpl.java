@@ -48,9 +48,6 @@ public class PathHistoryEventServiceImpl implements PathHistoryEventService {
         } catch (Exception e) {
             log.error("RabbitMQ에 경로 예상 도착 시간 갱신 이벤트 발행 실패: {}, {}, {}", exchangeName, pathHistoryRoutingKey, e.getMessage());
         }
-
-        // 유저가 자리를 점유하고 있다면 현재 탑승 중인 열차의 TrainCode, CarCode 를 알아낸 뒤 SeatEvent 또한 Publish해야 함.
-
     }
 
     /*

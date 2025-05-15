@@ -18,4 +18,5 @@ public interface UserTrainSeatService {
 
     void yieldSeat(Long seatId, Long giverID, Long takerId);
 
+    boolean isUserSitting(Long userId);
 }
