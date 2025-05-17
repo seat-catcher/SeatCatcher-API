@@ -57,6 +57,11 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
     @Override
     public void updateArrivalTimeAndSchedule(PathHistory pathHistory, String trainCode, TrainArrivalState beforeState) {
 
+        if(pathHistory.getUser() == null)
+        {
+            throw new PathHistoryException("해당 PathHistory 에 소유자 정보가 누락됐습니다!", ErrorCode.USER_NOT_FOUND);
+        }
+
         long realtimeRemainingSeconds = -1;
         long expectedRemainingTime = getRemainingSeconds(pathHistory.getExpectedArrivalTime());
         int currentStateCode = TrainArrivalState.STATE_NOT_FOUND.getStateCode();
@@ -72,6 +77,10 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         }
         else
         {
+            /*
+                Response 가 검색이 됨. 즉, 내가 찾는 TrainCode 의 열차 정보가 실제로 조회가 되었음.
+                이로부터 우리는 해당 열차의 State와 실제로 계산된 남은 시간을 반환받을 필요가 있음.
+            */
             currentStateCode = myResponse.getArrivalCode(); // 현재 state 값으로 Response 에서 추출한 ArrivalCode를 저장.
             realtimeRemainingSeconds = getRealtimeRemainingSeconds(myResponse, pathHistory); // Response 에서 예상 도착 시간 추출.
         }
@@ -153,7 +162,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         boolean isArrived = false;
         // 만약 못 찾은 경우
         // 해줘야 하는 작업 : Nothing or 하차처리
-        if(currentStateCode == TrainArrivalState.STATE_NOT_FOUND.getStateCode()) {
+        if(currentStateCode == TrainArrivalState.STATE_NOT_FOUND.getStateCode() || realtimeRemainingSeconds == -1 ) {
 
             if(beforeState == TrainArrivalState.STATE_NOT_FOUND)
             {
@@ -223,7 +232,15 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
 
         if (!response.getArrivalTime().equals("0")) // 만약 정상적인 값을 반환받는 것이 가능하다면
         {
-            realtimeRemainingSeconds = Long.parseLong(response.getArrivalTime()); // 그냥 받으면 됨.
+            try
+            {
+                realtimeRemainingSeconds = Long.parseLong(response.getArrivalTime()); // 그냥 받으면 됨.
+            }
+            catch(NumberFormatException e)
+            {
+                log.error("API 스펙이 변경되었습니다!!! 더 이상 response 의 ArrivalTime 은 숫자를 반환하지 않습니다.");
+                throw e;
+            }
         }
         else
         // barvlDt 에서 제대로 된 값을 받지 못 했다! 정해진 정책에 따라 값을 어떻게든 계산해내야 함.

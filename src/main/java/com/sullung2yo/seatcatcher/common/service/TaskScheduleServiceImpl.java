@@ -60,7 +60,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
                 log.warn("Trigger time is in the past. Executing task immediately.");
                 taskScheduler.schedule(task, now);
             }
-            taskScheduler.schedule(task, triggerTime);
+            else taskScheduler.schedule(task, triggerTime);
         } catch (Exception e) {
             log.error("Error scheduling task before {} seconds of {}", seconds, stdTime, e);
         }
@@ -82,7 +82,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
                 log.warn("Trigger time is in the past. Executing task immediately.");
                 taskScheduler.schedule(task, now);
             }
-            taskScheduler.schedule(task, triggerTime);
+            else taskScheduler.schedule(task, triggerTime);
         } catch (Exception e) {
             log.error("Error scheduling task before {} minutes of {}", minutes, stdTime, e);
         }

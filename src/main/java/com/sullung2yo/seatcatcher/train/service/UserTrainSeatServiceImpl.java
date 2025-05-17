@@ -102,7 +102,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
     @Override
     public boolean isUserSitting(Long userId) {
-        Optional<UserTrainSeat> optional = userTrainSeatRepository.findUserTrainSeatByTrainSeatId(userId);
+        Optional<UserTrainSeat> optional = userTrainSeatRepository.findUserTrainSeatByUserId(userId);
         return optional.isPresent();
     }
 }
