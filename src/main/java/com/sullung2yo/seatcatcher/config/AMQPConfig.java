@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Profile;
 @Slf4j
 @Configuration
 @EnableRabbit
-@Profile("!test")
+//@Profile("!test")
 @RequiredArgsConstructor
 public class AMQPConfig {
 
@@ -33,9 +33,9 @@ public class AMQPConfig {
 
 
     // 일단 큐를 분할해서 pathHistory 관련 이벤트는 pathHistory 전용 큐에 들어갈 수 있도록 설계. 지적받을 시 바로 수정할 것.
-    @Value("{rabbitmq.path.queue.name}")
+    @Value("${rabbitmq.path.queue.name}")
     private String pathHistoryQueueName;
-    @Value("{rabbitmq.path.binding.key}")
+    @Value("${rabbitmq.path.binding.key}")
     private String pathHistoryBindingKey;
     // RabbitMQ에서 PathHistory 서비스에 사용할 큐
 

@@ -19,32 +19,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Slf4j
 @AutoConfigureMockMvc
-public class PublishEventTest {
+public class WebSocketConnectionTest {
 
     @LocalServerPort
     private int port;
-
-    private StompSession stompSession;
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private UserRepository userRepository;
@@ -52,17 +44,13 @@ public class PublishEventTest {
     @Autowired
     private JwtTokenProviderImpl jwtTokenProvider;
 
-    @Value("${rabbitmq.exchange.name}")
-    private String exchangeName;
+    private String accessToken;
 
     @BeforeEach
-    void connectToWebSocket() throws InterruptedException, ExecutionException, TimeoutException
+    void setUp()
     {
-        User user;
-        String accessToken;
-
         // AccessToken 생성을 위해 더미 사용자 생성
-        user = User.builder()
+        User user = User.builder()
                 .provider(Provider.APPLE)
                 .providerId(String.valueOf(System.currentTimeMillis()))
                 .name("testUser")
@@ -70,46 +58,45 @@ public class PublishEventTest {
                 .profileImageNum(ProfileImageNum.IMAGE_1)
                 .build();
         userRepository.save(user);
+        userRepository.flush();
 
         // Access 토큰 생성
         accessToken = jwtTokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
-
-        WebSocketStompClient stompClient;
-/*
-        stompClient = new WebSocketStompClient(
-                new SockJsClient(
-                        List.of(
-                                new WebSocketTransport(
-                                        new StandardWebSocketClient()
-                                )
-                        )
-                )
-        );
-*/
-        stompClient = new WebSocketStompClient(new StandardWebSocketClient());
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
-        // 연길 시 사용하는 JWT 설정
-        WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
-        webSocketHttpHeaders.add("Authorization", "Bearer " + accessToken);
-
-        // STOMP 사용시 사용하는 JWT 설정
-        StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.add("Authorization", "Bearer " + accessToken);
-
-/*
-
-        // STOMP 연결
-        CompletableFuture<StompSession> futureSession = stompClient.connectAsync(
-                "ws://localhost:" + port + "/seatcatcher"
-                ,webSocketHttpHeaders, stompHeaders
-                ,new StompSessionHandlerAdapter(){}
-        );
-
-        stompSession = futureSession.get(5, TimeUnit.SECONDS);
-*/
     }
-/*
+
+    // 얼떨결에 WebSocket 테스트용 코드가 돼버렸는데, 해당 테스트가 정말 의미가 있을지는 두고 봐야 함.
+    @Test
+    void webSocketConnectionTest() throws InterruptedException, ExecutionException, TimeoutException
+    {
+        assertDoesNotThrow(()->{
+            StompSession stompSession;
+
+            WebSocketStompClient stompClient;
+
+            stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+            stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+            // 연길 시 사용하는 JWT 설정
+            WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
+            webSocketHttpHeaders.add("Authorization", "Bearer " + accessToken);
+
+            // STOMP 사용시 사용하는 JWT 설정
+            StompHeaders stompHeaders = new StompHeaders();
+            stompHeaders.add("Authorization", "Bearer " + accessToken);
+
+
+            // STOMP 연결
+            CompletableFuture<StompSession> futureSession = stompClient.connectAsync(
+                    "ws://localhost:" + port + "/seatcatcher"
+                    ,webSocketHttpHeaders, stompHeaders
+                    ,new StompSessionHandlerAdapter(){}
+            );
+
+            stompSession = futureSession.get(5, TimeUnit.SECONDS);
+        });
+    }
+
+    /*
     @Test
     void publishPathHistoryEvent_shouldReceiveWebSocketMessageWhenMessageIsPublishedToRabbitMQ() throws Exception
     {
@@ -145,7 +132,7 @@ public class PublishEventTest {
         assertNotNull(received);
         assertEquals(mockData.getId(), received.getId());
     }
+*/
 
 
- */
 }
