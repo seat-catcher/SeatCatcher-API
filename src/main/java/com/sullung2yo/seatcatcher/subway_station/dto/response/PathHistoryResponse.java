@@ -1,6 +1,7 @@
 package com.sullung2yo.seatcatcher.subway_station.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sullung2yo.seatcatcher.subway_station.domain.Line;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -37,11 +38,17 @@ public class PathHistoryResponse {
         @Schema(description = "시작역 명 입니다.")
         String startStationName;
 
+        @Schema(description = "시작역 호선 정보입니다.")
+        Line startline;
+
         @Schema(description = "도착역 id 입니다.")
         Long endStationId;
 
         @Schema(description = "도착역 명 입니다.")
         String endStationName;
+
+        @Schema(description = "도착역 호선 정보입니다.")
+        Line endline;
 
         //초 제외
         @Schema(description = "예상 도착 시간을 나타냅니다.")
