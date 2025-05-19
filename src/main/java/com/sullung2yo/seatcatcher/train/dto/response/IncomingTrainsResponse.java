@@ -29,6 +29,14 @@ public class IncomingTrainsResponse {
     @Schema(description = "도착 예정 시간", example = "180(초)")
     private String arrivalTime; // barvlDt
 
+    @JsonProperty("arvlMsg2")
+    @Schema(description = "첫 번째 도착 메시지", example = "도착, 출발, 진입 등")
+    private String arrivalMessage; // arvlMsg2
+
+    @JsonProperty("arvlCd")
+    @Schema(description = "도착 코드", example = "0:진입, 1:도착, 2:출발, 3:전역출발, 4:전역진입, 5:전역도착, 99:운행중")
+    private Integer arrivalCode; // arvlCd
+
     @JsonProperty("bstatnNm")
     @Schema(description = "종착역 이름", example = "서울역")
     private String destinationStationName; // bstatnNm

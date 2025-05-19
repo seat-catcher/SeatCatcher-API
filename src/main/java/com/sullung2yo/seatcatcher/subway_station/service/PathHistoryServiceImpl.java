@@ -1,8 +1,10 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.PathHistoryException;
 import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
 import com.sullung2yo.seatcatcher.subway_station.converter.PathHistoryConverter;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
@@ -11,6 +13,12 @@ import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryRespons
 import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.subway_station.repository.SubwayStationRepository;
 import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
+import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
+import com.sullung2yo.seatcatcher.train.dto.TrainCarDTO;
+import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
+import com.sullung2yo.seatcatcher.train.service.SeatEventService;
+import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
+import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.service.UserService;
@@ -20,12 +28,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -39,7 +48,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
     private final PathHistoryConverter pathHistoryConverter;
 
     @Override
-    public void addPathHistory(String token, PathHistoryRequest request) {
+    public PathHistory addPathHistory(String token, PathHistoryRequest request) {
         User user = userService.getUserWithToken(token);
 
         SubwayStation startStation = subwayStationRepository.findById(request.getStartStationId())
@@ -56,6 +65,8 @@ public class PathHistoryServiceImpl implements PathHistoryService{
         newPathHistory.calculateExpectedArrivalTime(startStation,endStation);
 
         pathHistoryRepository.save(newPathHistory);
+
+        return newPathHistory; // 필요해서 새로 추가했습니다! - 황유석
     }
 
     @Override
@@ -120,8 +131,20 @@ public class PathHistoryServiceImpl implements PathHistoryService{
 
 
     @Override
-    public long getRemainingMinutes(LocalDateTime expectedArrivalTime) {
+    public long getRemainingSeconds(LocalDateTime expectedArrivalTime) {
         LocalDateTime now = LocalDateTime.now();
-        return Duration.between(now, expectedArrivalTime).toMinutes();
+        return Duration.between(now, expectedArrivalTime).toSeconds();
+    }
+
+    @Override
+    public PathHistory getUsersLatestPathHistory(long userId) {
+
+        // 일단 진짜 해당 Id를 가진 User 가 존재하는지 Verify
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("해당 id를 가진 사용자를 찾을 수 없습니다. id : " + userId, ErrorCode.USER_NOT_FOUND));
+
+        // 해당 userId 를 통해 pathHistory 검색, 그 중 updatedAt 이 가장 최근인걸 가져옴.
+        return pathHistoryRepository.findTopByUserIdOrderByUpdatedAtDesc(userId)
+                .orElseThrow(() -> new PathHistoryException("사용자가 어떤 PathHistory도 소유하고 있지 않습니다.", ErrorCode.PATH_HISTORY_NOT_FOUND));
     }
 }

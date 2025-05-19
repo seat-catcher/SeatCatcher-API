@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Profile;
 @Slf4j
 @Configuration
 @EnableRabbit
-@Profile("!test")
+//@Profile("!test")
 @RequiredArgsConstructor
 public class AMQPConfig {
 
@@ -30,11 +30,25 @@ public class AMQPConfig {
     @Value("${rabbitmq.binding.key}")
     private String bindingKey;
 
+
+
+    // 일단 큐를 분할해서 pathHistory 관련 이벤트는 pathHistory 전용 큐에 들어갈 수 있도록 설계. 지적받을 시 바로 수정할 것.
+    @Value("${rabbitmq.path.queue.name}")
+    private String pathHistoryQueueName;
+    @Value("${rabbitmq.path.binding.key}")
+    private String pathHistoryBindingKey;
+    // RabbitMQ에서 PathHistory 서비스에 사용할 큐
+
+
     // RabbitMQ에서 Seatcatcher 서비스에 사용할 큐
     @Bean
     public Queue queue() {
         return QueueBuilder.durable(queueName).build();
     }
+
+    // RabbitMQ에서 특히 PathHistory 관련 서비스에 사용할 큐
+    @Bean
+    public Queue pathHistoryQueue(){ return QueueBuilder.durable(pathHistoryQueueName).build(); }
 
     // TODO : 좌석 관련 이벤트 작업 실패 시 실패 작업을 넣어둘 DLQ 구현 필요
 
@@ -55,6 +69,11 @@ public class AMQPConfig {
          * 즉, Exchange와 Queue를 연결해주는 역할이라고 이해하면 됨
          */
         return BindingBuilder.bind(queue()).to(topicExchange()).with(bindingKey);
+    }
+
+    @Bean
+    public Binding pathHistoryBinding() {
+        return BindingBuilder.bind(pathHistoryQueue()).to(topicExchange()).with(pathHistoryBindingKey);
     }
 
     // 응답 반환할 때 사용할 MessageConverter (JSON 직렬화)

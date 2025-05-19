@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SubwayStationRepository extends JpaRepository<SubwayStation, Long> {
     List<SubwayStation> findByStationNameContaining(String name);
@@ -23,4 +24,10 @@ public interface SubwayStationRepository extends JpaRepository<SubwayStation, Lo
                         "ELSE s.accumulateDistance END ASC"
     )
     List<SubwayStation> findBy(@Param("keyword") String keyword, @Param("line") Line line, @Param("order") String order);
+
+    // 상행선 방향에서 현재 역의 accumulateDistance 를 통해 이전 역이 어떤 역인지를 알아냄.
+    Optional<SubwayStation> findTopByLineAndAccumulateDistanceGreaterThanOrderByAccumulateDistanceAsc(Line line, float accumulateDistance);
+
+    // 하행선 방향에서 현재 역의 accumulateDistance 를 통해 이전 역이 어떤 역인지를 알아냄.
+    Optional<SubwayStation> findTopByLineAndAccumulateDistanceLessThanOrderByAccumulateDistanceDesc(Line line, float accumulateDistance);
 }

@@ -84,6 +84,7 @@ public class TrainController {
 
                 // 1. 실시간 도착 정보 API 호출
                 Optional<String> response = subwayStationService.fetchIncomingTrains(lineNumber, stationNameMapper.mapToApiName(departure.getStationName()));
+                log.debug("실시간 도착 정보에서 정보를 반환했습니다!");
 
                 // 2. API 응답 파싱
                 if (response.isPresent()) {
@@ -97,7 +98,7 @@ public class TrainController {
                                     Comparator.comparing(incomingTrain -> Integer.parseInt(incomingTrain.getArrivalTime()))
                             )
                             .toList();
-
+                    log.debug("반환받은 열차 개수 : {}", incomingTrains.size());
                     // 4. 정렬된 열차 정보 반환
                     return ResponseEntity.ok().body(incomingTrains);
                 } else {

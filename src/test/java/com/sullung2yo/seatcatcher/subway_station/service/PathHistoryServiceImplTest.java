@@ -1,5 +1,7 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
+import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
+import com.sullung2yo.seatcatcher.subway_station.converter.PathHistoryConverter;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.subway_station.domain.Line;
@@ -9,13 +11,23 @@ import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.subway_station.repository.SubwayStationRepository;
+import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
+import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
+import com.sullung2yo.seatcatcher.train.service.SeatEventService;
+import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
+import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,9 +36,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
@@ -35,7 +51,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // H2 설정 유지
 public class PathHistoryServiceImplTest {
     @Autowired
-    private PathHistoryService pathHistoryService;
+    private PathHistoryServiceImpl pathHistoryService;
 
     @Autowired
     private JwtTokenProviderImpl tokenProvider;
@@ -49,9 +65,15 @@ public class PathHistoryServiceImplTest {
     @Autowired
     private PathHistoryRepository pathHistoryRepository;
 
+    @Autowired
+    private SubwayStationService subwayStationService;
+
+    @Autowired
+    private PathHistoryConverter pathHistoryConverter;
+
+
     @Test
     @DisplayName("PathHistory가 저장")
-
     void addPathHistory_realDbTest() {
         // given
         User user = userRepository.save(User.builder().provider(Provider.APPLE).providerId("tsetUser").role(UserRole.ROLE_USER).name("테스트 유저").credit(0L).build());
@@ -296,5 +318,4 @@ public class PathHistoryServiceImplTest {
         boolean exists = pathHistoryRepository.existsById(pathHistory.getId());
         assertThat(exists).isFalse();
     }
-
 }
