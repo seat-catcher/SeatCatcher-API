@@ -147,4 +147,45 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
         log.debug("사용자 정보 삭제");
     }
+
+    @Override
+    public User increaseCredit(String token, long amount) throws RuntimeException {
+        // 사용자 정보 가져오기
+        User user = this.getUserWithToken(token);
+        // 서비스 호출
+        return this.increaseCredit(user, amount);
+    }
+
+    @Override
+    public User decreaseCredit(String token, long amount) throws RuntimeException {
+        // 사용자 정보 가져오기
+        User user = this.getUserWithToken(token);
+        // 서비스 호출
+        return this.decreaseCredit(user, amount);
+    }
+
+    @Override
+    public User increaseCredit(User user, long amount) throws RuntimeException {
+        long creditToUpdate = user.getCredit() + amount;
+        return updateCredit(user, creditToUpdate);
+    }
+
+    @Override
+    public User decreaseCredit(User user, long amount) throws RuntimeException {
+        long creditToUpdate = user.getCredit() - amount;
+        return updateCredit(user, creditToUpdate);
+    }
+
+    private User updateCredit(User user, long creditToUpdate) throws RuntimeException {
+
+        if (creditToUpdate < 0) {
+            throw new UserException("크레딧은 0보다 작을 수 없습니다.", ErrorCode.INVALID_PROFILE_IMAGE_NUM);
+        }
+
+        log.debug("사용자 크레딧 업데이트: {}", creditToUpdate);
+        user.setCredit(creditToUpdate);
+        userRepository.save(user);
+
+        return user;
+    }
 }

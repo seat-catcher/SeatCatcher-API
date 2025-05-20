@@ -2,6 +2,8 @@ package com.sullung2yo.seatcatcher.user.controller;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
+import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
@@ -128,5 +130,67 @@ public class UserController {
                         .hasOnBoarded(user.getHasOnBoarded())
                         .build()
         );
+    }
+
+    @PatchMapping("/credit/increase")
+    @Operation(
+            summary = "사용자 크레딧 증가 API",
+            description = "사용자의 크레딧을 직접 증가시키는 Endpoint입니다. 내부적으로 PATCH :: /user/me 와 동일한 동작을 수행합니다.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "유저의 총 크레딧 업데이트 완료"
+                    )
+            }
+    )
+    public ResponseEntity<UserInformationResponse> increaseCredit(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestParam(required = true) long amount
+    )
+    {
+        // Bearer 토큰 검증
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            log.error("올바른 JWT 형식이 아닙니다.");
+            throw new TokenException("올바른 JWT 형식이 아닙니다.", ErrorCode.INVALID_TOKEN);
+        }
+        String token = bearerToken.replace("Bearer ", "");
+        log.debug("JWT 파싱 성공");
+
+        User user = userService.increaseCredit(token, amount);
+
+        return getUserInformationResponseResponseEntity(user);
+    }
+
+    @PatchMapping("/credit/decrease")
+    @Operation(
+            summary = "사용자 크레딧 감소 API",
+            description = "사용자의 크레딧을 직접 감소시키는 Endpoint입니다. 내부적으로 PATCH :: /user/me 와 동일한 동작을 수행합니다.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "유저의 총 크레딧 업데이트 완료"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request - 잔액이 부족하여 실패했음."
+                    )
+            }
+    )
+    public ResponseEntity<UserInformationResponse> decreaseCredit(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestParam(required = true) long amount
+    )
+    {
+        // Bearer 토큰 검증
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            log.error("올바른 JWT 형식이 아닙니다.");
+            throw new TokenException("올바른 JWT 형식이 아닙니다.", ErrorCode.INVALID_TOKEN);
+        }
+        String token = bearerToken.replace("Bearer ", "");
+        log.debug("JWT 파싱 성공");
+
+        User user = userService.decreaseCredit(token, amount);
+
+        return getUserInformationResponseResponseEntity(user);
     }
 }
