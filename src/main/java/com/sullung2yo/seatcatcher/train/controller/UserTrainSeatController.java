@@ -34,7 +34,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/seats")
+@RequestMapping("/user/seats")
 @Tag(name = "착석 정보 API", description = "착석, 자리 양도 (소유권 해제) 등을 관리하는 API")
 public class UserTrainSeatController {
 
