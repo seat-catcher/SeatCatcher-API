@@ -1,5 +1,7 @@
 package com.sullung2yo.seatcatcher.user.service;
 
+import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
+import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.*;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @Slf4j
 @SpringBootTest
@@ -80,7 +83,13 @@ public class UserServiceImplTest {
         // When
         User updatedUser = userService.decreaseCredit(user, 100L);
 
-        // then
+        // Then
         assertThat(updatedUser.getCredit()).isEqualTo(23L);
+
+        // When & Then
+        assertThatThrownBy(() -> userService.decreaseCredit(user, 10000L))
+                .isInstanceOf(UserException.class)
+                .hasMessageContaining(ErrorCode.INSUFFICIENT_CREDIT.getMessage());
     }
+
 }

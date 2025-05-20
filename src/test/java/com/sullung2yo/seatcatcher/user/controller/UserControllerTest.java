@@ -151,7 +151,7 @@ class UserControllerTest {
     }
 
     @Test
-    void increaseTokenTest() throws Exception {
+    void increaseCreditTest() throws Exception {
         // When
         mockMvc.perform(patch("/user/credit/increase")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -164,7 +164,7 @@ class UserControllerTest {
     }
 
     @Test
-    void decreaseTokenTest() throws Exception {
+    void decreaseCreditTest() throws Exception {
         // When
         mockMvc.perform(patch("/user/credit/decrease")
                         .contentType(MediaType.APPLICATION_JSON)

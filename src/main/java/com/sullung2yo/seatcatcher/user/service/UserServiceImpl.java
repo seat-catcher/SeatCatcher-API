@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService {
     private User updateCredit(User user, long creditToUpdate) throws RuntimeException {
 
         if (creditToUpdate < 0) {
-            throw new UserException("크레딧은 0보다 작을 수 없습니다.", ErrorCode.INVALID_PROFILE_IMAGE_NUM);
+            throw new UserException(ErrorCode.INSUFFICIENT_CREDIT.getMessage(), ErrorCode.INSUFFICIENT_CREDIT);
         }
 
         log.debug("사용자 크레딧 업데이트: {}", creditToUpdate);

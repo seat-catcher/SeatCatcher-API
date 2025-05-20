@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -145,7 +146,7 @@ public class UserController {
     )
     public ResponseEntity<UserInformationResponse> increaseCredit(
             @RequestHeader("Authorization") String bearerToken,
-            @RequestParam(required = true) long amount
+            @RequestParam(required = true) @Min(value = 1, message = "증가량은 1 이상이어야 합니다.") long amount
     )
     {
         // Bearer 토큰 검증
@@ -178,7 +179,7 @@ public class UserController {
     )
     public ResponseEntity<UserInformationResponse> decreaseCredit(
             @RequestHeader("Authorization") String bearerToken,
-            @RequestParam(required = true) long amount
+            @RequestParam(required = true) @Min(value = 1, message = "감소량은 1 이상이어야 합니다.") long amount
     )
     {
         // Bearer 토큰 검증
@@ -189,6 +190,7 @@ public class UserController {
         String token = bearerToken.replace("Bearer ", "");
         log.debug("JWT 파싱 성공");
 
+        // 잔액 부족으로 실패할 경우 Global Exception Handler 에 의해 처리됨.
         User user = userService.decreaseCredit(token, amount);
 
         return getUserInformationResponseResponseEntity(user);
