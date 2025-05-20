@@ -6,8 +6,13 @@ import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
 import com.sullung2yo.seatcatcher.subway_station.utility.StationNameMapper;
+import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,6 +35,55 @@ public class TrainController {
 
     private final StationNameMapper stationNameMapper;
     private final SubwayStationService subwayStationService;
+    private final TrainSeatGroupService trainSeatGroupService;
+
+    @GetMapping
+    @Operation(
+            summary = "차량 좌석 정보 조회 API",
+            description = "전달된 열차 번호와 차량 번호를 기준으로 좌석 정보를 반환합니다",
+            parameters = {
+                    @Parameter(name = "trainCode", description = "열차 코드", required = true),
+                    @Parameter(name = "carCode", description = "차량 코드", required = true)
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 좌석 정보 반환",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = SeatInfoResponse.class))
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "잘못된 요청"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "인증 실패"
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "서버 오류"
+                    )
+            }
+    )
+    public ResponseEntity<List<SeatInfoResponse>> handleSeatRequest(
+            @NonNull @RequestParam String trainCode,
+            @NonNull @RequestParam String carCode
+    ) {
+        // 좌석 그룹 정보 가져오기
+        List<TrainSeatGroup> trainSeatGroups = trainSeatGroupService.findAllByTrainCodeAndCarCode(trainCode, carCode);
+        if (trainSeatGroups.isEmpty()) {
+            log.warn("해당 열차 코드 : " + trainCode + "와 차량 코드 : " + carCode + "로 생성된 좌석 그룹이 없습니다. 새로 생성합니다.");
+            trainSeatGroups = trainSeatGroupService.createGroupsOf(trainCode, carCode);
+        }
+
+        // 응답 구조 생성
+        List<SeatInfoResponse> responses = trainSeatGroupService.createSeatInfoResponse(trainCode, carCode, trainSeatGroups);
+
+        return ResponseEntity.ok(responses);
+    }
 
     @GetMapping("/incomings")
     @Operation(

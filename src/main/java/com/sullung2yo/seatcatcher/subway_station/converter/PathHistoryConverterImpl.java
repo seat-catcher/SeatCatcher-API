@@ -30,8 +30,10 @@ public class PathHistoryConverterImpl implements PathHistoryConverter{
                 .id(pathHistory.getId())
                 .startStationId(pathHistory.getStartStation().getId())
                 .startStationName(pathHistory.getStartStation().getStationName())
+                .startline(pathHistory.getStartStation().getLine())
                 .endStationId(pathHistory.getEndStation().getId())
                 .endStationName(pathHistory.getEndStation().getStationName())
+                .endline(pathHistory.getEndStation().getLine())
                 .expectedArrivalTime(pathHistory.getExpectedArrivalTime())
                 .createdDate(pathHistory.getCreatedAt().format(DATE_FORMATTER))
                 .build();

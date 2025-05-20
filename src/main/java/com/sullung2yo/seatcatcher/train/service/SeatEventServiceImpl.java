@@ -61,9 +61,10 @@ public class SeatEventServiceImpl implements SeatEventService {
 
         // 응답 구조 생성
         List<SeatInfoResponse> responses = trainSeatGroupService.createSeatInfoResponse(trainCode, carCode, trainSeatGroups);
+
         // RabbutMQ Exchange한테 메세지 발행
-        log.info("좌석 이벤트 발행 이벤트 발생 : TrainCode :: {}, CarCode :: {}", responses.get(0).getTrainCode(), responses.get(0).getCarCode());
-        String routingKey = "seat" + "." + responses.get(0).getTrainCode() + "." + responses.get(0).getCarCode();
+        log.info("좌석 이벤트 발행 이벤트 발생 : TrainCode :: {}", responses.get(0).getTrainCode());
+        String routingKey = "seat" + "." + responses.get(0).getTrainCode();
 
         // Exchange한테 routingKey를 사용해서 seatEvent 담아서 전달
         try {
@@ -76,7 +77,7 @@ public class SeatEventServiceImpl implements SeatEventService {
 
     /**
      * 좌석 이벤트가 RabbitMQ의 Queue에 전달되었을 때 이를 자동으로 감지해서 처리하는 메서드입니다.
-     * /topic/seat.{trainCode}.{carCode}를 구독한 클라이언트 전부한테 메세지를 내려줍니다. (topic 방식)
+     * /topic/seat.{trainCode}를 구독한 클라이언트 전부한테 메세지를 내려줍니다. (topic 방식)
      * @param seatInfoResponses 좌석 정보 응답 객체 리스트
      */
     @RabbitListener(queues = "${rabbitmq.queue.name}") // RabbitMQ Queue에 메세지가 들어오면 이 메서드가 호출됩니다.
@@ -85,8 +86,8 @@ public class SeatEventServiceImpl implements SeatEventService {
             log.warn("좌석 이벤트 처리 실패: 좌석 정보가 없습니다.");
             return;
         }
-        log.info("좌석 이벤트 처리 시작: TrainCode :: {}, CarCode :: {}", seatInfoResponses.get(0).getTrainCode(), seatInfoResponses.get(0).getCarCode());
-        String topic = "/topic/seat" + "." + seatInfoResponses.get(0).getTrainCode() + "." + seatInfoResponses.get(0).getCarCode();
+        log.info("좌석 이벤트 처리 시작: TrainCode :: {}", seatInfoResponses.get(0).getTrainCode());
+        String topic = "/topic/seat" + "." + seatInfoResponses.get(0).getTrainCode();
 
         try {
             webSocketMessagingTemplate.convertAndSend(topic, seatInfoResponses); // webSocket으로 topic 구독한 사람들에게 broadcast
