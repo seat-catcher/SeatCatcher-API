@@ -6,10 +6,13 @@ import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
+import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
+import com.sullung2yo.seatcatcher.user.domain.CreditPolicy;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.user.service.CreditService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     private final UserTrainSeatRepository userTrainSeatRepository;
     private final TrainSeatRepository trainSeatRepository;
     private final UserRepository userRepository;
+    private final CreditService creditService;
 
     @Override
     @Transactional
@@ -68,6 +72,28 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     public UserTrainSeat findUserTrainSeatBySeatId(Long seatId) {
         return userTrainSeatRepository.findUserTrainSeatByTrainSeatId(seatId)
                 .orElseThrow(() -> new EntityNotFoundException("UserTrainSeat not found"));
+    }
+
+    @Override
+    @Transactional
+    public void updateSeatOwner(Long userId, Long seatId) {
+        // 1. 원래 좌석 소유자 정보 가져오기
+        UserTrainSeat seat = findUserTrainSeatBySeatId(seatId);
+        User originalUser = seat.getUser();
+
+        // 2. 좌석 소유자 정보 업데이트
+        User newUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(userId + "에 해당하는 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
+        seat.setUser(newUser);
+
+        // 3. 원래 좌석 소유자에게 크레딧 지급
+        creditService.creditModification(
+                originalUser.getId(),
+                CreditPolicy.CREDIT_FOR_SEAT_YIELD_APPROVE.getCredit(),
+                true,
+                YieldRequestType.ACCEPT
+        );
+        // 4. DB 저장 -> JPA가 자동으로 처리 (Transactional 어노테이션)
     }
 
     @Override

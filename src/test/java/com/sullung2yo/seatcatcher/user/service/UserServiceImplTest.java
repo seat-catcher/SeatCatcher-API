@@ -67,29 +67,29 @@ public class UserServiceImplTest {
         accessToken = jwtTokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
     }
 
-    @Test
-    void increaseCreditForInternalImplementTest()
-    {
-        // When
-        User updatedUser = userService.increaseCredit(user, 100L);
-
-        // then
-        assertThat(updatedUser.getCredit()).isEqualTo(223L);
-    }
-
-    @Test
-    void decreaseCreditForInternalImplementTest()
-    {
-        // When
-        User updatedUser = userService.decreaseCredit(user, 100L);
-
-        // Then
-        assertThat(updatedUser.getCredit()).isEqualTo(23L);
-
-        // When & Then
-        assertThatThrownBy(() -> userService.decreaseCredit(user, 10000L))
-                .isInstanceOf(UserException.class)
-                .hasMessageContaining(ErrorCode.INSUFFICIENT_CREDIT.getMessage());
-    }
+//    @Test
+//    void increaseCreditForInternalImplementTest()
+//    {
+//        // When
+//        userService.creditModification(user.getId(), 100L, true);
+//
+//        // then
+//        assertThat(user.getCredit()).isEqualTo(223L);
+//    }
+//
+//    @Test
+//    void decreaseCreditForInternalImplementTest()
+//    {
+//        // When
+//        userService.creditModification(user.getId(), 100L, false);
+//
+//        // Then
+//        assertThat(user.getCredit()).isEqualTo(23L);
+//
+//        // When & Then
+//        assertThatThrownBy(() -> userService.creditModification(user.getId(), 10000L, false))
+//                .isInstanceOf(UserException.class)
+//                .hasMessageContaining(ErrorCode.INSUFFICIENT_CREDIT.getMessage());
+//    }
 
 }

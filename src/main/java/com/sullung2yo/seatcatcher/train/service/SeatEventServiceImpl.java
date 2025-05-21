@@ -10,9 +10,12 @@ import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
+import com.sullung2yo.seatcatcher.user.domain.CreditPolicy;
 import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -35,6 +38,7 @@ public class SeatEventServiceImpl implements SeatEventService {
     private final UserTrainSeatService userTrainSeatService;
     private final UserAlarmService userAlarmService;
     private final PathHistoryService pathHistoryService;
+    private final CreditService creditService;
 
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
@@ -46,7 +50,7 @@ public class SeatEventServiceImpl implements SeatEventService {
     /**
      * 좌석 관련 이벤트를 발행하는 메서드입니다.
      * 좌석 그룹 정보를 가져오고, 없으면 새로 생성합니다.
-     * 그 후, 응답 구조를 생성해서 RabbitMQ한테 넘겨줍니다.
+     * 그 후, 응답 구조를 생성해서 RabbitMQ한테 작업을 수행하라고 넘겨줍니다.
      *
      * @param trainCode 기차 코드
      * @param carCode 차량 코드
@@ -106,6 +110,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param oppositeUserId : 양보 요청을 받은 사용자 ID or 수락/거절 시 양보 요청을 보낸 사용자 ID
      */
     @Override
+    @Transactional
     public void publishSeatYieldEvent(
             Long seatId,
             YieldRequestType requestType,
@@ -113,16 +118,16 @@ public class SeatEventServiceImpl implements SeatEventService {
             Optional<Long> oppositeUserId)
     {
         switch (requestType) {
-            case request -> {this.handleYieldRequest(seatId, requestUserId);}
-            case cancel -> {this.handleCancelYieldRequest(seatId, requestUserId);}
-            case accept -> {
+            case REQUEST -> {this.handleYieldRequest(seatId, requestUserId);}
+            case CANCEL -> {this.handleCancelYieldRequest(seatId, requestUserId);}
+            case ACCEPT -> {
                 if (oppositeUserId.isPresent()) {
                     this.handleAcceptRejectYieldRequest(seatId, requestUserId, oppositeUserId.get(), true);
                 } else {
                     throw new SeatException("양보 요청을 수락 시 상대방 사용자 ID를 전달해야 합니다.", ErrorCode.INVALID_PARAMETER);
                 }
             }
-            case reject -> {
+            case REJECT -> {
                 if (oppositeUserId.isPresent()) {
                     this.handleAcceptRejectYieldRequest(seatId, requestUserId, oppositeUserId.get(), false);
                 } else {
@@ -141,14 +146,13 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param seatId : 좌석 ID
      * @param requestUserId : 양보 요청을 보낸 사용자 ID
      */
-    private void handleYieldRequest(Long seatId, Long requestUserId) {
+    protected void handleYieldRequest(Long seatId, Long requestUserId) {
 
         UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
         User requestUser = userService.getUserWithId(requestUserId);
         User owner = seat.getUser();
 
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
-
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
             SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
                     .requestUserId(requestUserId)
@@ -170,6 +174,9 @@ public class SeatEventServiceImpl implements SeatEventService {
             userAlarmService.sendSeatRequestReceivedAlarm(owner.getFcmToken(), requestUser.getName());
             log.debug("좌석 요청 푸시 알람 전송 성공");
         }
+
+        // 양보 요청을 보낸 사용자의 크레딧 감소 (서비스 내부에서 검증)
+        creditService.creditModification(requestUserId, CreditPolicy.CREDIT_FOR_SIT_INFO_PROVIDE.getCredit(), false, YieldRequestType.REQUEST);
     }
 
     /**
@@ -178,7 +185,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param requestUserId : 양보 요청을 수락한 사용자(좌석 점유자) ID
      * @param oppositeUserId : 양보 요청을 보낸 사용자 ID
      */
-    private void handleAcceptRejectYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId, boolean isAccepted) { // TODO :: 테스트코드 작성 필요
+    protected void handleAcceptRejectYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId, boolean isAccepted) { // TODO :: 테스트코드 작성 필요
         // requestUserId가 seatId를 점유하고 있는지 검증
         UserTrainSeat userTrainSeat = userTrainSeatService.findUserTrainSeatBySeatId(seatId);
         User owner = userTrainSeat.getUser();
@@ -189,6 +196,7 @@ public class SeatEventServiceImpl implements SeatEventService {
         }
 
         // 검증이 되었으므로, 양보를 수락했다는 메세지 생성 후, 양보를 요청한 사람(oppositeUser)한테 전달
+        // 양보 요청 수락 시 크레딧 증가 로직은, 클라이언트에서 "좌석 교환" API를 호출할 때 처리됨
         User oppositeUser = userService.getUserWithId(oppositeUserId);
         if (oppositeUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 수락/거절하셨어요 -> 이 메세지는 양보 요청을 보낸 사용자가 볼 수 있어야 함

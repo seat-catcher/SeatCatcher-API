@@ -11,6 +11,9 @@ import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
+import com.sullung2yo.seatcatcher.user.domain.CreditPolicy;
+import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,6 +44,7 @@ public class UserTrainSeatController {
     private final UserTrainSeatService userTrainSeatService;
     private final UserService userService;
     private final SeatEventService seatEventService;
+    private final CreditService creditService;
 
     @PostMapping
     @Operation(
@@ -81,7 +85,41 @@ public class UserTrainSeatController {
         seatEventService.publishSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
         log.debug("좌석 변경 이벤트 생성 완료");
 
+        // 크레딧 추가
+        creditService.creditModification(userId, CreditPolicy.CREDIT_FOR_SIT_INFO_PROVIDE.getCredit(), true, YieldRequestType.NONE);
+        log.debug("좌석 정보 제공에 대한 크레딧 보상 제공 완료");
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping
+    @Operation(
+            summary = "좌석 정보 소유자를 수정하는 API",
+            description = "유저가 앉아있던 좌석의 소유자를 교체하는 API입니다. 좌석 양보 수락 시 이 API를 호출하면, 좌석 소유자가 변경되고 양보 수락 사용자에게는 크레딧이 지급됩니다.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 좌석 점유 해제 완료"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "사용자를 찾을 수 없거나, 사용자가 앉은 좌석 정보가 데이터베이스에 없는 경우"
+                    )
+            }
+    )
+    public ResponseEntity<Void> updateSeat(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestBody UserTrainSeatRequest userTrainSeatRequest
+    ) {
+        // Bearer 토큰 검증
+        Long requestUserId = verifyUserAndGetId(bearerToken);
+        if (requestUserId == null) {
+            throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
+        }
+
+        userTrainSeatService.updateSeatOwner(requestUserId, userTrainSeatRequest.getSeatId());
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
@@ -113,6 +151,9 @@ public class UserTrainSeatController {
         // 좌석 변경 이벤트 생성
         seatEventService.publishSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
         log.debug("좌석 변경 이벤트 생성 완료");
+
+        // 5분 내로 좌석 정보를 삭제한 경우, 크레딧 회수 (서비스 내부에서 조건 검증 및 처리)
+        creditService.creditModification(userId, CreditPolicy.CREDIT_FOR_SIT_INFO_PROVIDE.getCredit(), false, YieldRequestType.NONE);
 
         return ResponseEntity.noContent().build();
     }

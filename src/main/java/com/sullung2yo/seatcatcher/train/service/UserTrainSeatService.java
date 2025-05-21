@@ -14,6 +14,8 @@ public interface UserTrainSeatService {
 
     UserTrainSeat findUserTrainSeatBySeatId(Long id);
 
+    void updateSeatOwner(Long userId, Long seatId);
+
     TrainSeatGroup releaseSeat(Long id);
 
     void yieldSeat(Long seatId, Long giverID, Long takerId);

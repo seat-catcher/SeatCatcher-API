@@ -6,6 +6,7 @@ import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
 import com.sullung2yo.seatcatcher.user.domain.*;
 import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,13 +86,6 @@ public class UserServiceImpl implements UserService {
             }
             user.setProfileImageNum(userInformationUpdateRequest.getProfileImageNum());
         }
-        if (userInformationUpdateRequest.getCredit() != null) {
-            log.debug("사용자 크레딧 업데이트: {}", userInformationUpdateRequest.getCredit());
-            if (userInformationUpdateRequest.getCredit() < 0) {
-                throw new UserException("크레딧은 0보다 작을 수 없습니다.", ErrorCode.INVALID_PROFILE_IMAGE_NUM);
-            }
-            user.setCredit(userInformationUpdateRequest.getCredit());
-        }
         if (userInformationUpdateRequest.getIsActive() != null) {
             log.debug("사용자 기기 활성 상태 업데이트: {}", userInformationUpdateRequest.getIsActive());
             user.setDeviceStatus(userInformationUpdateRequest.getIsActive());
@@ -146,46 +142,5 @@ public class UserServiceImpl implements UserService {
         // 3. 사용자 정보 삭제
         userRepository.delete(user);
         log.debug("사용자 정보 삭제");
-    }
-
-    @Override
-    public User increaseCredit(String token, long amount) throws RuntimeException {
-        // 사용자 정보 가져오기
-        User user = this.getUserWithToken(token);
-        // 서비스 호출
-        return this.increaseCredit(user, amount);
-    }
-
-    @Override
-    public User decreaseCredit(String token, long amount) throws RuntimeException {
-        // 사용자 정보 가져오기
-        User user = this.getUserWithToken(token);
-        // 서비스 호출
-        return this.decreaseCredit(user, amount);
-    }
-
-    @Override
-    public User increaseCredit(User user, long amount) throws RuntimeException {
-        long creditToUpdate = user.getCredit() + amount;
-        return updateCredit(user, creditToUpdate);
-    }
-
-    @Override
-    public User decreaseCredit(User user, long amount) throws RuntimeException {
-        long creditToUpdate = user.getCredit() - amount;
-        return updateCredit(user, creditToUpdate);
-    }
-
-    private User updateCredit(User user, long creditToUpdate) throws RuntimeException {
-
-        if (creditToUpdate < 0) {
-            throw new UserException(ErrorCode.INSUFFICIENT_CREDIT.getMessage(), ErrorCode.INSUFFICIENT_CREDIT);
-        }
-
-        log.debug("사용자 크레딧 업데이트: {}", creditToUpdate);
-        user.setCredit(creditToUpdate);
-        userRepository.save(user);
-
-        return user;
     }
 }
