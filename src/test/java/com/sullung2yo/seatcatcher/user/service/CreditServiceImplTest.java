@@ -52,18 +52,13 @@ class CreditServiceImplTest {
                 .thenAnswer(inv -> inv.getArgument(0));
     }
 
-    /* -------------------------------------------------------------
-     * Helper : 저장된 User 의 크레딧 캡처
-     * ----------------------------------------------------------- */
+    // Helper : 저장된 User 의 크레딧 캡처
     private long captureSavedCredit() {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository, atLeastOnce()).save(captor.capture());
         return captor.getValue().getCredit();
     }
 
-    /* =============================================================
-     * 1. 좌석 정보 최초 생성
-     * =========================================================== */
     @Test
     @DisplayName("좌석 생성 시 크레딧이 amount 만큼 증가해야 한다")
     void whenSeatCreated_thenCreditIncreases() {
@@ -79,9 +74,6 @@ class CreditServiceImplTest {
         assertThat(savedCredit).isEqualTo(INIT_CREDIT + AMOUNT);
     }
 
-    /* =============================================================
-     * 2. 좌석 정보 5분 내 제거
-     * =========================================================== */
     @Test
     @DisplayName("좌석 제거(5분 이내) 시 크레딧이 amount 만큼 차감돼야 한다")
     void whenSeatDeletedWithin5Min_thenCreditDecreases() {
@@ -100,9 +92,6 @@ class CreditServiceImplTest {
         assertThat(savedCredit).isEqualTo(INIT_CREDIT - AMOUNT);
     }
 
-    /* =============================================================
-     * 3. 양보 수락
-     * =========================================================== */
     @Test
     @DisplayName("양보 수락 시 크레딧이 amount 만큼 증가해야 한다")
     void whenSeatYieldAccepted_thenCreditIncreases() {
@@ -116,9 +105,6 @@ class CreditServiceImplTest {
         assertThat(savedCredit).isEqualTo(INIT_CREDIT + AMOUNT);
     }
 
-    /* =============================================================
-     * 4. 양보 요청(보낸 측) – 차감
-     * =========================================================== */
     @Test
     @DisplayName("양보 요청 시 크레딧이 amount 만큼 차감돼야 한다")
     void whenSeatYieldRequested_thenCreditDecreases() {
@@ -132,9 +118,6 @@ class CreditServiceImplTest {
         assertThat(savedCredit).isEqualTo(INIT_CREDIT - AMOUNT);
     }
 
-    /* =============================================================
-     * 5. 예외 시나리오(양보 ACCEPT + 차감 요청) – 참고
-     * =========================================================== */
     @Test
     @DisplayName("ACCEPT 타입에 차감 요청 시 예외가 발생해야 한다")
     void whenAcceptButReductionRequested_thenThrows() {
