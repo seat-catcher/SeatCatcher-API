@@ -87,12 +87,17 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         seat.setUser(newUser);
 
         // 3. 원래 좌석 소유자에게 크레딧 지급
-        creditService.creditModification(
-                originalUser.getId(),
-                CreditPolicy.CREDIT_FOR_SEAT_YIELD_APPROVE.getCredit(),
-                true,
-                YieldRequestType.ACCEPT
-        );
+        try {
+            creditService.creditModification(
+                    originalUser.getId(),
+                    CreditPolicy.CREDIT_FOR_SEAT_YIELD_APPROVE.getCredit(),
+                    true,
+                    YieldRequestType.ACCEPT
+            );
+        } catch (UserException e) {
+            log.error("좌석 양도 승인 중 크레딧 지급 실패: {}", e.getMessage());
+            throw e;
+        }
         // 4. DB 저장 -> JPA가 자동으로 처리 (Transactional 어노테이션)
     }
 

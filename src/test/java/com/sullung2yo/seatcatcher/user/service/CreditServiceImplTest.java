@@ -131,4 +131,42 @@ class CreditServiceImplTest {
 
         verify(userRepository, never()).save(Mockito.<User>any()); // DB 반영 없음
     }
+
+    @Test
+    @DisplayName("크레딧이 부족한 경우 예외가 발생해야 한다")
+    void whenInsufficientCredit_thenThrows() {
+        // given
+        baseUser.setCredit(10L); // 충분하지 않은 크레딧 설정
+
+        // when/then
+        assertThatThrownBy(() ->
+                creditService.creditModification(USER_ID,
+                        AMOUNT,
+                        false,
+                        YieldRequestType.REQUEST)
+        ).isInstanceOf(UserException.class);
+
+        verify(userRepository, never()).save(Mockito.<User>any()); // DB 반영 없음
+    }
+
+    @Test
+    @DisplayName("5분 초과 후 좌석 정보를 삭제하면 크레딧이 차감되지 않는다")
+    void whenSeatDeletedAfterFiveMinutes_thenCreditNotDecreased() {
+        // given – 5분 1초 이전으로 설정 (301초)
+        baseUser.setUpdatedAt(LocalDateTime.now().minusMinutes(5).minusSeconds(1));
+
+        // when
+        creditService.creditModification(
+                USER_ID,
+                AMOUNT,
+                /* isAddition = */ false,
+                YieldRequestType.NONE);
+
+        // then
+        // 1) 저장 메서드가 호출되지 않았는지 확인
+        verify(userRepository, never()).save(Mockito.<User>any());
+
+        // 2) 엔티티의 크레딧이 그대로인지 확인
+        assertThat(baseUser.getCredit()).isEqualTo(INIT_CREDIT);
+    }
 }

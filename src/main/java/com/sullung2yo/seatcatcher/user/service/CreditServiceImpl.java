@@ -5,7 +5,7 @@ import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,7 @@ public class CreditServiceImpl implements CreditService {
      * @param userId 사용자 ID
      * @param amount 증가할 크레딧
      * @param isAddition 크레딧 증가 여부 True : 증가, False : 감소
+     * @param yieldRequestType 요청 유형 (NONE/ACCEPT/REQUEST)
      */
     @Override
     @Transactional
@@ -78,7 +79,7 @@ public class CreditServiceImpl implements CreditService {
         long afterAmount = beforeAmount + creditDelta;
         if (afterAmount < 0) {
             throw new UserException("크레딧이 음수가 될 수 없습니다.",
-                    ErrorCode.INVALID_CREDIT_MODIFICATION);
+                    ErrorCode.INSUFFICIENT_CREDIT);
         }
 
         // DB 반영

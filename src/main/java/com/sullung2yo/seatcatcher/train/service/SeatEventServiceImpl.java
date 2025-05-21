@@ -15,7 +15,7 @@ import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -152,6 +152,9 @@ public class SeatEventServiceImpl implements SeatEventService {
         User requestUser = userService.getUserWithId(requestUserId);
         User owner = seat.getUser();
 
+        // 양보 요청을 보낸 사용자의 크레딧 감소 (서비스 내부에서 검증)
+        creditService.creditModification(requestUserId, CreditPolicy.CREDIT_FOR_SIT_INFO_PROVIDE.getCredit(), false, YieldRequestType.REQUEST);
+
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
             SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
@@ -174,9 +177,6 @@ public class SeatEventServiceImpl implements SeatEventService {
             userAlarmService.sendSeatRequestReceivedAlarm(owner.getFcmToken(), requestUser.getName());
             log.debug("좌석 요청 푸시 알람 전송 성공");
         }
-
-        // 양보 요청을 보낸 사용자의 크레딧 감소 (서비스 내부에서 검증)
-        creditService.creditModification(requestUserId, CreditPolicy.CREDIT_FOR_SIT_INFO_PROVIDE.getCredit(), false, YieldRequestType.REQUEST);
     }
 
     /**

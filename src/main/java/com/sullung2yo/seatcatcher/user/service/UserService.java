@@ -1,8 +1,6 @@
 package com.sullung2yo.seatcatcher.user.service;
 
 
-import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
-import com.sullung2yo.seatcatcher.user.domain.CreditPolicy;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 
