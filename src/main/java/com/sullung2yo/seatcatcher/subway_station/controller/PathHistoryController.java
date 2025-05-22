@@ -125,7 +125,11 @@ public class PathHistoryController {
             summary = "도착까지 남은 시간 주기적 갱신 API",
             description = "해당 API 호출 시점부터 차량에 탑승한 것으로 판단, 도착까지 남은 시간을 주기적으로 계산하여 갱신합니다."
     )
-    @ApiResponse(responseCode = "201", description = "성공적으로 PathHistory 생성 & 스케줄링 완료.")
+    @ApiResponse(
+            responseCode = "201",
+            description = "성공적으로 PathHistory 생성 & 스케줄링 완료.",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StartJourneyResponse.class))
+    )
     @ApiResponse(responseCode = "400", description = "잘못된 요청.")
     public ResponseEntity<StartJourneyResponse> startJourney(
             @RequestHeader("Authorization") String bearerToken,

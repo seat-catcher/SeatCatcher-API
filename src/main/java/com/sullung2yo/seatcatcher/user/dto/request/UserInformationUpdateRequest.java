@@ -3,7 +3,6 @@ package com.sullung2yo.seatcatcher.user.dto.request;
 import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
 import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.util.List;
@@ -24,10 +23,6 @@ public class UserInformationUpdateRequest {
             example = "[\"USERTAG_NULL\",\"USERTAG_LONGDISTANCE\"]"
     )
     private List<UserTagType> tags;
-
-    @Schema(description = "사용자 크레딧", example = "1000")
-    @Min(value = 0, message = "크레딧은 0 이상이어야 합니다.")
-    private Long credit;
 
     @Schema(description = "온보딩 진행 여부", example = "true, false")
     private Boolean hasOnBoarded; // 온보딩 진행 여부

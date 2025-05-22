@@ -91,6 +91,9 @@ public class GlobalExceptionHandler {
         else if (ex.getErrorCode() == ErrorCode.INVALID_PROFILE_IMAGE_NUM) {
             return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid Profile Image Number", ex.getMessage());
         }
+        else if(ex.getErrorCode() == ErrorCode.INSUFFICIENT_CREDIT){
+            return createErrorResponse(HttpStatus.BAD_REQUEST, "Insufficient Credit", ex.getMessage());
+        }
         else {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "User Internal Server Error", ex.getMessage());
         }
