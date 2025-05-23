@@ -1,8 +1,9 @@
 package com.sullung2yo.seatcatcher.train.domain;
 
 public enum YieldRequestType {
-    request,
-    cancel,
-    accept,
-    reject
+    REQUEST, // 양보 요청
+    CANCEL, // 양보 요청 취소
+    ACCEPT, // 양보 요청 수락
+    REJECT, // 양보 요청 거절
+    NONE // 양보 아님
 }

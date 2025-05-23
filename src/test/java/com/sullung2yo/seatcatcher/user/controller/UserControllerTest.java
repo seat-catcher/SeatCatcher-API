@@ -8,8 +8,7 @@ import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserTagRepository;
-import com.sullung2yo.seatcatcher.user.service.UserService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +67,11 @@ class UserControllerTest {
                 .build();
         userRepository.save(user);
 
-        Tag tag = tagRepository.findByTagName(UserTagType.USERTAG_CARRIER).get();
+        Optional<Tag> optionalTag = tagRepository.findByTagName(UserTagType.USERTAG_CARRIER);
+        if (optionalTag.isEmpty()) {
+            throw new RuntimeException("Tag not found");
+        }
+        Tag tag = optionalTag.get();
 
         UserTag userTag = UserTag.builder()
                 .user(user)
@@ -107,7 +110,6 @@ class UserControllerTest {
         // Given
         UserInformationUpdateRequest userInformationUpdateRequest = UserInformationUpdateRequest.builder()
                 .profileImageNum(ProfileImageNum.IMAGE_2) // IMAGE_1 -> IMAGE_2
-                .credit(555L) // 123 -> 555
                 .tags(List.of(UserTagType.USERTAG_NULL, UserTagType.USERTAG_LONGDISTANCE)) // USERTAG_CARRIER -> USERTAG_NULL, USERTAG_LONGDISTANCE
                 .hasOnBoarded(true) // 최초 사용자 생성 시 false이므로 true로 변경 시도
                 .build();
@@ -125,7 +127,6 @@ class UserControllerTest {
                 .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.profileImageNum").value(userInformationUpdateRequest.getProfileImageNum().name()))
-                .andExpect(jsonPath("$.credit").value(userInformationUpdateRequest.getCredit()))
                 .andExpect(jsonPath("$.tags").isArray())
                 .andExpect(jsonPath("$.hasOnBoarded").value(userInformationUpdateRequest.getHasOnBoarded()));
     }

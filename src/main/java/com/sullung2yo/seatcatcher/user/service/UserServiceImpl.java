@@ -11,10 +11,11 @@ import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserTagRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -82,13 +83,6 @@ public class UserServiceImpl implements UserService {
                 throw new UserException("올바른 프로필 이미지 번호가 아닙니다.", ErrorCode.INVALID_PROFILE_IMAGE_NUM);
             }
             user.setProfileImageNum(userInformationUpdateRequest.getProfileImageNum());
-        }
-        if (userInformationUpdateRequest.getCredit() != null) {
-            log.debug("사용자 크레딧 업데이트: {}", userInformationUpdateRequest.getCredit());
-            if (userInformationUpdateRequest.getCredit() < 0) {
-                throw new UserException("크레딧은 0보다 작을 수 없습니다.", ErrorCode.INVALID_PROFILE_IMAGE_NUM);
-            }
-            user.setCredit(userInformationUpdateRequest.getCredit());
         }
         if (userInformationUpdateRequest.getIsActive() != null) {
             log.debug("사용자 기기 활성 상태 업데이트: {}", userInformationUpdateRequest.getIsActive());

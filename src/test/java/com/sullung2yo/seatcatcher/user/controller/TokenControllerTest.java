@@ -9,7 +9,7 @@ import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.dto.request.TokenRefreshRequest;
 import com.sullung2yo.seatcatcher.user.repository.RefreshTokenRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.aspectj.lang.annotation.After;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

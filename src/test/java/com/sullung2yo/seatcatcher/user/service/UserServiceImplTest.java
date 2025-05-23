@@ -1,10 +1,9 @@
 package com.sullung2yo.seatcatcher.user.service;
 
-import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
-import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.*;
+import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserTagRepository;
@@ -12,12 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @Slf4j
 @SpringBootTest
@@ -54,7 +54,11 @@ public class UserServiceImplTest {
                 .build();
         userRepository.save(user);
 
-        Tag tag = tagRepository.findByTagName(UserTagType.USERTAG_CARRIER).get();
+        Optional<Tag> optionalTag = tagRepository.findByTagName(UserTagType.USERTAG_CARRIER);
+        if (optionalTag.isEmpty()) {
+            throw new RuntimeException("Tag not found");
+        }
+        Tag tag = optionalTag.get();
 
         UserTag userTag = UserTag.builder()
                 .user(user)
@@ -68,28 +72,33 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void increaseCreditForInternalImplementTest()
-    {
+    void testGetUserWithToken() {
         // When
-        User updatedUser = userService.increaseCredit(user, 100L);
+        User retrievedUser = userService.getUserWithToken(accessToken);
 
-        // then
-        assertThat(updatedUser.getCredit()).isEqualTo(223L);
+        // Then
+        assertThat(retrievedUser.getProviderId()).isEqualTo(user.getProviderId());
+        assertThat(retrievedUser.getName()).isEqualTo(user.getName());
+        assertThat(retrievedUser.getCredit()).isEqualTo(user.getCredit());
+        assertThat(retrievedUser.getProfileImageNum()).isEqualTo(user.getProfileImageNum());
     }
 
     @Test
-    void decreaseCreditForInternalImplementTest()
-    {
+    void testUpdateUser() {
+        // Given
+        UserInformationUpdateRequest userInformationUpdateRequest = UserInformationUpdateRequest.builder()
+                .name("updatedName")
+                .profileImageNum(ProfileImageNum.IMAGE_2)
+                .hasOnBoarded(true)
+                .tags(List.of(UserTagType.USERTAG_CARRIER))
+                .build();
+
         // When
-        User updatedUser = userService.decreaseCredit(user, 100L);
+        User updatedUser = userService.updateUser(accessToken, userInformationUpdateRequest);
 
         // Then
-        assertThat(updatedUser.getCredit()).isEqualTo(23L);
-
-        // When & Then
-        assertThatThrownBy(() -> userService.decreaseCredit(user, 10000L))
-                .isInstanceOf(UserException.class)
-                .hasMessageContaining(ErrorCode.INSUFFICIENT_CREDIT.getMessage());
+        assertThat(updatedUser.getName()).isEqualTo("updatedName");
+        assertThat(updatedUser.getProfileImageNum()).isEqualTo(ProfileImageNum.IMAGE_2);
+        assertThat(updatedUser.getHasOnBoarded()).isTrue();
     }
-
 }
