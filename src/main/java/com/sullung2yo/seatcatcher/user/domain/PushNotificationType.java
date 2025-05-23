@@ -11,7 +11,7 @@ public enum PushNotificationType {
     ),
     SEAT_REQUEST_RECEIVED(
             "%s님의 자리 요청",
-            "좌석 요청이 도착했어요. %s님에게 넘기고 300 크레딧을 획득해요."
+            "좌석 요청이 도착했어요. %s님에게 넘기고 %d 크레딧을 획득해요."
     ),
     SEAT_REQUEST_ACCEPTED(
             "좌석 요청 수락",

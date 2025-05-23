@@ -119,10 +119,11 @@ public class UserAlarmServiceImpl implements UserAlarmService {
     /** 좌석 요청 도착 알림
      * @param receiverToken : 좌석 점유자의 FCM 토큰
      * @param nickname : 좌석 양보를 요청한 사람의 닉네임
+     * @param creditAmount : 좌석 양보를 요청한 사람이 제시한 크레딧
      */
     @Override
-    public void sendSeatRequestReceivedAlarm(String receiverToken, String nickname) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_RECEIVED, nickname);
+    public void sendSeatRequestReceivedAlarm(String receiverToken, String nickname, long creditAmount) {
+        send(receiverToken, PushNotificationType.SEAT_REQUEST_RECEIVED, nickname, creditAmount);
     }
 
     // 좌석 요청 거절 알림

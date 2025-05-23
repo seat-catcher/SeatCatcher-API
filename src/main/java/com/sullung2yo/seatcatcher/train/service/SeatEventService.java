@@ -10,5 +10,5 @@ public interface SeatEventService {
 
     void publishSeatEvent(String trainCode, String carCode);
     void handleSeatEvent(List<SeatInfoResponse> seatInfoResponses);
-    void publishSeatYieldEvent(Long seatId, YieldRequestType requestType, Long requestUserId, Optional<Long> oppositeUserId);
+    void publishSeatYieldEvent(Long seatId, YieldRequestType requestType, Long requestUserId, Optional<Long> oppositeUserId, Optional<Long> credit);
 }
