@@ -113,6 +113,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 사용자 정보를 ResponseEntity로 변환하는 메서드
+     * @param user 사용자 정보
+     * @return ResponseEntity<UserInformationResponse>
+     */
     private ResponseEntity<UserInformationResponse> getUserInformationResponseResponseEntity(User user) {
         List<UserTagType> tags = user.getUserTag().stream()
                 .map(userTag -> userTag.getTag().getTagName())
