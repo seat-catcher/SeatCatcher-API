@@ -10,7 +10,6 @@ import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.StartJourneyRequest;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.StartJourneyResponse;
-import com.sullung2yo.seatcatcher.subway_station.dto.response.SubwayStationResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryRealtimeUpdateService;
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;

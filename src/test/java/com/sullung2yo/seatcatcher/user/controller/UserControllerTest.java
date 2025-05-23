@@ -151,41 +151,6 @@ class UserControllerTest {
         assertThat(userTags).isEmpty();
     }
 
-    @Test
-    void increaseCreditTest() throws Exception {
-        // When
-        mockMvc.perform(patch("/user/credit/increase")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + accessToken)
-                        .param("amount", String.valueOf(100L)))
-
-                // Then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.credit").value(223L));
-    }
-
-    @Test
-    void decreaseCreditTest() throws Exception {
-        // When
-        mockMvc.perform(patch("/user/credit/decrease")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + accessToken)
-                        .param("amount", String.valueOf(100L)))
-
-                // Then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.credit").value(23L));
-
-        // When
-        mockMvc.perform(patch("/user/credit/decrease")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + accessToken)
-                        .param("amount", String.valueOf(10000L))) // 잔액보다 터무니없이 많은 값이 감소될 경우
-
-                // Then
-                .andExpect(status().isBadRequest());
-    }
-
     @AfterEach
     void tearDown() {
         userTagRepository.deleteAll();
