@@ -125,7 +125,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
 
     @Override
     public Optional<String> getUserDestination(User user) {
-        SubwayStation destination = pathHistoryRepository.findEndStationByUser(user);
+        SubwayStation destination = this.getUsersLatestPathHistory(user.getId()).getEndStation();
         return Optional.of(destination.getStationName());
     }
 
