@@ -62,6 +62,22 @@ public class CreditServiceImpl implements CreditService {
                 creditDelta = amount;
             }
 
+            // REJECT : 양보 거절당함 -> 무조건 증액 (복구)
+            case REJECT -> {
+                if(!isAddition) {
+                    throw new UserException("REJECT는 크레딧 감소가 불가합니다.", ErrorCode.INVALID_CREDIT_MODIFICATION);
+                }
+                creditDelta = amount;
+            }
+
+            // CANCEL : 양보 요청을 취소함. -> 무조건 증액 (복구)
+            case CANCEL -> {
+                if(!isAddition) {
+                    throw new UserException("CANCEL은 크레딧 감소가 불가합니다.", ErrorCode.INVALID_CREDIT_MODIFICATION);
+                }
+                creditDelta = amount;
+            }
+
             // REQUEST : 양보 요청 -> 무조건 차감
             case REQUEST -> {
                 if (isAddition) {

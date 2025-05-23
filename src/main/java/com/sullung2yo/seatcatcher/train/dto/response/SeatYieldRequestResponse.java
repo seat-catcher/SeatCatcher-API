@@ -32,4 +32,8 @@ public class SeatYieldRequestResponse {
 
     @NotNull
     Set<UserTag> requestUserTags;
+
+    @NotNull
+    @Schema(description = "좌석 양보를 요청한 사람이 제안한 크레딧 수", example = "300")
+    Long creditAmount;
 }

@@ -76,7 +76,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
 
     @Override
     @Transactional
-    public void updateSeatOwner(Long userId, Long seatId) {
+    public void updateSeatOwner(Long userId, Long seatId, Long creditAmount) {
         // 1. 원래 좌석 소유자 정보 가져오기
         UserTrainSeat seat = findUserTrainSeatBySeatId(seatId);
         User originalUser = seat.getUser();
@@ -90,7 +90,8 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
         try {
             creditService.creditModification(
                     originalUser.getId(),
-                    CreditPolicy.CREDIT_FOR_SEAT_YIELD_APPROVE.getCredit(),
+                    //CreditPolicy.CREDIT_FOR_SEAT_YIELD_APPROVE.getCredit(),
+                    creditAmount,
                     true,
                     YieldRequestType.ACCEPT
             );

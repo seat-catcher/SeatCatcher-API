@@ -108,6 +108,7 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param requestType : 요청 타입 (양보 요청: request, 양보 수락: accept, 양보 거절: reject)
      * @param requestUserId : 양보 요청을 보낸 사용자 ID or 수락/거절 시 좌석을 점유하고 있는 사용자 ID
      * @param oppositeUserId : 양보 요청을 받은 사용자 ID or 수락/거절 시 양보 요청을 보낸 사용자 ID
+     * @param creditAmount : 양보 요청을 보낸 사용자 측에서 제시하는 크레딧 수
      */
     @Override
     @Transactional
@@ -115,21 +116,39 @@ public class SeatEventServiceImpl implements SeatEventService {
             Long seatId,
             YieldRequestType requestType,
             Long requestUserId,
-            Optional<Long> oppositeUserId)
+            Optional<Long> oppositeUserId,
+            Optional<Long> creditAmount)
     {
         switch (requestType) {
-            case REQUEST -> {this.handleYieldRequest(seatId, requestUserId);}
-            case CANCEL -> {this.handleCancelYieldRequest(seatId, requestUserId);}
+            case REQUEST -> {
+                if(creditAmount.isPresent()) {
+                    this.handleYieldRequest(seatId, requestUserId, creditAmount.get());
+                } else {
+                    throw new SeatException("양보 요청 시 상대방에게 제안할 크레딧 수가 포함되어야 합니다.", ErrorCode.INVALID_PARAMETER);
+                }
+            }
+            case CANCEL -> {
+                if(creditAmount.isPresent())
+                {
+                    this.handleCancelYieldRequest(seatId, requestUserId, creditAmount.get());
+                } else {
+                    throw new SeatException("양보 요청 취소 시 상대방이 제안했던 크레딧 수가 포함되어야 합니다.", ErrorCode.INVALID_PARAMETER);
+                }
+            }
             case ACCEPT -> {
                 if (oppositeUserId.isPresent()) {
-                    this.handleAcceptRejectYieldRequest(seatId, requestUserId, oppositeUserId.get(), true);
+                    this.handleAcceptYieldRequest(seatId, requestUserId, oppositeUserId.get());
                 } else {
                     throw new SeatException("양보 요청을 수락 시 상대방 사용자 ID를 전달해야 합니다.", ErrorCode.INVALID_PARAMETER);
                 }
             }
             case REJECT -> {
                 if (oppositeUserId.isPresent()) {
-                    this.handleAcceptRejectYieldRequest(seatId, requestUserId, oppositeUserId.get(), false);
+                    if(creditAmount.isPresent()) {
+                        this.handleRejectYieldRequest(seatId, requestUserId, oppositeUserId.get(), creditAmount.get());
+                    } else {
+                        throw new SeatException("양보 요청 거부 시 상대방이 제안했던 크레딧 수가 포함되어야 합니다.", ErrorCode.INVALID_PARAMETER);
+                    }
                 } else {
                     throw new SeatException("양보 요청을 거절 시 상대방 사용자 ID를 전달해야 합니다.", ErrorCode.INVALID_PARAMETER);
                 }
@@ -146,14 +165,14 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param seatId : 좌석 ID
      * @param requestUserId : 양보 요청을 보낸 사용자 ID
      */
-    protected void handleYieldRequest(Long seatId, Long requestUserId) {
+    protected void handleYieldRequest(Long seatId, Long requestUserId, Long creditAmount) {
 
         UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
         User requestUser = userService.getUserWithId(requestUserId);
         User owner = seat.getUser();
 
         // 양보 요청을 보낸 사용자의 크레딧 감소 (서비스 내부에서 검증)
-        creditService.creditModification(requestUserId, CreditPolicy.CREDIT_FOR_SIT_INFO_PROVIDE.getCredit(), false, YieldRequestType.REQUEST);
+        creditService.creditModification(requestUserId, /*CreditPolicy.CREDIT_FOR_SIT_INFO_PROVIDE.getCredit()*/creditAmount, false, YieldRequestType.REQUEST);
 
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
@@ -162,6 +181,7 @@ public class SeatEventServiceImpl implements SeatEventService {
                     .requestUserNickname(requestUser.getName())
                     .requestUserProfileImageNum(requestUser.getProfileImageNum())
                     .requestUserTags(requestUser.getUserTag())
+                    .creditAmount(creditAmount)
                     .build(); // 좌석 양보 요청에 대한 응답 객체 생성
 
             String routingKey = "seat" + "." + seatId + "." + "owner"; // 좌석 점유자가 구독한 경로에다 전달
@@ -174,7 +194,7 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            userAlarmService.sendSeatRequestReceivedAlarm(owner.getFcmToken(), requestUser.getName());
+            userAlarmService.sendSeatRequestReceivedAlarm(owner.getFcmToken(), requestUser.getName(), creditAmount);
             log.debug("좌석 요청 푸시 알람 전송 성공");
         }
     }
@@ -185,51 +205,97 @@ public class SeatEventServiceImpl implements SeatEventService {
      * @param requestUserId : 양보 요청을 수락한 사용자(좌석 점유자) ID
      * @param oppositeUserId : 양보 요청을 보낸 사용자 ID
      */
-    protected void handleAcceptRejectYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId, boolean isAccepted) { // TODO :: 테스트코드 작성 필요
+    protected void handleAcceptYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId) { // TODO :: 테스트코드 작성 필요
         // requestUserId가 seatId를 점유하고 있는지 검증
         UserTrainSeat userTrainSeat = userTrainSeatService.findUserTrainSeatBySeatId(seatId);
         User owner = userTrainSeat.getUser();
 
         if (!Objects.equals(owner.getId(), requestUserId)) {
-            log.error("양보 수락/거절 실패: 양보를 수락/거절한 사람이 좌석을 점유하고 있지 않습니다.");
-            throw new SeatException("양보 수락/거절 실패: 양보를 수락/거절한 사람이 좌석을 점유하고 있지 않습니다.", ErrorCode.YIELD_ACCEPT_FAILED);
+            log.error("양보 수락 실패: 양보를 수락한 사람이 좌석을 점유하고 있지 않습니다.");
+            throw new SeatException("양보 수락 실패: 양보를 수락한 사람이 좌석을 점유하고 있지 않습니다.", ErrorCode.YIELD_ACCEPT_FAILED);
         }
 
         // 검증이 되었으므로, 양보를 수락했다는 메세지 생성 후, 양보를 요청한 사람(oppositeUser)한테 전달
         // 양보 요청 수락 시 크레딧 증가 로직은, 클라이언트에서 "좌석 교환" API를 호출할 때 처리됨
         User oppositeUser = userService.getUserWithId(oppositeUserId);
         if (oppositeUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
-            // OOO님이 좌석 양보 요청을 수락/거절하셨어요 -> 이 메세지는 양보 요청을 보낸 사용자가 볼 수 있어야 함
+            // OOO님이 좌석 양보 요청을 수락하셨어요 -> 이 메세지는 양보 요청을 보낸 사용자가 볼 수 있어야 함
             SeatYieldAcceptRejectResponse response = SeatYieldAcceptRejectResponse.builder()
                     .ownerId(requestUserId) // owner ID
                     .ownerNickname(owner.getName())
                     .ownerProfileImageNum(owner.getProfileImageNum())
-                    .isAccepted(isAccepted)
+                    .isAccepted(true)
                     .build();
 
             String routingKey = "seat." + seatId + "." + "requester." + oppositeUserId;
             try {
                 rabbitTemplate.convertAndSend(exchangeName, routingKey, response);
-                log.debug("RabbitMQ에 좌석 양보 수락/거절 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
+                log.debug("RabbitMQ에 좌석 양보 수락 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
             } catch (Exception e) {
-                log.error("RabbitMQ에 좌석 양보 수락/거절 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
+                log.error("RabbitMQ에 좌석 양보 수락 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
             }
         } else {
             // 좌석 양보 요청자에게 FCM 푸시 알림 전송
-            if (isAccepted) {
-                // 좌석에 앉아있는 사람의 목적지
-                Optional<String> destination = pathHistoryService.getUserDestination(owner);
-                if (destination.isEmpty()) {
-                    log.error("양보 수락 실패: 양보를 수락한 사람(좌석 점유자)의 목적지를 찾을 수 없습니다.");
-                    throw new SeatException("양보 수락 실패: 양보를 수락한 사람(좌석 점유자)의 목적지를 찾을 수 없습니다.", ErrorCode.YIELD_ACCEPT_FAILED);
-                }
-                // 양보를 요청한 사람의 FCM 토큰을 통해 좌석 점유자가 양보를 수락/거절했다는 푸시 알림 전송
-                userAlarmService.sendSeatRequestAcceptedAlarm(oppositeUser.getFcmToken(), owner.getName(), destination.get());
-                log.debug("수락 푸시 알람 전송 성공");
-            } else {
-                userAlarmService.sendSeatRequestRejectedAlarm(oppositeUser.getFcmToken());
-                log.debug("거절 푸시 알람 전송 성공");
+            // 좌석에 앉아있는 사람의 목적지
+            Optional<String> destination = pathHistoryService.getUserDestination(owner);
+            /*
+                ㄴ 이거 검토해보셔야 할 것 같습니다.
+                    유저가 PathHistory 를 자기 소유로 많이 가지고 있을 텐데
+                    해당 서비스의 구현부를 살펴보면 현재 경로의 목적지가 아닌, 과거 경로의 목적지가 집계될 가능성이 있을 것 같습니다.
+            */
+            if (destination.isEmpty()) {
+                log.error("양보 수락 실패: 양보를 수락한 사람(좌석 점유자)의 목적지를 찾을 수 없습니다.");
+                throw new SeatException("양보 수락 실패: 양보를 수락한 사람(좌석 점유자)의 목적지를 찾을 수 없습니다.", ErrorCode.YIELD_ACCEPT_FAILED);
             }
+            // 양보를 요청한 사람의 FCM 토큰을 통해 좌석 점유자가 양보를 수락/거절했다는 푸시 알림 전송
+            userAlarmService.sendSeatRequestAcceptedAlarm(oppositeUser.getFcmToken(), owner.getName(), destination.get());
+            log.debug("수락 푸시 알람 전송 성공");
+        }
+    }
+
+
+    /**
+     * 양보 요청을 거절했을 때 호출되는 메서드입니다.
+     * @param seatId : 대상 좌석 ID
+     * @param requestUserId : 양보 요청을 수락한 사용자(좌석 점유자) ID
+     * @param oppositeUserId : 양보 요청을 보낸 사용자 ID
+     * @param creditAmount : 복구될 크레딧 수
+     */
+    protected void handleRejectYieldRequest(Long seatId, Long requestUserId, Long oppositeUserId, Long creditAmount) { // TODO :: 테스트코드 작성 필요
+        // requestUserId가 seatId를 점유하고 있는지 검증
+        UserTrainSeat userTrainSeat = userTrainSeatService.findUserTrainSeatBySeatId(seatId);
+        User owner = userTrainSeat.getUser();
+
+        if (!Objects.equals(owner.getId(), requestUserId)) {
+            log.error("양보 거절 실패: 양보를 거절한 사람이 좌석을 점유하고 있지 않습니다.");
+            throw new SeatException("양보 거절 실패: 양보를 거절한 사람이 좌석을 점유하고 있지 않습니다.", ErrorCode.YIELD_ACCEPT_FAILED);
+        }
+
+        // 검증이 되었으므로, 양보를 거절했다는 메세지 생성 후, 양보를 요청한 사람(oppositeUser)한테 전달
+        User oppositeUser = userService.getUserWithId(oppositeUserId);
+        // 한 편, 요청이 거절됐으므로 요청할 때 지불했던 크레딧은 복구되어야 함.
+        creditService.creditModification(oppositeUserId, creditAmount, true, YieldRequestType.REJECT); // TODO :: MVP 단계에선 상관 없지만 실제 서비스를 하게 되면 악성 클라이언트에게 악용될 가능성 존재. 이 부분 고려할 것.
+
+        if (oppositeUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
+            // OOO님이 좌석 양보 요청을 거절하셨어요 -> 이 메세지는 양보 요청을 보낸 사용자가 볼 수 있어야 함
+            SeatYieldAcceptRejectResponse response = SeatYieldAcceptRejectResponse.builder()
+                    .ownerId(requestUserId) // owner ID
+                    .ownerNickname(owner.getName())
+                    .ownerProfileImageNum(owner.getProfileImageNum())
+                    .isAccepted(false) // 거절당했으므로 false.
+                    .build();
+
+            String routingKey = "seat." + seatId + "." + "requester." + oppositeUserId;
+            try {
+                rabbitTemplate.convertAndSend(exchangeName, routingKey, response);
+                log.debug("RabbitMQ에 좌석 양보 거절 이벤트 발행 성공: {}, {}", exchangeName, routingKey);
+            } catch (Exception e) {
+                log.error("RabbitMQ에 좌석 양보 거절 이벤트 발행 실패: {}, {}, {}", exchangeName, routingKey, e.getMessage());
+            }
+        } else {
+            // 좌석 양보 요청자에게 FCM 푸시 알림 전송
+            userAlarmService.sendSeatRequestRejectedAlarm(oppositeUser.getFcmToken());
+            log.debug("거절 푸시 알람 전송 성공");
         }
     }
 
@@ -237,11 +303,14 @@ public class SeatEventServiceImpl implements SeatEventService {
      * 좌석 양보를 취소했을 때 호출되는 메서드 입니다.
      * 취소 요청 시 프론트엔드는 구독한 웹소켓 토픽을 구독 해제 해야 합니다.
      */
-    private void handleCancelYieldRequest(Long seatId, Long requestUserId) { // TODO :: 테스트코드 작성 필요
+    private void handleCancelYieldRequest(Long seatId, Long requestUserId, Long creditAmount) { // TODO :: 테스트코드 작성 필요
         // 취소 요청했을 때 -> 좌석에 앉아있는 사용자에게 해당 사용자는 양보 요청을 취소했습니다. 라는 메세지를 보내야 함
         UserTrainSeat seat = userTrainSeatService.findUserTrainSeatBySeatId(seatId); // 좌석을 점유하고 있는 사용자
         User requestUser = userService.getUserWithId(requestUserId); // 양보 요청을 보낸 사용자
         User owner = seat.getUser();
+
+        // 양보 요청을 보낸 사용자는 요청을 취소했으므로 소모했던 크레딧을 반환받아야 함.
+        creditService.creditModification(requestUser.getId(), creditAmount, true, YieldRequestType.CANCEL); // TODO :: MVP 단계에선 상관 없지만 실제 서비스를 하게 되면 악성 클라이언트에게 악용될 가능성 존재. 이 부분 고려할 것.
 
         if (owner.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 취소하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함

@@ -117,7 +117,7 @@ public class UserTrainSeatController {
             throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
         }
 
-        userTrainSeatService.updateSeatOwner(requestUserId, userTrainSeatRequest.getSeatId());
+        userTrainSeatService.updateSeatOwner(requestUserId, userTrainSeatRequest.getSeatId(), userTrainSeatRequest.getCreditAmount());
 
         return ResponseEntity.ok().build();
     }
@@ -175,7 +175,8 @@ public class UserTrainSeatController {
             description = "쿼리 파라미터를 통해서 수행하려는 동작을 명시해주세요.",
             parameters = {
                     @Parameter(name = "type", description = "양보 요청 타입 (양보 요청: request, 양보 수락: accept, 양보 거절: reject, 요청 취소 : cancel)", required = true),
-                    @Parameter(name = "oppositeUserId", description = "상대방 사용자 ID (양보 수락/거절 시 필수적으로 전달해야하고, 그 이외에는 전달 X)", required = false)
+                    @Parameter(name = "oppositeUserId", description = "상대방 사용자 ID (양보 수락/거절 시 필수적으로 전달해야하고, 그 이외에는 전달 X)", required = false),
+                    @Parameter(name = "creditAmount", description = "상대방에게 제안할 크레딧 양 (양보 요청/거절/취소 시 필수적으로 전달해야 하고, 그 이외에는 전달 X)", required = false)
             },
             responses = {
                     @ApiResponse(
@@ -192,8 +193,10 @@ public class UserTrainSeatController {
             @RequestHeader("Authorization") String bearerToken,
             @NonNull @PathVariable("seatId") Long seatId, // 양보 대상 좌석 ID
             @RequestParam(value = "type") YieldRequestType requestType, // 양보 요청 타입 (양보 요청: request, 양보 수락: accept, 양보 거절: reject, 요청 취소 : cancel)
-            @RequestParam(value = "oppositeUserId", required = false) Optional<Long> oppositeUserId // 상대방 사용자 ID
+            @RequestParam(value = "oppositeUserId", required = false) Optional<Long> oppositeUserId, // 상대방 사용자 ID
+            @RequestParam(value = "creditAmount", required = false) Optional<Long> creditAmount // 상대방에게 제안할 크레딧 양
     ) {
+
         // API 호출한 사람 ID 가져오기
         Long requestUserId = verifyUserAndGetId(bearerToken);
 
@@ -202,7 +205,8 @@ public class UserTrainSeatController {
                 seatId,
                 requestType,
                 requestUserId,
-                oppositeUserId
+                oppositeUserId,
+                creditAmount
         );
         log.debug("좌석 점유자에게 양보 요청 완료");
 
