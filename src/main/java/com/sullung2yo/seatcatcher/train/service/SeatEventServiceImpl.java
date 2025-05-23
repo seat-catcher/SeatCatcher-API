@@ -274,7 +274,7 @@ public class SeatEventServiceImpl implements SeatEventService {
         // 검증이 되었으므로, 양보를 거절했다는 메세지 생성 후, 양보를 요청한 사람(oppositeUser)한테 전달
         User oppositeUser = userService.getUserWithId(oppositeUserId);
         // 한 편, 요청이 거절됐으므로 요청할 때 지불했던 크레딧은 복구되어야 함.
-        creditService.creditModification(oppositeUserId, creditAmount, true, YieldRequestType.REJECT);
+        creditService.creditModification(oppositeUserId, creditAmount, true, YieldRequestType.REJECT); // TODO :: MVP 단계에선 상관 없지만 실제 서비스를 하게 되면 악성 클라이언트에게 악용될 가능성 존재. 이 부분 고려할 것.
 
         if (oppositeUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 거절하셨어요 -> 이 메세지는 양보 요청을 보낸 사용자가 볼 수 있어야 함
@@ -310,7 +310,7 @@ public class SeatEventServiceImpl implements SeatEventService {
         User owner = seat.getUser();
 
         // 양보 요청을 보낸 사용자는 요청을 취소했으므로 소모했던 크레딧을 반환받아야 함.
-        creditService.creditModification(requestUser.getId(), creditAmount, true, YieldRequestType.CANCEL);
+        creditService.creditModification(requestUser.getId(), creditAmount, true, YieldRequestType.CANCEL); // TODO :: MVP 단계에선 상관 없지만 실제 서비스를 하게 되면 악성 클라이언트에게 악용될 가능성 존재. 이 부분 고려할 것.
 
         if (owner.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 취소하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
