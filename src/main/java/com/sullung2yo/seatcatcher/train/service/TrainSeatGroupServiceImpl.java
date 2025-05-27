@@ -42,12 +42,12 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
         List<TrainSeatGroup> groups = new ArrayList<>();
         // 차량 코드에서 편성번호 추출하고, 편성번호에 따라 좌석 배치 타입을 구분해서 TrainSeatGroup 엔티티 리스트 생성
         List<SeatGroupType> types = this.seatGroupChecker(carCode)
-                ? List.of(SeatGroupType.ELDERLY_A, SeatGroupType.NORMAL_A_14,
+                ? List.of(SeatGroupType.PRIORITY_A, SeatGroupType.NORMAL_A_14,
                 SeatGroupType.NORMAL_B_14, SeatGroupType.NORMAL_C_14,
-                SeatGroupType.ELDERLY_B)      // 37773 (true)
-                : List.of(SeatGroupType.ELDERLY_A, SeatGroupType.NORMAL_A_12,
+                SeatGroupType.PRIORITY_B)      // 37773 (true)
+                : List.of(SeatGroupType.PRIORITY_A, SeatGroupType.NORMAL_A_12,
                 SeatGroupType.NORMAL_B_12, SeatGroupType.NORMAL_C_12,
-                SeatGroupType.ELDERLY_B);     // 36663 (false)
+                SeatGroupType.PRIORITY_B);     // 36663 (false)
 
         types.forEach(t -> groups.add(createTrainSeatGroup(trainCode, carCode, t)));
         trainSeatGroupRepository.saveAll(groups);
@@ -119,8 +119,8 @@ public class TrainSeatGroupServiceImpl implements TrainSeatGroupService {
             SeatType seatType = null;
 
             // 노약자석의 경우에는 seatType 을 ELDERLY 로 설정
-            if(trainSeatGroup.getSeatGroupType() == SeatGroupType.ELDERLY_A || trainSeatGroup.getSeatGroupType() == SeatGroupType.ELDERLY_B) {
-                seatType = SeatType.ELDERLY;
+            if(trainSeatGroup.getSeatGroupType() == SeatGroupType.PRIORITY_A || trainSeatGroup.getSeatGroupType() == SeatGroupType.PRIORITY_B) {
+                seatType = SeatType.PRIORITY;
             } else {
                 seatType = SeatType.NORMAL; // 임산부 좌석은 고려하지 않고 일단 Normal 로 모두 설정하겠음. TODO :: 추후에 임산부 좌석이 고려되어야 할 경우 이 부분을 변경할 것.
             }

@@ -95,8 +95,8 @@ public class TrainSeatGroupServiceTest {
                 Arguments.of(SeatGroupType.NORMAL_A_12, SeatType.NORMAL),
                 Arguments.of(SeatGroupType.NORMAL_B_12, SeatType.NORMAL),
                 Arguments.of(SeatGroupType.NORMAL_C_12, SeatType.NORMAL),
-                Arguments.of(SeatGroupType.ELDERLY_A, SeatType.ELDERLY),
-                Arguments.of(SeatGroupType.ELDERLY_B, SeatType.ELDERLY)
+                Arguments.of(SeatGroupType.PRIORITY_A, SeatType.PRIORITY),
+                Arguments.of(SeatGroupType.PRIORITY_B, SeatType.PRIORITY)
         );
     }
 }
