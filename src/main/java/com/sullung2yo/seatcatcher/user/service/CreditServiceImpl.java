@@ -99,7 +99,7 @@ public class CreditServiceImpl implements CreditService {
         }
 
         // DB 반영
-        User updatedUser = updateCredit(user, afterAmount);
+        User updatedUser = applyCreditChange(user, afterAmount);
 
         // 무결성 검증
         if (!isValidCreditModification(beforeAmount, updatedUser.getCredit(), amount, isAddition)) {
@@ -109,7 +109,7 @@ public class CreditServiceImpl implements CreditService {
     }
 
     @Transactional
-    protected User updateCredit(User user, long creditToUpdate) throws RuntimeException {
+    public User applyCreditChange(User user, long creditToUpdate) throws RuntimeException {
 
         if (creditToUpdate < 0) {
             throw new UserException(ErrorCode.INSUFFICIENT_CREDIT.getMessage(), ErrorCode.INSUFFICIENT_CREDIT);
