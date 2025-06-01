@@ -167,7 +167,7 @@ public class PathHistoryController {
             pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
         });
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new StartJourneyResponse(latestPathHistory.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new StartJourneyResponse(latestPathHistory.getId(), latestPathHistory.getExpectedArrivalTime()));
     }
 
 
