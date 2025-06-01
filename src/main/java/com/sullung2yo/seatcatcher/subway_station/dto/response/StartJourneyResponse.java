@@ -18,6 +18,6 @@ public class StartJourneyResponse {
     private Long pathHistoryId;
 
     @Schema(description = "생성한 PathHistory 의 Expected Arrival Time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime expectedArrivalTime;
 }
