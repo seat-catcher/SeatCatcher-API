@@ -17,7 +17,7 @@ public class StartJourneyResponse {
     @Schema(description = "앞으로 추적해야 하는, 생성된 PathHistory 의 id")
     private Long pathHistoryId;
 
-    @Schema(description = "생성한 PathHistory 의 Expected Arrival Time")
+    @Schema(description = "생성한 PathHistory 의 Expected Arrival Time", example = "2025-06-01 14:30")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime expectedArrivalTime;
 }
