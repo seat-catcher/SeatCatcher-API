@@ -8,8 +8,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -143,6 +147,17 @@ public class GlobalExceptionHandler {
          */
         log.error("EntityNotFoundException", ex);
         return createErrorResponse(HttpStatus.NOT_FOUND, "Entity Not Found", ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+        String errorMessage = "Validation failed: " + errors.toString();
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Validation Error", errorMessage);
     }
 
     @ExceptionHandler(Exception.class)
