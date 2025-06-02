@@ -48,6 +48,10 @@ public class CreditController {
         User targetUser = userService.getUserWithId(targetUserId);
         Long currentCredit = targetUser.getCredit();
 
+        if (!isAddition && currentCredit < amount) {
+            throw new IllegalArgumentException("잔여 크레딧이 부족합니다.");
+        }
+
         creditService.applyCreditChange(
                 targetUser,
                 currentCredit + (isAddition ? amount : -amount)
