@@ -4,8 +4,6 @@ import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
 
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
-import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
-import com.sullung2yo.seatcatcher.train.dto.TrainCarDTO;
 import com.sullung2yo.seatcatcher.user.domain.User;
 
 import java.time.LocalDateTime;

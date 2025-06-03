@@ -3,6 +3,7 @@ package com.sullung2yo.seatcatcher.common.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cglib.core.Local;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -21,70 +22,82 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
     private final TaskScheduler taskScheduler;
 
     @Override
-    public void runThisAfterSeconds(long seconds, Runnable task) {
+    public LocalDateTime runThisAfterSeconds(long seconds, Runnable task) {
         try {
-            Instant triggerTime = LocalDateTime.now().plusSeconds(seconds)
+            LocalDateTime triggerTime = LocalDateTime.now().plusSeconds(seconds);
+            Instant triggerTimeInstant = triggerTime
                     .atZone(ZoneId.systemDefault())
                     .toInstant();
-            taskScheduler.schedule(task, triggerTime);
+            taskScheduler.schedule(task, triggerTimeInstant);
+            return triggerTime;
         } catch (Exception e) {
             log.error("Error scheduling task after {} seconds", seconds, e);
+            return null;
         }
     }
 
     @Override
-    public void runThisAfterMinutes(long minutes, Runnable task) {
+    public LocalDateTime runThisAfterMinutes(long minutes, Runnable task) {
         try{
-            Instant triggerTime = LocalDateTime.now().plusMinutes(minutes)
+            LocalDateTime triggerTime = LocalDateTime.now().plusMinutes(minutes);
+            Instant triggerTimeInstant = triggerTime
                     .atZone(ZoneId.systemDefault())
                     .toInstant();
-            taskScheduler.schedule(task, triggerTime);
+            taskScheduler.schedule(task, triggerTimeInstant);
+            return triggerTime;
         } catch (Exception e) {
             log.error("Error scheduling task after {} minutes", minutes, e);
+            return null;
         }
     }
 
     @Override
-    public void runThisAtBeforeSeconds(LocalDateTime stdTime, long seconds, Runnable task) {
+    public LocalDateTime runThisAtBeforeSeconds(LocalDateTime stdTime, long seconds, Runnable task) {
         try {
             if(stdTime == null)
             {
                 log.error("Standard time cannot be null!");
-                return;
+                return null;
             }
-            Instant triggerTime = stdTime.minusSeconds(seconds)
+            LocalDateTime triggerTime = stdTime.minusSeconds(seconds);
+            Instant triggerTimeInstant = triggerTime
                     .atZone(ZoneId.systemDefault())
                     .toInstant();
             Instant now = Instant.now();
-            if(triggerTime.isBefore(now)){
+            if(triggerTimeInstant.isBefore(now)){
                 log.warn("Trigger time is in the past. Executing task immediately.");
                 taskScheduler.schedule(task, now);
             }
-            else taskScheduler.schedule(task, triggerTime);
+            else taskScheduler.schedule(task, triggerTimeInstant);
+            return triggerTime;
         } catch (Exception e) {
             log.error("Error scheduling task before {} seconds of {}", seconds, stdTime, e);
+            return null;
         }
     }
 
     @Override
-    public void runThisAtBeforeMinutes(LocalDateTime stdTime, long minutes, Runnable task) {
+    public LocalDateTime runThisAtBeforeMinutes(LocalDateTime stdTime, long minutes, Runnable task) {
         try{
             if(stdTime == null)
             {
                 log.error("Standard time cannot be null!");
-                return;
+                return null;
             }
-            Instant triggerTime = stdTime.minusMinutes(minutes)
+            LocalDateTime triggerTime = stdTime.minusMinutes(minutes);
+            Instant triggerTimeInstant = triggerTime
                     .atZone(ZoneId.systemDefault())
                     .toInstant();
             Instant now = Instant.now();
-            if(triggerTime.isBefore(now)){
+            if(triggerTimeInstant.isBefore(now)){
                 log.warn("Trigger time is in the past. Executing task immediately.");
                 taskScheduler.schedule(task, now);
             }
-            else taskScheduler.schedule(task, triggerTime);
+            else taskScheduler.schedule(task, triggerTimeInstant);
+            return triggerTime;
         } catch (Exception e) {
             log.error("Error scheduling task before {} minutes of {}", minutes, stdTime, e);
+            return null;
         }
     }
 }

@@ -220,7 +220,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
         //when
         when(mockPathHistoryRepository.save(any(PathHistory.class)))
                 .thenReturn(new PathHistory());
-        doNothing().when(mockPathHistoryEventService).publishPathHistoryEvent(nullable(Long.class));
+        //doNothing().when(mockPathHistoryEventService).publishPathHistoryEvent(nullable(Long.class)); // 여기서 호출 안 하게 바뀜.
         when(mockTrainSeatGroupService.getSittingTrainCarInfo(nullable(User.class)))
                 .thenReturn(null);
 
@@ -243,7 +243,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
         //when
         when(mockPathHistoryRepository.save(any(PathHistory.class)))
                 .thenReturn(new PathHistory());
-        doNothing().when(mockPathHistoryEventService).publishPathHistoryEvent(nullable(Long.class));
+        // doNothing().when(mockPathHistoryEventService).publishPathHistoryEvent(nullable(Long.class)); // 여기서 호출 안 하게 바뀜.
         when(mockTrainSeatGroupService.getSittingTrainCarInfo(nullable(User.class)))
                 .thenReturn(null);
 
