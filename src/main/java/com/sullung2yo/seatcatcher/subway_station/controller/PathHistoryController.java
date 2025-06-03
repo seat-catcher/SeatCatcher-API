@@ -27,6 +27,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @RestController
 @RequestMapping("/path-histories")
@@ -153,8 +155,8 @@ public class PathHistoryController {
         // 해당 PathHistory 의 expectedArrivalTime 을 이용해서 남은 시간이 정확히 몇 초인지 계산.
         long remainingSeconds = pathHistoryService.getRemainingSeconds(latestPathHistory.getExpectedArrivalTime());
 
-        if(remainingSeconds < 0)
-        { // 과거 값이 들어온 경우
+        if(remainingSeconds < 0 || latestPathHistory.getExpectedArrivalTime() == null)
+        { // 과거 값이 들어온 경우거나 값이 올바르지 않게 들어왔을 경우
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
@@ -162,12 +164,17 @@ public class PathHistoryController {
         long nextScheduleTime = pathHistoryRealtimeUpdateService.getNextScheduleTime(remainingSeconds);
 
         // expected arrival time 이 되기 전 N초 전에 해당 스케줄을 실행.
-        scheduleService.runThisAtBeforeSeconds(latestPathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
+        LocalDateTime nextScheduleDateTime = scheduleService.runThisAtBeforeSeconds(latestPathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
         {
             pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
         });
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new StartJourneyResponse(latestPathHistory.getId(), latestPathHistory.getExpectedArrivalTime()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new StartJourneyResponse(
+                latestPathHistory.getId(),
+                latestPathHistory.getExpectedArrivalTime(),
+                nextScheduleDateTime,
+                false
+                ));
     }
 
 
