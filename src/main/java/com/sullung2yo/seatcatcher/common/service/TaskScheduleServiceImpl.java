@@ -67,6 +67,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
             if(triggerTimeInstant.isBefore(now)){
                 log.warn("Trigger time is in the past. Executing task immediately.");
                 taskScheduler.schedule(task, now);
+                return LocalDateTime.now();
             }
             else taskScheduler.schedule(task, triggerTimeInstant);
             return triggerTime;
@@ -92,6 +93,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
             if(triggerTimeInstant.isBefore(now)){
                 log.warn("Trigger time is in the past. Executing task immediately.");
                 taskScheduler.schedule(task, now);
+                return LocalDateTime.now();
             }
             else taskScheduler.schedule(task, triggerTimeInstant);
             return triggerTime;
