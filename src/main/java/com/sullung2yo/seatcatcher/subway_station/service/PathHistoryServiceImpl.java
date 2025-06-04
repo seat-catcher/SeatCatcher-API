@@ -87,6 +87,13 @@ public class PathHistoryServiceImpl implements PathHistoryService{
     }
 
     @Override
+    public PathHistoryResponse.PathHistoryInfoResponse getPathHistoryAfterAuthenticate(Long pathId) {
+        PathHistory pathHistory = pathHistoryRepository.findById(pathId)
+                .orElseThrow(() -> new SubwayException("해당 id를 가진 경로 이력을 찾을 수 없습니다. : " + pathId, ErrorCode.SUBWAY_STATION_NOT_FOUND ));
+        return pathHistoryConverter.toResponse(pathHistory);
+    }
+
+    @Override
     public PathHistoryResponse.PathHistoryList getAllPathHistory(int size, Long lastPathId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();

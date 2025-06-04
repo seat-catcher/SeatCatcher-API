@@ -48,7 +48,7 @@ public class PathHistoryEventServiceImplTest {
         PathHistoryResponse.PathHistoryInfoResponse pathHistoryInfoResponse = new PathHistoryResponse.PathHistoryInfoResponse();
         pathHistoryInfoResponse.setId(1L);
 
-        when(pathHistoryService.getPathHistory(1L)).thenReturn(pathHistoryInfoResponse);
+        when(pathHistoryService.getPathHistoryAfterAuthenticate(1L)).thenReturn(pathHistoryInfoResponse);
 
         //when
         pathHistoryEventService.publishPathHistoryEvent(1L, null, false);
