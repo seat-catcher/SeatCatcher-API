@@ -111,6 +111,6 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
 
     private void writeLog(LocalDateTime scheduledTime, Runnable task)
     {
-        log.info("{} 작업이 {} 시간대에 실행되도록 스케줄링되었습니다.", task, scheduledTime);
+        log.info("{} 의 작업이 {} 시간대에 실행되도록 스케줄링되었습니다.", task.getClass().getSimpleName(), scheduledTime);
     }
 }
