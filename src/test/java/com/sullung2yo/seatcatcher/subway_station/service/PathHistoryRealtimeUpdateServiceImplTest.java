@@ -1,5 +1,6 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
+import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
 import com.sullung2yo.seatcatcher.subway_station.domain.Line;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
@@ -10,7 +11,9 @@ import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
+import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +54,9 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
     private TrainSeatGroupService mockTrainSeatGroupService;
 
     @Mock
+    private TaskScheduleService mockScheduleService;
+
+    @Mock
     private SeatEventService mockSeatEventService;
 
     @InjectMocks
@@ -58,6 +65,57 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
 
 
     ///=============================== 실시간 도착 정보를 통해 PathHistory 갱신 로직 테스트 =================================///
+    @Test
+    @DisplayName("Test that updateArrivalTimeAndSchedule send websocket message and schedule properly")
+    void updateArrivalTimeAndScheduleTest() {
+        /* 함수의 흐름 :
+                1. pathHistory 에 User 가 없으면 에러 처리.
+                2. pathHistory 에서 expectedArrivalTime 을 이용해서 계산.
+                        ㄴ Mock 할 PathHistory 는 User, ExpectedArrivalTime 이 있어야만 함.
+                3. fetchIncomingTrainsResponseByPathHistory 메소드를 호출하여 IncomingTrainsResponse 를 얻어냄.
+                        ㄴ 그냥 null 반환하게 해도 좋음.
+                4. processTrainStateAndRefresh 함수를 사용하여 isArrived 를 얻어냄.
+                        ㄴ 그냥 false 반환하게 해도 좋음.
+                5. pathHistory 에서 남은 시간을 계산, 이를 바탕으로 다음에 스케줄링할 시간을 알아냄.
+                6. 그 시간을 기반으로 스케줄링
+                7. publishPathHistoryEvent 서비스를 호출함.
+
+                테스트해보고 싶은 것 :
+                    정상적으로 다음 스케줄링을 진행하는지
+                    정상적으로 publishPathHistoryEvent를 호출하는지
+         */
+
+        // given
+        User user = User.builder()
+                .provider(Provider.APPLE)
+                .providerId("testUser")
+                .role(UserRole.ROLE_USER)
+                .name("테스터")
+                .credit(0L)
+                .build();
+
+        PathHistory pathHistory = PathHistory.builder()
+                .user(user)
+                .expectedArrivalTime(LocalDateTime.now().plusMinutes(30))
+                .build(); // 예상 도착 시간은 30분 뒤.
+        pathHistory.setId(1L);
+
+        PathHistoryRealtimeUpdateServiceImpl spyService = Mockito.spy(pathHistoryRealtimeUpdateServiceWithMock);
+
+        doNothing().when(mockPathHistoryEventService).publishPathHistoryEvent(any(), any(), anyBoolean());
+        doReturn(null).when(mockScheduleService).runThisAtBeforeSeconds(any(), anyLong(), any(Runnable.class));
+        doReturn(null).when(spyService).fetchIncomingTrainsResponseByPathHistory(any(PathHistory.class), anyString());
+        doReturn(false).when(spyService).processTrainStateAndRefresh(anyInt(), any(TrainArrivalState.class), any(PathHistory.class), anyLong(), anyLong(), anyLong());
+
+        // when
+        spyService.updateArrivalTimeAndSchedule(pathHistory, "1234", TrainArrivalState.STATE_NOT_FOUND);
+
+        // then
+        verify(mockPathHistoryEventService).publishPathHistoryEvent(anyLong(), any(), anyBoolean());
+        verify(mockScheduleService).runThisAtBeforeSeconds(any(LocalDateTime.class), anyLong(), any(Runnable.class));
+    }
+
+
     @Test
     @DisplayName("SubwayStationService 가 유효한 Response 를 반환하는 경우 null 이 아닌 자신이 추적중인 train 의 정보를 함수가 반환함을 테스트")
     void fetchIncomingTrainsResponseByPathHistory_shouldReturnResponse_whenTrainCodeMatches()
@@ -390,6 +448,7 @@ public class PathHistoryRealtimeUpdateServiceImplTest {
         //then
         assertThat(realtimeRemainingSeconds).isEqualTo(0);
     }
+
 
 
     /// =============================== 실시간 도착 정보를 통해 PathHistory 갱신 로직 테스트 끝 =================================///
