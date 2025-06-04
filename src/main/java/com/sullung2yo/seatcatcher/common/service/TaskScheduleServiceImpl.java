@@ -29,6 +29,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
                     .atZone(ZoneId.systemDefault())
                     .toInstant();
             taskScheduler.schedule(task, triggerTimeInstant);
+            writeLog(triggerTime, task);
             return triggerTime;
         } catch (Exception e) {
             log.error("Error scheduling task after {} seconds", seconds, e);
@@ -44,6 +45,7 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
                     .atZone(ZoneId.systemDefault())
                     .toInstant();
             taskScheduler.schedule(task, triggerTimeInstant);
+            writeLog(triggerTime, task);
             return triggerTime;
         } catch (Exception e) {
             log.error("Error scheduling task after {} minutes", minutes, e);
@@ -67,9 +69,11 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
             if(triggerTimeInstant.isBefore(now)){
                 log.warn("Trigger time is in the past. Executing task immediately.");
                 taskScheduler.schedule(task, now);
+                writeLog(LocalDateTime.now(), task);
                 return LocalDateTime.now();
             }
             else taskScheduler.schedule(task, triggerTimeInstant);
+            writeLog(triggerTime, task);
             return triggerTime;
         } catch (Exception e) {
             log.error("Error scheduling task before {} seconds of {}", seconds, stdTime, e);
@@ -93,13 +97,20 @@ public class TaskScheduleServiceImpl implements TaskScheduleService {
             if(triggerTimeInstant.isBefore(now)){
                 log.warn("Trigger time is in the past. Executing task immediately.");
                 taskScheduler.schedule(task, now);
+                writeLog(LocalDateTime.now(), task);
                 return LocalDateTime.now();
             }
             else taskScheduler.schedule(task, triggerTimeInstant);
+            writeLog(triggerTime, task);
             return triggerTime;
         } catch (Exception e) {
             log.error("Error scheduling task before {} minutes of {}", minutes, stdTime, e);
             return null;
         }
+    }
+
+    private void writeLog(LocalDateTime scheduledTime, Runnable task)
+    {
+        log.info("{} 작업이 {} 시간대에 실행되도록 스케줄링되었습니다.", task, scheduledTime);
     }
 }

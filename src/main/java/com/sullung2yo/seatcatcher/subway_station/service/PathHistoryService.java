@@ -12,6 +12,9 @@ import java.util.Optional;
 public interface PathHistoryService {
     PathHistory addPathHistory(String token, PathHistoryRequest request);
     PathHistoryResponse.PathHistoryInfoResponse getPathHistory(Long pathId);
+
+    PathHistoryResponse.PathHistoryInfoResponse getPathHistoryAfterAuthenticate(Long pathId); // 이미 권한 인증을 끝낸 뒤 호출할 수 있는 서비스.
+
     PathHistoryResponse.PathHistoryList getAllPathHistory(int size, Long pathId);
     void deletePathHistory(Long pathId);
 
