@@ -162,12 +162,22 @@ public class PathHistoryController {
 
         // 그리고 이걸 이용해서 언제 스케줄링되어야 하는지를 계산.
         long nextScheduleTime = pathHistoryRealtimeUpdateService.getNextScheduleTime(remainingSeconds);
+        LocalDateTime nextScheduleDateTime;
 
-        // expected arrival time 이 되기 전 N초 전에 해당 스케줄을 실행.
-        LocalDateTime nextScheduleDateTime = scheduleService.runThisAtBeforeSeconds(latestPathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
+        if(nextScheduleTime < 360)
         {
+            nextScheduleDateTime = LocalDateTime.now().plusSeconds(nextScheduleTime);
+            // 이 정도면 곧바로 실시간으로 업데이트가 가능함. 스케줄링 맡기지 말고 즉시 한 번 업데이트하자!
             pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
-        });
+        }
+        else
+        {
+            // expected arrival time 이 되기 전 N초 전에 해당 스케줄을 실행.
+            nextScheduleDateTime = scheduleService.runThisAtBeforeSeconds(latestPathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
+            {
+                pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
+            });
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new StartJourneyResponse(
                 latestPathHistory.getId(),
