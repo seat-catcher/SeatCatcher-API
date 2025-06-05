@@ -166,9 +166,11 @@ public class PathHistoryController {
 
         if(nextScheduleTime < 360)
         {
-            nextScheduleDateTime = LocalDateTime.now().plusSeconds(nextScheduleTime);
             // 이 정도면 곧바로 실시간으로 업데이트가 가능함. 스케줄링 맡기지 말고 즉시 한 번 업데이트하자!
-            pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
+            nextScheduleDateTime = scheduleService.runThisAfterSeconds(10, ()->
+            {
+                pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
+            });
         }
         else
         {
