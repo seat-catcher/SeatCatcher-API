@@ -126,6 +126,7 @@ public class UserController {
         log.debug("사용자 정보: {}, {}, {}, {}", user.getName(), user.getCredit(), user.getProfileImageNum(), tags);
         return ResponseEntity.status(HttpStatus.OK).body(
                 UserInformationResponse.builder()
+                        .userId(user.getId())
                         .name(user.getName())
                         .profileImageNum(user.getProfileImageNum())
                         .credit(user.getCredit())
