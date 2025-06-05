@@ -93,25 +93,31 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         // 이 시점에서 해줘야 하는 처리는 다 해줬음. 이제 스케줄링을 해줄 차례.
         TrainArrivalState currentState = TrainArrivalState.getState(currentStateCode);
 
-        if(isArrived) return; // 만약 모두 끝난 경우 스케줄링을 따로 안 해줘도 됨.
+        if(isArrived) {
+            // 만약 모두 끝난 경우 스케줄링을 따로 안 해줘도 됨.
+            pathHistoryEventService.publishPathHistoryEvent(pathHistory.getId(), null, isArrived);
+            return;
+        }
         else
         {
             expectedRemainingTime = getRemainingSeconds(pathHistory.getExpectedArrivalTime());
             long nextScheduleTime = getNextScheduleTime(expectedRemainingTime);
+            LocalDateTime nextScheduleDateTime;
             if(nextScheduleTime < scheduleThreshold) // 너무 심하게 작다!
             {
-                scheduleService.runThisAfterSeconds(scheduleThreshold, ()->
+                nextScheduleDateTime = scheduleService.runThisAfterSeconds(scheduleThreshold, ()->
                 {
                     updateArrivalTimeAndSchedule(pathHistory, trainCode, currentState);
                 });
             }
             else
             {
-                scheduleService.runThisAtBeforeSeconds(pathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
+                nextScheduleDateTime = scheduleService.runThisAtBeforeSeconds(pathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
                 {
                     updateArrivalTimeAndSchedule(pathHistory, trainCode, currentState);
                 });
             }
+            pathHistoryEventService.publishPathHistoryEvent(pathHistory.getId(), nextScheduleDateTime, isArrived);
         }
     }
 
@@ -297,10 +303,13 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         //TODO :: 자동하차 처리를 수행하게 되는데, 나중에 설정을 통해 자동으로 하차처리가 안 되게 해야 할 수도 있음.
         // 일단 그 부분이 없으니까 하차할 타이밍이 되면 무지성으로 하차하게 해놓겠음.
         long userId = pathHistory.getUser().getId();
+
         if(userTrainSeatService.isUserSitting(userId)) {
             userTrainSeatService.releaseSeat(userId);
             userAlarmService.sendArrivalHandledAlarm(pathHistory.getUser().getFcmToken()); // 이야 만들어놓으셨네요?? 좋습니다!
         }
+
+
     }
 
     private void onShouldRefreshPathHistory(PathHistory pathHistory, LocalDateTime value)
@@ -308,8 +317,8 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         pathHistory.setExpectedArrivalTime(value);
         pathHistoryRepository.save(pathHistory);
 
-        // WebSocket Refresh Event Publish 가 일어나야 함.
-        pathHistoryEventService.publishPathHistoryEvent(pathHistory.getId());
+        // WebSocket Refresh Event Publish 가 일어나야 함. 그러나 이제 매번 publish 를 하는 방식으로 변경됐으므로 더 이상 수행하지 않겠음.
+        //pathHistoryEventService.publishPathHistoryEvent(pathHistory.getId());
 
         // 만약 사용자가 좌석에 앉아 있다면 Seat Event Publish 가 일어나야 함.
         TrainCarDTO dto = trainSeatGroupService.getSittingTrainCarInfo(pathHistory.getUser());

@@ -1,6 +1,7 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
+import com.sullung2yo.seatcatcher.subway_station.dto.response.StartJourneyResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,13 +48,13 @@ public class PathHistoryEventServiceImplTest {
         PathHistoryResponse.PathHistoryInfoResponse pathHistoryInfoResponse = new PathHistoryResponse.PathHistoryInfoResponse();
         pathHistoryInfoResponse.setId(1L);
 
-        when(pathHistoryService.getPathHistory(1L)).thenReturn(pathHistoryInfoResponse);
+        when(pathHistoryService.getPathHistoryAfterAuthenticate(1L)).thenReturn(pathHistoryInfoResponse);
 
         //when
-        pathHistoryEventService.publishPathHistoryEvent(1L);
+        pathHistoryEventService.publishPathHistoryEvent(1L, null, false);
 
         //then
-        verify(rabbitTemplate).convertAndSend(eq(exchangeName), eq("path-histories.1"), any(PathHistoryResponse.PathHistoryInfoResponse.class));
+        verify(rabbitTemplate).convertAndSend(eq(exchangeName), eq("path-histories.1"), any(StartJourneyResponse.class));
     }
 
     @Test
@@ -61,9 +62,9 @@ public class PathHistoryEventServiceImplTest {
 
         // given
         Long pathHistoryId = 1L;
-        PathHistoryResponse.PathHistoryInfoResponse mockResponse =
-                new PathHistoryResponse.PathHistoryInfoResponse();
-        mockResponse.setId(pathHistoryId);
+        StartJourneyResponse mockResponse =
+                new StartJourneyResponse();
+        mockResponse.setPathHistoryId(pathHistoryId);
 
         // when
         pathHistoryEventService.handlePathHistoryEvent(mockResponse);

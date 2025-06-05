@@ -4,8 +4,6 @@ import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
 
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
-import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
-import com.sullung2yo.seatcatcher.train.dto.TrainCarDTO;
 import com.sullung2yo.seatcatcher.user.domain.User;
 
 import java.time.LocalDateTime;
@@ -14,6 +12,9 @@ import java.util.Optional;
 public interface PathHistoryService {
     PathHistory addPathHistory(String token, PathHistoryRequest request);
     PathHistoryResponse.PathHistoryInfoResponse getPathHistory(Long pathId);
+
+    PathHistoryResponse.PathHistoryInfoResponse getPathHistoryAfterAuthenticate(Long pathId); // 이미 권한 인증을 끝낸 뒤 호출할 수 있는 서비스.
+
     PathHistoryResponse.PathHistoryList getAllPathHistory(int size, Long pathId);
     void deletePathHistory(Long pathId);
 

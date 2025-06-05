@@ -3,6 +3,7 @@ package com.sullung2yo.seatcatcher.subway_station.service;
 import com.google.type.DateTime;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
+import com.sullung2yo.seatcatcher.subway_station.dto.response.StartJourneyResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -32,14 +33,25 @@ public class PathHistoryEventServiceImpl implements PathHistoryEventService {
     */
 
     @Override
-    public void publishPathHistoryEvent(Long pathHistoryId) {
+    public void publishPathHistoryEvent(Long pathHistoryId, LocalDateTime nextScheduleTime, boolean isArrived) {
         // 입력받은 파라미터의 유효성 검증
-        // TODO :: 원석님이 만드신 service 사용하는데, 로직 보니까 확실히 작동할지는 모르겠음. 테스트 필요.
-        PathHistoryResponse.PathHistoryInfoResponse response = pathHistoryService.getPathHistory(pathHistoryId);
+        PathHistoryResponse.PathHistoryInfoResponse infoResponse = pathHistoryService.getPathHistoryAfterAuthenticate(pathHistoryId);
         // 예외처리는 service 계층에서 모두 수행됨. 따라서 여기에서는 생략.
 
-        log.info("경로 예상 도착 시간 갱신 이벤트 발생 : 경로 ID :: {}", response.getId());
-        String pathHistoryRoutingKey = "path-histories" + "." + response.getId();
+        StartJourneyResponse response = StartJourneyResponse.builder()
+                .pathHistoryId(infoResponse.getId())
+                .expectedArrivalTime(infoResponse.getExpectedArrivalTime())
+                .nextScheduleTime(nextScheduleTime)
+                .isArrived(isArrived)
+                .build();
+
+        log.info("경로 예상 도착 시간 갱신 이벤트 발생 : 경로 ID :: {}, 예상 도착 시간 :: {}, 다음 스케줄 시간 :: {}, 도착 여부 :: {}",
+                response.getPathHistoryId(),
+                response.getExpectedArrivalTime(),
+                response.getNextScheduleTime(),
+                response.isArrived()
+        );
+        String pathHistoryRoutingKey = "path-histories" + "." + response.getPathHistoryId();
 
         // Exchange한테 routingKey를 사용해서 pathHistoryEvent 담아서 전달
         try {
@@ -56,14 +68,18 @@ public class PathHistoryEventServiceImpl implements PathHistoryEventService {
     */
     @Override
     @RabbitListener(queues = "${rabbitmq.path.queue.name}")
-    public void handlePathHistoryEvent(PathHistoryResponse.PathHistoryInfoResponse response) {
+    public void handlePathHistoryEvent(StartJourneyResponse response) {
         if(response == null)
         {
             log.warn("경로 예상 도착 시간 갱신 이벤트 처리 실패 : 갱신 경로 정보가 없습니다.");
             return;
         }
-        log.info("경로 예상 도착 시간 갱신 이벤트 처리 시작 : id :: {}", response.getId());
-        String topic = "/topic/path-histories" + "." + response.getId();
+        log.info("경로 예상 도착 시간 갱신 이벤트 처리 시작 : id :: {} 예상 도착 시간 :: {}, 다음 스케줄 시간 :: {}, 도착 여부 :: {}",
+                response.getPathHistoryId(),
+                response.getExpectedArrivalTime(),
+                response.getNextScheduleTime(),
+                response.isArrived());
+        String topic = "/topic/path-histories" + "." + response.getPathHistoryId();
 
         try
         {
