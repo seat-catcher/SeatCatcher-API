@@ -15,6 +15,9 @@ import java.util.List;
 @Schema(description = "사용자 정보 응답 DTO")
 public class UserInformationResponse {
 
+    @Schema(description = "사용자 ID", example = "1")
+    private Long userId;
+
     @Schema(description = "사용자 닉네임", example = "user_asdf")
     private String name;
 

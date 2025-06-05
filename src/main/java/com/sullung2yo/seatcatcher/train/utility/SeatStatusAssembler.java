@@ -1,5 +1,6 @@
 package com.sullung2yo.seatcatcher.train.utility;
 
+import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
@@ -24,6 +25,7 @@ public class SeatStatusAssembler {
 
     private final TrainSeatRepository trainSeatRepository;
     private final UserTrainSeatRepository userTrainSeatRepository;
+    private final PathHistoryService pathHistoryService;
 
     /**
      * 열차 좌석 정보, 사용자 정보 조합해서 응답 DTO 생성하는 메서드
@@ -54,9 +56,19 @@ public class SeatStatusAssembler {
                         .seatType(seat.getSeatType())
                         .occupant(occupants.containsKey(seat.getId())
                                 ? SeatOccupant.builder() // // 점유자 정보가 존재하는 경우
-                                .userId(occupants.get(seat.getId()).getId())
-                                .nickname(occupants.get(seat.getId()).getName())
-                                .getOffRemainingCount(0) // TODO: ETA 계산 로직
+                                .userId(occupants.get(seat.getId()).getId()) // 사용자 ID
+                                .nickname(occupants.get(seat.getId()).getName()) // 사용자 닉네임
+                                .expectedArrivalTime( // 도착역까지 남은 시간
+                                        pathHistoryService.getUsersLatestPathHistory(
+                                                occupants.get(seat.getId()).getId()
+                                        ).getExpectedArrivalTime()
+                                )
+                                .getOffStationName( // 도착역 이름
+                                        pathHistoryService.getUserDestination(occupants.get(seat.getId()))
+                                                .orElse(null)
+                                )
+                                .profileImageNum(occupants.get(seat.getId()).getProfileImageNum()) // 프로필 이미지 번호
+                                .tags(occupants.get(seat.getId()).getUserTag().stream().map(userTag -> userTag.getTag().getTagName()).toList()) // 태그
                                 .build()
                                 : null) // 점유자 정보가 존재하지 않는 경우 Null
                         .build())

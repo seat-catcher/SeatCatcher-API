@@ -10,7 +10,6 @@ import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
-import com.sullung2yo.seatcatcher.user.domain.CreditPolicy;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
@@ -81,7 +80,6 @@ public class SeatEventServiceImpl implements SeatEventService {
 
     /**
      * 좌석 이벤트가 RabbitMQ의 Queue에 전달되었을 때 이를 자동으로 감지해서 처리하는 메서드입니다.
-     * /topic/seat.{trainCode}를 구독한 클라이언트 전부한테 메세지를 내려줍니다. (topic 방식)
      * @param seatInfoResponses 좌석 정보 응답 객체 리스트
      */
     @RabbitListener(queues = "${rabbitmq.queue.name}") // RabbitMQ Queue에 메세지가 들어오면 이 메서드가 호출됩니다.
@@ -172,7 +170,7 @@ public class SeatEventServiceImpl implements SeatEventService {
         User owner = seat.getUser();
 
         // 양보 요청을 보낸 사용자의 크레딧 감소 (서비스 내부에서 검증)
-        creditService.creditModification(requestUserId, /*CreditPolicy.CREDIT_FOR_SIT_INFO_PROVIDE.getCredit()*/creditAmount, false, YieldRequestType.REQUEST);
+        creditService.creditModification(requestUserId, creditAmount, false, YieldRequestType.REQUEST);
 
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
