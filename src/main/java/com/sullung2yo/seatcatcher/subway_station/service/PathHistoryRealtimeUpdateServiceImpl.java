@@ -305,11 +305,14 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         long userId = pathHistory.getUser().getId();
 
         if(userTrainSeatService.isUserSitting(userId)) {
+            TrainCarDTO dto = trainSeatGroupService.getSittingTrainCarInfo(pathHistory.getUser());
+
             userTrainSeatService.releaseSeat(userId);
             userAlarmService.sendArrivalHandledAlarm(pathHistory.getUser().getFcmToken()); // 이야 만들어놓으셨네요?? 좋습니다!
+
+            //Seat Event Publish 가 일어나야 함.
+            if(dto != null) seatEventService.publishSeatEvent(dto.getTrainCode(), dto.getCarCode());
         }
-
-
     }
 
     private void onShouldRefreshPathHistory(PathHistory pathHistory, LocalDateTime value)
