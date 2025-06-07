@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,9 +69,10 @@ public class UserTrainSeatController {
     )
     public ResponseEntity<Void> createSeat(
             @RequestHeader("Authorization") String bearerToken,
-            @RequestBody UserTrainSeatRequest userTrainSeatRequest
+            @Valid @RequestBody UserTrainSeatRequest userTrainSeatRequest
     )
     {
+        log.debug("좌석 점유 요청: {}", userTrainSeatRequest.getSeatId());
         // Bearer 토큰 검증
         Long userId = verifyUserAndGetId(bearerToken);
         if (userId == null) {
