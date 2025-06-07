@@ -9,7 +9,6 @@ import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
-import com.sullung2yo.seatcatcher.user.domain.CreditPolicy;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.service.CreditService;
@@ -36,11 +35,14 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
     public UserTrainSeat reserveSeat(Long userId, Long seatId) { // TODO :: 테스트코드 작성 필요
         // 사용자 정보 가져오기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException("userId에 해당하는 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(userId + "에 해당하는 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
 
         // 좌석 정보 가져오기 (Lock 획득)
-        TrainSeat seat = trainSeatRepository.findByIdForUpdate(seatId)
-                .orElseThrow(() -> new SeatException("seatId에 해당하는 좌석을 찾을 수 없습니다.", ErrorCode.SEAT_NOT_FOUND));
+        TrainSeat seat = trainSeatRepository.findBySeatId(seatId)
+                .orElseThrow(() -> {
+                    log.error("좌석 예약 요청 실패: 사용자 ID={}, 좌석 ID={}", userId, seatId);
+                    return new SeatException(seatId + "에 해당하는 좌석을 찾을 수 없습니다.", ErrorCode.SEAT_NOT_FOUND);
+                });
 
         // 해당 사용자가 예약한 좌석이 이미 있는지 확인
         Optional<UserTrainSeat> hasUserReservedOtherSeat = userTrainSeatRepository.findUserTrainSeatByUserId(userId);
