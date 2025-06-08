@@ -13,9 +13,6 @@ import java.util.Optional;
 
 public interface TrainSeatRepository extends JpaRepository<TrainSeat, Long> {
 
-    @Query("SELECT ts FROM TrainSeat ts WHERE ts.id = :seatId")
-    Optional<TrainSeat> findBySeatId(@Param("seatId") Long seatId);
-
     @Lock(LockModeType.PESSIMISTIC_WRITE) // 비관적 락을 사용해서, 해당 TrainSeat을 비관적 락이 걸린채로 가져옴 -> (화장실 변기를 사용할 수 있음) // 다른 쓰레드는 해당 TrainSeat을 수정할 수 없음 (화장실 사용 불가)
     @Query("SELECT ts FROM TrainSeat ts WHERE ts.id = :seatId")
     Optional<TrainSeat> findByIdForUpdate(@Param("seatId") Long seatId);
