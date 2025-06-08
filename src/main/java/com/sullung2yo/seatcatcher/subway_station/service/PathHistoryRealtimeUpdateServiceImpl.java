@@ -3,14 +3,11 @@ package com.sullung2yo.seatcatcher.subway_station.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.PathHistoryException;
-import com.sullung2yo.seatcatcher.common.exception.SeatException;
-import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
 import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
 import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
 import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
-import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.TrainCarDTO;
 import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
 import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
@@ -21,12 +18,10 @@ import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +39,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
     private final SeatEventService seatEventService;
     private final UserTrainSeatRepository userTrainSeatRepository;
     private final UserAlarmService userAlarmService;
+    private final TransactionalExecuteService transactionalExecuteService;
 
     //TODO :: 환경변수화할 것
     private static final long refreshThreshold = 40; // 40초 이상 차이가 나는 경우 갱신
@@ -56,7 +52,6 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
     }
 
     @Override
-    @Transactional
     public void updateArrivalTimeAndSchedule(PathHistory pathHistory, String trainCode, TrainArrivalState beforeState) {
 
         if(pathHistory.getUser() == null)
@@ -109,14 +104,18 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
             {
                 nextScheduleDateTime = scheduleService.runThisAfterSeconds(scheduleThreshold, ()->
                 {
-                    updateArrivalTimeAndSchedule(pathHistory, trainCode, currentState);
+                    transactionalExecuteService.executeTransactional(()->{
+                        updateArrivalTimeAndSchedule(pathHistory, trainCode, currentState);
+                    });
                 });
             }
             else
             {
                 nextScheduleDateTime = scheduleService.runThisAtBeforeSeconds(pathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
                 {
-                    updateArrivalTimeAndSchedule(pathHistory, trainCode, currentState);
+                    transactionalExecuteService.executeTransactional(()->{
+                        updateArrivalTimeAndSchedule(pathHistory, trainCode, currentState);
+                    });
                 });
             }
             pathHistoryEventService.publishPathHistoryEvent(pathHistory.getId(), nextScheduleDateTime, isArrived);
