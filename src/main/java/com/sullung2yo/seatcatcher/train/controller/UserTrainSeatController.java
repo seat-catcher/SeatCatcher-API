@@ -66,7 +66,7 @@ public class UserTrainSeatController {
     public ResponseEntity<Void> createSeat(
             @RequestHeader("Authorization") String bearerToken,
             @Valid @RequestParam(value="seatId") Long seatId, // 좌석 ID,
-            @RequestParam(value = "creditAmount", required = false) Optional<String> creditAmount // 크레딧 수량(선택적, 없으면 null)
+            @RequestParam(value = "creditAmount", required = false) Optional<Long> creditAmount // 크레딧 수량(선택적, 없으면 null)
     ) {
         log.debug("좌석 점유 요청: {}, {}", seatId, creditAmount);
         // Bearer 토큰 검증
