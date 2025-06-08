@@ -67,7 +67,7 @@ public class UserTrainSeatController {
             @Valid @RequestBody UserTrainSeatRequest userTrainSeatRequest
     )
     {
-        log.debug("좌석 점유 요청: {}", userTrainSeatRequest.getSeatId());
+        log.debug("좌석 점유 요청: {}", userTrainSeatRequest.toString());
         // Bearer 토큰 검증
         Long userId = verifyUserAndGetId(bearerToken);
         if (userId == null) {
