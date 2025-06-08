@@ -6,7 +6,7 @@ import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
-import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
+// import com.sullung2yo.seatcatcher.train.dto.request.UserTrainSeatRequest;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.domain.CreditPolicy;
@@ -14,11 +14,8 @@ import com.sullung2yo.seatcatcher.user.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +43,15 @@ public class UserTrainSeatController {
     @Operation(
             summary = "양보X, 그냥 좌석에 앉을 때 해당 정보를 생성하는 API",
             description = "좌석 id와 유저 id를 이용하여 착석 정보(매핑 정보)를 만들어줍니다.",
-            requestBody = @RequestBody(
-                    description = "",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = UserTrainSeatRequest.class))
-            ),
+//            requestBody = @RequestBody(
+//                    description = "",
+//                    required = true,
+//                    content = @Content(schema = @Schema(implementation = UserTrainSeatRequest.class))
+//            ),
+            parameters = {
+                    @Parameter(name = "seatId", description = "유저가 앉을 자리의 ID입니다.", required = true),
+                    @Parameter(name = "creditAmount", description = "유저 간에 오고 가는 크레딧 양입니다. (선택적, 없으면 null)", required = false)
+            },
             responses = {
                     @ApiResponse(
                             responseCode = "201",
@@ -64,17 +65,17 @@ public class UserTrainSeatController {
     )
     public ResponseEntity<Void> createSeat(
             @RequestHeader("Authorization") String bearerToken,
-            @Valid @RequestBody UserTrainSeatRequest userTrainSeatRequest
-    )
-    {
-        log.debug("좌석 점유 요청: {}", userTrainSeatRequest.toString());
+            @Valid @RequestParam(value="seatId") Long seatId, // 좌석 ID,
+            @RequestParam(value = "creditAmount", required = false) Optional<String> creditAmount // 크레딧 수량(선택적, 없으면 null)
+    ) {
+        log.debug("좌석 점유 요청: {}, {}", seatId, creditAmount);
         // Bearer 토큰 검증
         Long userId = verifyUserAndGetId(bearerToken);
         if (userId == null) {
             throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
         }
 
-        UserTrainSeat userSeat = userTrainSeatService.reserveSeat(userId, userTrainSeatRequest.getSeatId());
+        UserTrainSeat userSeat = userTrainSeatService.reserveSeat(userId, seatId);
         log.debug("성공적으로 좌석 점유 지정 완료");
 
         // 좌석 변경 이벤트 생성
@@ -93,6 +94,10 @@ public class UserTrainSeatController {
     @Operation(
             summary = "좌석 정보 소유자를 수정하는 API",
             description = "유저가 앉아있던 좌석의 소유자를 교체하는 API입니다. 좌석 양보 수락 시 이 API를 호출하면, 좌석 소유자가 변경되고 양보 수락 사용자에게는 크레딧이 지급됩니다.",
+            parameters = {
+                    @Parameter(name = "seatId", description = "유저가 앉을 자리의 ID입니다.", required = true),
+                    @Parameter(name = "creditAmount", description = "유저 간에 오고 가는 크레딧 양입니다. (선택적, 없으면 null)", required = false)
+            },
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -106,7 +111,8 @@ public class UserTrainSeatController {
     )
     public ResponseEntity<Void> updateSeat(
             @RequestHeader("Authorization") String bearerToken,
-            @RequestBody UserTrainSeatRequest userTrainSeatRequest
+            @Valid @RequestParam(value="seatId") Long seatId, // 좌석 ID,
+            @RequestParam(value = "creditAmount", required = false) Optional<Long> creditAmount // 크레딧 수량(선택적, 없으면 null)
     ) {
         // Bearer 토큰 검증
         Long requestUserId = verifyUserAndGetId(bearerToken);
@@ -114,7 +120,7 @@ public class UserTrainSeatController {
             throw new UserException("토큰에 담긴 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND);
         }
 
-        userTrainSeatService.updateSeatOwner(requestUserId, userTrainSeatRequest.getSeatId(), userTrainSeatRequest.getCreditAmount());
+        userTrainSeatService.updateSeatOwner(requestUserId, seatId, creditAmount.orElse(0L));
 
         return ResponseEntity.ok().build();
     }
