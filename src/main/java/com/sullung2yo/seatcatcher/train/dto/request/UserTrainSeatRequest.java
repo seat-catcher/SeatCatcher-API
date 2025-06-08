@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@ToString
 @Schema(description = "착석 정보에 대한 Request DTO입니다.")
 public class UserTrainSeatRequest {
 
