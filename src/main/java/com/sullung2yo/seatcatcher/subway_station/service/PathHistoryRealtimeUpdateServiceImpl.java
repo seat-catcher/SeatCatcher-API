@@ -21,6 +21,7 @@ import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -55,6 +56,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
     }
 
     @Override
+    @Transactional
     public void updateArrivalTimeAndSchedule(PathHistory pathHistory, String trainCode, TrainArrivalState beforeState) {
 
         if(pathHistory.getUser() == null)
