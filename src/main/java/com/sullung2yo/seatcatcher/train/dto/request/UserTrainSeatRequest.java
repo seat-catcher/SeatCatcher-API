@@ -10,7 +10,6 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Validated // DTO 요구사항 만족 안하면 400 에러 발생시켜주는 어노테이션
 @Schema(description = "착석 정보에 대한 Request DTO입니다.")
 public class UserTrainSeatRequest {
 
