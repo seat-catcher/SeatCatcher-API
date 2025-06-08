@@ -309,7 +309,14 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
             TrainCarDTO dto = trainSeatGroupService.getSittingTrainCarInfo(pathHistory.getUser());
 
             userTrainSeatService.releaseSeat(userId);
-            userAlarmService.sendArrivalHandledAlarm(pathHistory.getUser().getFcmToken()); // 이야 만들어놓으셨네요?? 좋습니다!
+            try
+            {
+                userAlarmService.sendArrivalHandledAlarm(pathHistory.getUser().getFcmToken()); // 이야 만들어놓으셨네요?? 좋습니다!
+            }
+            catch(Exception e)
+            {
+                // 알림 보내는데에 실패했다고 서비스가 터져버리는건 부적절하므로 그냥 패스
+            }
 
             //Seat Event Publish 가 일어나야 함.
             if(dto != null) seatEventService.publishSeatEvent(dto.getTrainCode(), dto.getCarCode());
