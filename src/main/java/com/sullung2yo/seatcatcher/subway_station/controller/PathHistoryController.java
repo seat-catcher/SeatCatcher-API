@@ -12,6 +12,7 @@ import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryRespons
 import com.sullung2yo.seatcatcher.subway_station.dto.response.StartJourneyResponse;
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryRealtimeUpdateService;
 import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
+import com.sullung2yo.seatcatcher.subway_station.service.TransactionalExecuteService;
 import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,7 @@ public class PathHistoryController {
     private final UserService userService;
     private final TaskScheduleService scheduleService;
     private final PathHistoryRealtimeUpdateService pathHistoryRealtimeUpdateService;
+    private final TransactionalExecuteService transactionalExecuteService;
 
     @PostMapping("/")
     @Operation(
@@ -169,7 +171,9 @@ public class PathHistoryController {
             // 이 정도면 곧바로 실시간으로 업데이트가 가능함. 스케줄링 맡기지 말고 즉시 한 번 업데이트하자!
             nextScheduleDateTime = scheduleService.runThisAfterSeconds(10, ()->
             {
-                pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
+                transactionalExecuteService.executeTransactional(()->{
+                    pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
+                });
             });
         }
         else
@@ -177,7 +181,9 @@ public class PathHistoryController {
             // expected arrival time 이 되기 전 N초 전에 해당 스케줄을 실행.
             nextScheduleDateTime = scheduleService.runThisAtBeforeSeconds(latestPathHistory.getExpectedArrivalTime(), nextScheduleTime, ()->
             {
-                pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
+                transactionalExecuteService.executeTransactional(()->{
+                    pathHistoryRealtimeUpdateService.updateArrivalTimeAndSchedule(latestPathHistory, request.getTrainCode(), TrainArrivalState.STATE_NOT_FOUND);
+                });
             });
         }
 
