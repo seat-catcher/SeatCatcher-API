@@ -316,6 +316,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
             catch(Exception e)
             {
                 // 알림 보내는데에 실패했다고 서비스가 터져버리는건 부적절하므로 그냥 패스
+                log.error("자동하차처리 알림을 보내는데에 실패했습니다.");
             }
 
             //Seat Event Publish 가 일어나야 함.
