@@ -38,7 +38,7 @@ public class UserTrainSeatServiceImpl implements UserTrainSeatService {
                 .orElseThrow(() -> new UserException(userId + "에 해당하는 사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
 
         // 좌석 정보 가져오기 (Lock 획득)
-        TrainSeat seat = trainSeatRepository.findBySeatId(seatId)
+        TrainSeat seat = trainSeatRepository.findById(seatId)
                 .orElseThrow(() -> {
                     log.error("좌석 예약 요청 실패: 사용자 ID={}, 좌석 ID={}", userId, seatId);
                     return new SeatException(seatId + "에 해당하는 좌석을 찾을 수 없습니다.", ErrorCode.SEAT_NOT_FOUND);
