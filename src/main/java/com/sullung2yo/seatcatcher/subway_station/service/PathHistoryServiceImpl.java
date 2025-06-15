@@ -133,7 +133,7 @@ public class PathHistoryServiceImpl implements PathHistoryService{
     @Override
     public Optional<String> getUserDestination(User user) {
         try{
-            SubwayStation destination = this.getUsersLatestPathHistory(user.getId()).getEndStation();
+            SubwayStation destination = this.getUsersLatestPathHistory(user.getId()).getEndStation(); // 사용자의 가장 최신 PathHistory 의 도착역을 가져옴.
             return Optional.of(destination.getStationName());
         } catch ( RuntimeException e ) {
             return Optional.empty();

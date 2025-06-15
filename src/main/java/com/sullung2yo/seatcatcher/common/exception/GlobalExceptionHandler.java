@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.common.exception;
 
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -104,11 +105,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SeatException.class)
-    public ResponseEntity<ErrorResponse> handleSeatException(SeatException ex) {
+    public ResponseEntity<ErrorResponse> handleSeatException(SeatException ex, HttpServletRequest request) {
         /*
           좌석 관련 ExceptionHandler
          */
-        log.error("SeatException", ex);
+        log.error("SeatException 발생 - URI : {}, Message: {}", request.getRequestURI(), ex.getMessage(), ex);
         if (ex.getErrorCode() == ErrorCode.SEAT_ALREADY_RESERVED) {
             return createErrorResponse(HttpStatus.CONFLICT, "Seat already reserved", ex.getMessage());
         }

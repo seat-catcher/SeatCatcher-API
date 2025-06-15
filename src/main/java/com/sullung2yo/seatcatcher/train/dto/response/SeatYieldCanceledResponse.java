@@ -4,15 +4,18 @@ import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
 import com.sullung2yo.seatcatcher.user.domain.UserTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Builder
 @Schema(description = "좌석 양보 요청 취소 응답 객체", title = "SeatYieldCanceledResponse")
 public class SeatYieldCanceledResponse {
+
+    @Schema(description = "좌석 ID", example = "1")
+    Long seatId;
 
     @NotNull
     @Schema(description = "좌석 양보 요청을 취소한 사람의 User Id", example = "1")
