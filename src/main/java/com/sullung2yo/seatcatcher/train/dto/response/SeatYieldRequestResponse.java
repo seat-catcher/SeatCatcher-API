@@ -4,10 +4,7 @@ import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
 import com.sullung2yo.seatcatcher.user.domain.UserTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Set;
 
@@ -17,6 +14,9 @@ import java.util.Set;
 @ToString
 @Schema(description = "좌석 양보 요청 응답 객체", title = "SeatYieldRequestResponse")
 public class SeatYieldRequestResponse {
+
+    @Schema(description = "좌석 Id", example = "1")
+    Long seatId;
 
     @NotNull
     @Schema(description = "좌석 양보를 요청한 사람의 User Id", example = "1")
