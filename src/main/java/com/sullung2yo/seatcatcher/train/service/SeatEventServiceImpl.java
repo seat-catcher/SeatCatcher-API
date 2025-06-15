@@ -183,7 +183,7 @@ public class SeatEventServiceImpl implements SeatEventService {
                     .creditAmount(creditAmount)
                     .build(); // 좌석 양보 요청에 대한 응답 객체 생성
 
-            String topic = "seat" + "." + seatId + "." + "owner"; // 좌석 점유자가 구독한 경로에다 전달
+            String topic = "/topic/seat" + "." + seatId + "." + "owner"; // 좌석 점유자가 구독한 경로에다 전달
             try {
                 webSocketMessagingTemplate.convertAndSend(topic, seatYieldRequestResponse);
                 log.debug("RabbitMQ에 좌석 양보 요청 이벤트 발행 성공: {}, {}", topic, seatYieldRequestResponse);
@@ -227,7 +227,7 @@ public class SeatEventServiceImpl implements SeatEventService {
                     .isAccepted(true)
                     .build();
 
-            String topic = "seat." + seatId + "." + "requester." + oppositeUserId;
+            String topic = "/topic/seat." + seatId + "." + "requester." + oppositeUserId;
             try {
                 webSocketMessagingTemplate.convertAndSend(topic, response);
                 log.debug("RabbitMQ에 좌석 양보 수락 이벤트 발행 성공: {}, {}", topic, response);
@@ -282,7 +282,7 @@ public class SeatEventServiceImpl implements SeatEventService {
                     .isAccepted(false) // 거절당했으므로 false.
                     .build();
 
-            String topic = "seat." + seatId + "." + "requester." + oppositeUserId;
+            String topic = "/topic/seat." + seatId + "." + "requester." + oppositeUserId;
             try {
                 webSocketMessagingTemplate.convertAndSend(topic, response);
                 log.debug("RabbitMQ에 좌석 양보 거절 이벤트 발행 성공: {}, {}", topic, response);
@@ -320,7 +320,7 @@ public class SeatEventServiceImpl implements SeatEventService {
                     .requestUserTags(requestUser.getUserTag())
                     .build(); // 좌석 양보 요청 취소 응답 객체 생성
 
-            String topic = "seat" + "." + seatId + "." + "owner"; // 좌석에 앉아있는 사용자의 routingKey로 취소 메세지 전달해야함
+            String topic = "/topic/seat" + "." + seatId + "." + "owner"; // 좌석에 앉아있는 사용자의 routingKey로 취소 메세지 전달해야함
             try {
                 webSocketMessagingTemplate.convertAndSend(topic, seatYieldCanceledResponse);
                 log.debug("RabbitMQ에 좌석 양보 요청 취소 이벤트 발행 성공: {}, {}", topic, seatYieldCanceledResponse);
