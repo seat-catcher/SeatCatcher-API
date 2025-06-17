@@ -185,7 +185,7 @@ public class SeatEventServiceImpl implements SeatEventService {
                 webSocketMessagingTemplate.convertAndSend(topic, seatYieldRequestResponse);
                 log.debug("RabbitMQ에 좌석 양보 요청 이벤트 발행 성공: {}, {}", topic, seatYieldRequestResponse);
             } catch (Exception e) {
-                log.error("RabbitMQ에 좌석 양보 요청 이벤트 발행 실패: {}, {}, {}", topic, seatYieldRequestResponse, e.getMessage());
+                log.error("유감스럽게도 RabbitMQ에 좌석 양보 요청 이벤트 발행 실패: {}, {}, {}", topic, seatYieldRequestResponse, e.getMessage());
             }
         } else {
             // FCM 푸시 알림 전송
