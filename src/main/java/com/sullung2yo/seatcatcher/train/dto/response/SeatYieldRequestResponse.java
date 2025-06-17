@@ -1,12 +1,12 @@
 package com.sullung2yo.seatcatcher.train.dto.response;
 
 import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
-import com.sullung2yo.seatcatcher.user.domain.UserTag;
+import com.sullung2yo.seatcatcher.user.domain.Tag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,7 +31,7 @@ public class SeatYieldRequestResponse {
     ProfileImageNum requestUserProfileImageNum;
 
     @NotNull
-    Set<UserTag> requestUserTags;
+    List<Tag> requestUserTags;
 
     @NotNull
     @Schema(description = "좌석 양보를 요청한 사람이 제안한 크레딧 수", example = "300")
