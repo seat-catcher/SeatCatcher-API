@@ -1,6 +1,5 @@
 package com.sullung2yo.seatcatcher.user.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +17,6 @@ import java.util.Set;
 @Table(name = "tag")
 public class Tag extends BaseEntity {
 
-    @JsonIgnore
     @OneToMany(mappedBy = "tag")
     @Builder.Default
     private Set<UserTag> userTag = new HashSet<>();
