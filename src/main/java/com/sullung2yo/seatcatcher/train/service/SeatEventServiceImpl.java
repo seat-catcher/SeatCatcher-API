@@ -317,8 +317,8 @@ public class SeatEventServiceImpl implements SeatEventService {
                     .requestUserId(requestUserId)
                     .requestUserNickname(requestUser.getName())
                     .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                    .requestUserTags(requestUser.getUserTag())
                     .build(); // 좌석 양보 요청 취소 응답 객체 생성
+            // TODO :: 추후 사용자의 태그 정보도 전달해야함
 
             String topic = "/topic/seat" + "." + seatId + "." + "owner"; // 좌석에 앉아있는 사용자의 routingKey로 취소 메세지 전달해야함
             try {

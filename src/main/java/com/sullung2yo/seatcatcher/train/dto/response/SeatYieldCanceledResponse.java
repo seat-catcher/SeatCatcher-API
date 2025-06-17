@@ -28,7 +28,4 @@ public class SeatYieldCanceledResponse {
     @NotNull
     @Schema(description = "좌석 양보 요청을 취소한 사람의 프로필 이미지 번호", example = "IMAGE_1")
     ProfileImageNum requestUserProfileImageNum;
-
-    @NotNull
-    Set<UserTag> requestUserTags;
 }
