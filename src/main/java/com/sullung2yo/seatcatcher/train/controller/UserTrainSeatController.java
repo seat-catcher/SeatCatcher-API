@@ -122,6 +122,11 @@ public class UserTrainSeatController {
 
         userTrainSeatService.updateSeatOwner(requestUserId, seatId, creditAmount.orElse(0L));
 
+        // 좌석 변경 이벤트 생성
+        TrainSeatGroup trainSeatGroup = userTrainSeatService.findUserTrainSeatBySeatId(seatId).getTrainSeat().getTrainSeatGroup();
+        seatEventService.publishSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
+        log.info("좌석 변경 이벤트 생성 완료");
+
         return ResponseEntity.ok().build();
     }
 
