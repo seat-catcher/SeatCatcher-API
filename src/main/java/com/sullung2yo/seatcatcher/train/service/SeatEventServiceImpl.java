@@ -10,8 +10,10 @@ import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
+import com.sullung2yo.seatcatcher.user.domain.Tag;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserTag;
+import com.sullung2yo.seatcatcher.user.domain.UserTagType;
 import com.sullung2yo.seatcatcher.user.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
@@ -180,7 +182,10 @@ public class SeatEventServiceImpl implements SeatEventService {
                     .requestUserId(requestUserId)
                     .requestUserNickname(requestUser.getName())
                     .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                    .requestUserTags(requestUser.getUserTag().stream().map(UserTag::getTag).toList())
+                    .requestUserTags(requestUser.getUserTag().stream()
+                            .map(UserTag::getTag)
+                            .map(Tag::getTagName)
+                            .toList())
                     .creditAmount(creditAmount)
                     .build(); // 좌석 양보 요청에 대한 응답 객체 생성
 
