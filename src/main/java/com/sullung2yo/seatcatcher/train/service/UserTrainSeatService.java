@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.train.service;
 
 
 import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
+import com.sullung2yo.seatcatcher.train.domain.TrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
