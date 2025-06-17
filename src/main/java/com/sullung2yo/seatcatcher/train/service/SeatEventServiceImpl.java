@@ -171,12 +171,13 @@ public class SeatEventServiceImpl implements SeatEventService {
 
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
-            TempSeatYieldRequestResponse seatYieldRequestResponse = TempSeatYieldRequestResponse.builder()
+            SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
                     .seatId(seatId)
                     .requestUserId(requestUserId)
                     .requestUserNickname(requestUser.getName())
                     .requestUserProfileImageNum(requestUser.getProfileImageNum())
                     .creditAmount(creditAmount)
+                    .requestUserTags(requestUser.getUserTag().stream().map(userTag -> userTag.getTag().getTagName()).toList())
                     .build(); // 좌석 양보 요청에 대한 응답 객체 생성
             // TODO :: 추후 사용자의 태그 정보도 전달해야함
 
