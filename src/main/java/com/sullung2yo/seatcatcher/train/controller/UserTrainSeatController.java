@@ -68,7 +68,7 @@ public class UserTrainSeatController {
             @Valid @RequestParam(value="seatId") Long seatId, // 좌석 ID,
             @RequestParam(value = "creditAmount", required = false) Optional<Long> creditAmount // 크레딧 수량(선택적, 없으면 null)
     ) {
-        log.debug("좌석 점유 요청: {}, {}", seatId, creditAmount);
+        log.info("좌석 점유 요청: {}, {}", seatId, creditAmount);
         // Bearer 토큰 검증
         Long userId = verifyUserAndGetId(bearerToken);
         if (userId == null) {
@@ -76,7 +76,7 @@ public class UserTrainSeatController {
         }
 
         UserTrainSeat userSeat = userTrainSeatService.reserveSeat(userId, seatId);
-        log.debug("성공적으로 좌석 점유 지정 완료");
+        log.info("성공적으로 좌석 점유 지정 완료 / userId : {}", userId);
 
         // 좌석 변경 이벤트 생성
         TrainSeatGroup trainSeatGroup = userSeat.getTrainSeat().getTrainSeatGroup();
