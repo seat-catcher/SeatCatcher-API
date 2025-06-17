@@ -183,7 +183,7 @@ public class SeatEventServiceImpl implements SeatEventService {
                     .requestUserId(requestUserId)
                     .requestUserNickname(requestUser.getName())
                     .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                    .requestUserTags(List.of())
+                    .requestUserTags(List.of()) // TODO:: 태그 전달 시 순환 직렬화 오류 발생 -> 문제 해결 필요
                     .creditAmount(creditAmount)
                     .build(); // 좌석 양보 요청에 대한 응답 객체 생성
 
