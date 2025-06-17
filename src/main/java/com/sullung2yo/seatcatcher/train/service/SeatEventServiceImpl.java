@@ -10,11 +10,7 @@ import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
-import com.sullung2yo.seatcatcher.user.domain.Tag;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserTag;
-import com.sullung2yo.seatcatcher.user.domain.UserTagType;
-import com.sullung2yo.seatcatcher.user.dto.TagDto;
 import com.sullung2yo.seatcatcher.user.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
@@ -30,7 +26,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -179,18 +174,14 @@ public class SeatEventServiceImpl implements SeatEventService {
 
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
-            List<TagDto> tagDtos = requestUser.getUserTag().stream()
-                    .map(userTag -> new TagDto(userTag.getTag().getTagName()))
-                    .toList();
-
             SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
                     .seatId(seatId)
                     .requestUserId(requestUserId)
                     .requestUserNickname(requestUser.getName())
                     .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                    .requestUserTags(tagDtos)
                     .creditAmount(creditAmount)
                     .build(); // 좌석 양보 요청에 대한 응답 객체 생성
+            // TODO :: 추후 사용자의 태그 정보도 전달해야함
 
             String topic = "/topic/seat" + "." + seatId + "." + "owner"; // 좌석 점유자가 구독한 경로에다 전달
             try {
