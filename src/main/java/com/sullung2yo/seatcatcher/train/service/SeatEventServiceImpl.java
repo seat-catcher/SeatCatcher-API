@@ -6,10 +6,7 @@ import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.*;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
@@ -174,7 +171,7 @@ public class SeatEventServiceImpl implements SeatEventService {
 
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
-            SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
+            TempSeatYieldRequestResponse seatYieldRequestResponse = TempSeatYieldRequestResponse.builder()
                     .seatId(seatId)
                     .requestUserId(requestUserId)
                     .requestUserNickname(requestUser.getName())
