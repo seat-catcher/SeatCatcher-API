@@ -99,6 +99,9 @@ public class GlobalExceptionHandler {
         else if(ex.getErrorCode() == ErrorCode.INSUFFICIENT_CREDIT){
             return createErrorResponse(HttpStatus.BAD_REQUEST, "Insufficient Credit", ex.getMessage());
         }
+        else if(ex.getErrorCode() == ErrorCode.USER_STATUS_NOT_FOUND){
+            return createErrorResponse(HttpStatus.NOT_FOUND, "User Status Not Found", ex.getMessage());
+        }
         else {
             return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "User Internal Server Error", ex.getMessage());
         }
