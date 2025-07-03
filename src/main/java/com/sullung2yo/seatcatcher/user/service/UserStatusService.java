@@ -10,4 +10,5 @@ public interface UserStatusService {
     UserStatusResponse getUserStatusWithToken(String token) throws RuntimeException;
     void createUserStatus(String token, UserStatusRequest userStatusRequest) throws RuntimeException;
     void deleteUserStatus(User user);
+    void updateUserStatus(String token, UserStatusRequest userStatusRequest) throws RuntimeException;
 }

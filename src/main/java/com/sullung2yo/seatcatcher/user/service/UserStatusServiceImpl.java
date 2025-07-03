@@ -31,17 +31,12 @@ public class UserStatusServiceImpl implements UserStatusService {
         UserStatus userStatusEntity = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new UserException("사용자의 상태값을 찾을 수 없습니다.", ErrorCode.USER_STATUS_NOT_FOUND));
 
-        UserStatusResponse userStatusResponse = UserStatusResponse.builder()
+        return UserStatusResponse.builder()
                 .trainCode(userStatusEntity.getTrainCode())
                 .carCode(userStatusEntity.getCarCode())
                 .seatSection(userStatusEntity.getSeatSection())
                 .seatIdRequested(userStatusEntity.getSeatIdRequested())
                 .build();
-
-        // 이제 response 구조도 모두 만들어줬으니 기존 UserStatus 는 제거하겠음.
-        userStatusRepository.delete(userStatusEntity);
-
-        return userStatusResponse;
     }
 
     @Override
@@ -67,5 +62,22 @@ public class UserStatusServiceImpl implements UserStatusService {
     public void deleteUserStatus(User user) throws RuntimeException {
         Optional<UserStatus> entity = userStatusRepository.findByUserId(user.getId());
         entity.ifPresent(userStatusRepository::delete); // 있으면 제거함. 없으면 말고.
+    }
+
+    @Override
+    public void updateUserStatus(String token, UserStatusRequest userStatusRequest) throws RuntimeException {
+        final User user = userService.getUserWithToken(token); // 일단 유저를 가져옵시다.
+
+        UserStatus entity = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() ->
+                        new UserException(
+                                "사용자의 Status 를 찾을 수 없습니다.",
+                                ErrorCode.USER_STATUS_NOT_FOUND)
+                );
+
+        entity.setTrainCode(userStatusRequest.getTrainCode());
+        entity.setCarCode(userStatusRequest.getCarCode());
+        entity.setSeatSection(userStatusRequest.getSeatSection());
+        entity.setSeatIdRequested(userStatusRequest.getSeatIdRequested());
     }
 }
