@@ -75,9 +75,9 @@ public class UserStatusServiceImpl implements UserStatusService {
                                 ErrorCode.USER_STATUS_NOT_FOUND)
                 );
 
-        entity.setTrainCode(userStatusRequest.getTrainCode());
-        entity.setCarCode(userStatusRequest.getCarCode());
-        entity.setSeatSection(userStatusRequest.getSeatSection());
-        entity.setSeatIdRequested(userStatusRequest.getSeatIdRequested());
+        if(userStatusRequest.getTrainCode() != null) entity.setTrainCode(userStatusRequest.getTrainCode());
+        if(userStatusRequest.getCarCode() != null) entity.setCarCode(userStatusRequest.getCarCode());
+        if(userStatusRequest.getSeatSection() != null) entity.setSeatSection(userStatusRequest.getSeatSection());
+        if(userStatusRequest.getSeatIdRequested() != null) entity.setSeatIdRequested(userStatusRequest.getSeatIdRequested());
     }
 }
