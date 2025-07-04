@@ -11,6 +11,8 @@ public interface UserAlarmService {
     UserAlarmResponse.UserAlarmItem getAlarm(String token, Long id);
     void deletAlarm(String token, Long id);
 
+    void sendHelloAlarm(String token);
+
     void sendArrivalHandledAlarm(String receiverToken); // 자동 하차 처리 알람
     void sendSeatRequestReceivedAlarm(String receiverToken, String nickname, long creditAmount); // 좌석 요청 도착 알림
     void sendSeatRequestRejectedAlarm(String receiverToken); // 좌석 요청 거절 알림
