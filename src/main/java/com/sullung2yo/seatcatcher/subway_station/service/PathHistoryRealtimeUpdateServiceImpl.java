@@ -15,6 +15,7 @@ import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
+import com.sullung2yo.seatcatcher.user.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
     private final UserTrainSeatRepository userTrainSeatRepository;
     private final UserAlarmService userAlarmService;
     private final TransactionalExecuteService transactionalExecuteService;
+    private final UserStatusService userStatusService;
 
     //TODO :: 환경변수화할 것
     private static final long refreshThreshold = 40; // 40초 이상 차이가 나는 경우 갱신
@@ -304,6 +306,7 @@ public class PathHistoryRealtimeUpdateServiceImpl implements PathHistoryRealtime
         //TODO :: 자동하차 처리를 수행하게 되는데, 나중에 설정을 통해 자동으로 하차처리가 안 되게 해야 할 수도 있음.
         // 일단 그 부분이 없으니까 하차할 타이밍이 되면 무지성으로 하차하게 해놓겠음.
         long userId = pathHistory.getUser().getId();
+        userStatusService.deleteUserStatus(pathHistory.getUser()); // 유저의 Status 를 삭제
 
         if(userTrainSeatService.isUserSitting(userId)) {
             TrainCarDTO dto = trainSeatGroupService.getSittingTrainCarInfo(pathHistory.getUser());

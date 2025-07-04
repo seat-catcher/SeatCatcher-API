@@ -127,6 +127,8 @@ public class UserTrainSeatController {
         seatEventService.publishSeatEvent(trainSeatGroup.getTrainCode(), trainSeatGroup.getCarCode());
         log.info("좌석 변경 이벤트 생성 완료");
 
+        //TODO :: FCM 좌석 변경 성공 알림 보내는 로직 추가되어야 함.
+
         return ResponseEntity.ok().build();
     }
 

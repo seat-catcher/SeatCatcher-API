@@ -110,6 +110,20 @@ public class UserAlarmServiceImpl implements UserAlarmService {
 
     }
 
+    @Override
+    public void sendHelloAlarm(String token)
+    {
+        User user = userService.getUserWithToken(token);
+        String fcmToken = user.getFcmToken();
+
+        if(user.getFcmToken() == null)
+        {
+            throw new UserAlarmException("유저의 FcmToken 이 없습니다!", ErrorCode.INVALID_PARAMETER);
+        }
+
+        send(fcmToken, PushNotificationType.HELLO);
+    }
+
     // 자동 하차 처리 알람
     @Override
     public void sendArrivalHandledAlarm(String receiverToken) {

@@ -1,6 +1,10 @@
 package com.sullung2yo.seatcatcher.user.domain;
 
 public enum PushNotificationType {
+    HELLO(
+      "ACK",
+      "Hello, FCM!"
+    ),
     MOST_USED_TIME_ALERT(
             "지하철에 타셨나요?",
             "앉은 좌석 입력하고 뽑기 한 판 해볼까요?"
