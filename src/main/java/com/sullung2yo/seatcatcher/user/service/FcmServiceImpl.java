@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -57,13 +58,17 @@ public class FcmServiceImpl implements FcmService {
                 .header(ACCEPT, "application/json; UTF-8")
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (fcmRequest, fcmResponse) -> {
-                    throw new FcmException("Firebase 메시지 전송 실패:"+fcmResponse.getBody(), ErrorCode.INVALID_REQUEST_URI);
+                    String error = new String(fcmResponse.getBody().readAllBytes(), StandardCharsets.UTF_8);
+
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String errorMessage = objectMapper.readTree(error).toPrettyString();
+
+                    throw new FcmException("Firebase 메시지 전송 실패 : " + errorMessage, ErrorCode.INVALID_REQUEST_URI);
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (fcmRequest, fcmResponse) -> {
                     throw new FcmException("FCM 요청 URI가 잘못되었습니다", ErrorCode.FIREBASE_SERVER_ERROR);
                 })
                 .toBodilessEntity();
-
     }
 
     @Override
