@@ -52,18 +52,23 @@ jobs:
       - name: Start RabbitMQ service
         run: |
           docker run -d --name rabbitmq \
-            -p 5672:5672 -p 61613:61613 \
+            -p 5672:5672 \ 
+            -p 61613:61613 \
             -e RABBITMQ_DEFAULT_USER=test \
             -e RABBITMQ_DEFAULT_PASS=testtest \
             -e RABBITMQ_DEFAULT_VHOST=ttteeesssttt \
-            rabbitmq:3-management-alpine
-          
-          # Enable STOMP plugin
-          docker exec rabbitmq rabbitmq-plugins enable rabbitmq_web_stomp
-          docker exec rabbitmq rabbitmq-plugins enable rabbitmq_stomp
-          
-          # Wait for RabbitMQ to be ready
-          timeout 60s bash -c 'until docker exec rabbitmq rabbitmqctl status; do sleep 2; done'
+            rabbitmq:4.1.0-management-alpine sh -c "
+              rabbitmq-plugins enable --offline rabbitmq_stomp rabbitmq_web_stomp &&
+              rabbitmq-server
+            "
+
+      - name: Wait until RabbitMQ is healthy
+        run: |
+          timeout 60s bash -c "
+          until docker exec rabbitmq rabbitmqctl status; 
+            do echo 'Waiting for RabbitMQ to be healthy...'
+            sleep 5
+          done
 
       - name: Run tests # 전체 테스트 실행
         run: ./gradlew test
