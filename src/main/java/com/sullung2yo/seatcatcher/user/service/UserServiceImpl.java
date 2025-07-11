@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProviderImpl jwtTokenProvider;
     private final TagRepository tagRepository;
     private final UserTagRepository userTagRepository;
+    private final AuthServiceImpl authService;
 
     @Override
     public User getUserWithId(Long userId) throws RuntimeException {
@@ -131,14 +132,30 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(String token) throws RuntimeException {
         // 1. 사용자 정보 가져오기
         User user = this.getUserWithToken(token);
-        log.debug("삭제할 사용자 : {}", user.getProviderId());
+        log.info("사용자 계정 삭제 요청. 사용자 ID: {}, 제공자: {}", user.getProviderId(), user.getProvider());
 
-        // 2. 사용자-태그 중간 테이블 삭제
+        // 2. Apple 사용자인 경우 토큰 취소 (앱스토어 가이드라인 준수)
+        if (user.getProvider() == Provider.APPLE) {
+            try {
+                log.info("Apple 사용자 토큰 취소 시작");
+                authService.revokeAppleToken(user.getAppleAuthorizationCode());
+                log.info("Apple 사용자 토큰 취소 완료");
+            } catch (Exception e) {
+                log.warn("Apple 토큰 취소 실패하지만 계정 삭제 계속 진행: {}", e.getMessage());
+                // 토큰 취소 실패해도 사용자 삭제 요청은 거부하면 안돤다고 하네요
+            }
+        }
+
+        // 3. 관련 데이터 삭제
+        // 3-1. 사용자-태그 중간 테이블 삭제
         userTagRepository.deleteAll(user.getUserTag());
-        log.debug("사용자-태그 테이블에 저장된 사용자 관련 정보 삭제");
+        log.debug("사용자-태그 관계 삭제 완료");
 
-        // 3. 사용자 정보 삭제
+        // 3-2. 기타 사용자 관련 데이터 삭제 (필요시 추가)
+        // TODO: 알람, 경로 기록, 좌석 예약 등 관련 데이터 삭제 로직 추가
+
+        // 4. 사용자 정보 삭제
         userRepository.delete(user);
-        log.debug("사용자 정보 삭제");
+        log.info("사용자 계정 삭제 완료. 사용자 ID: {}", user.getProviderId());
     }
 }
