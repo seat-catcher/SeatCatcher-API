@@ -23,7 +23,9 @@ jobs:
       - name: Setup cicd.properties
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.PROD_PROPERTIES }}" > ./src/main/resources/application.properties
+          cat << 'EOF' > ./src/main/resources/application.properties
+          ${{ secrets.PROD_PROPERTIES }}
+          EOF
 
       - name: Setup firebase-adminsdk-fbsvc-5d0ae449ec.json
         run: |
@@ -73,7 +75,9 @@ jobs:
       - name: Setup application.properties
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.SWAGGER_PROPERTIES }}" > ./src/main/resources/application.properties
+          cat << 'EOF' > ./src/main/resources/application.properties
+          ${{ secrets.SWAGGER_PROPERTIES }}
+          EOF
 
       - name: Setup firebase-adminsdk-fbsvc-5d0ae449ec.json
         run: |
