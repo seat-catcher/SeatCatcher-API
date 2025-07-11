@@ -41,5 +41,5 @@ src/main/.DS_Store
 
 ### Spring Boot ###
 src/main/resources/*.properties
-
+src/main/resources/*.p8
 /src/main/resources/seat-catcher-firebase-adminsdk-fbsvc-5d0ae449ec.json
