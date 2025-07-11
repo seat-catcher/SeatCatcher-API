@@ -15,6 +15,6 @@ jobs:
     steps:
       - uses: Laurenfrost/mention-to-slack@latest
         with:
-          configuration-path: .github/slack-config.yml
+          configuration-path: .github/config/slack-config.yml
           repo-token: ${{ secrets.GH_TOKEN }}
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
