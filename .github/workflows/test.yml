@@ -29,7 +29,9 @@ jobs:
       - name: Setup application.properties
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.TEST_PROPERTIES }}" > ./src/main/resources/application.properties
+          cat << 'EOF' > ./src/main/resources/application.properties
+          ${{ secrets.TEST_PROPERTIES }}
+          EO
 
       - name: Setup firebase-adminsdk-fbsvc-5d0ae449ec.json
         run: |
