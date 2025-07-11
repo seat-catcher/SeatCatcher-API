@@ -6,6 +6,8 @@ on:
       - uijong
       - yuseok
       - wonseok
+      - Seunghan
+      - kihye
 
 permissions:
   contents: read
@@ -31,7 +33,7 @@ jobs:
           mkdir -p ./src/main/resources
           cat << 'EOF' > ./src/main/resources/application.properties
           ${{ secrets.TEST_PROPERTIES }}
-          EO
+          EOF
 
       - name: Setup firebase-adminsdk-fbsvc-5d0ae449ec.json
         run: |
@@ -46,6 +48,22 @@ jobs:
           else
             echo "✅ Java compilation succeeded"
           fi
+
+      - name: Start RabbitMQ service
+        run: |
+          docker run -d --name rabbitmq \
+            -p 5672:5672 -p 61613:61613 \
+            -e RABBITMQ_DEFAULT_USER=test \
+            -e RABBITMQ_DEFAULT_PASS=testtest \
+            -e RABBITMQ_DEFAULT_VHOST=ttteeesssttt \
+            rabbitmq:3-management-alpine
+          
+          # Enable STOMP plugin
+          docker exec rabbitmq rabbitmq-plugins enable rabbitmq_web_stomp
+          docker exec rabbitmq rabbitmq-plugins enable rabbitmq_stomp
+          
+          # Wait for RabbitMQ to be ready
+          timeout 60s bash -c 'until docker exec rabbitmq rabbitmqctl status; do sleep 2; done'
 
       - name: Run tests # 전체 테스트 실행
         run: ./gradlew test
