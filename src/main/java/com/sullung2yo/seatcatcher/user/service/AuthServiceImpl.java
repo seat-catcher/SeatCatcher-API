@@ -64,7 +64,10 @@ public class AuthServiceImpl implements AuthService {
     private String appleKeyId;
 
     @Value("${apple.private_key_pem}")
-    private String applePrivateKeyPath;
+    private String applePrivateKeyPath; // 로컬, 로컬 테스트 환경에서만 사용
+
+    @Value("${apple.private_key_content}")
+    private String applePrivateKeyContent; // CICD, PROD 환경에서 사용
 
     public AuthServiceImpl(
             UserRepository userRepository,
@@ -367,35 +370,47 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * Apple 개인키 로드
+     * Apple 개인키 로드 (환경변수 우선, 파일 fallback)
      */
     private ECPrivateKey loadApplePrivateKey() {
         try {
-            log.debug("Apple private key 로드");
+            log.debug("Apple private key 로드 시작");
             
-            // 1. 리소스 파일 로드
-            Resource resource = resourceLoader.getResource(applePrivateKeyPath);
-            if (!resource.exists()) {
-                throw new AuthException("Apple Private key 파일을 찾을 수 없습니다: " + applePrivateKeyPath, ErrorCode.AUTH_APPLE_PRIVATE_KEY_ERROR);
+            String privateKeyContent;
+            
+            // 1. 환경변수에서 키 내용 확인 (CI/CD 환경, Prod 환경용)
+            if (applePrivateKeyContent != null && !applePrivateKeyContent.trim().isEmpty()) {
+                log.debug("환경변수에서 Apple private key 로드");
+                privateKeyContent = applePrivateKeyContent;
+            }
+            // 2. 파일에서 키 로드 (로컬 개발, 로컬 Test 환경용)
+            else if (applePrivateKeyPath != null && !applePrivateKeyPath.trim().isEmpty()) {
+                log.debug("파일에서 Apple private key 로드: {}", applePrivateKeyPath);
+                Resource resource = resourceLoader.getResource(applePrivateKeyPath);
+                if (!resource.exists()) {
+                    throw new AuthException("Apple Private key 파일을 찾을 수 없습니다: " + applePrivateKeyPath, ErrorCode.AUTH_APPLE_PRIVATE_KEY_ERROR);
+                }
+                privateKeyContent = new String(resource.getInputStream().readAllBytes());
+            }
+            // 3. 둘 다 없으면 오류
+            else {
+                throw new AuthException("Apple private key가 설정되지 않았습니다. 환경변수 APPLE_PRIVATE_KEY_CONTENT 또는 apple.private_key_pem 설정이 필요합니다.", ErrorCode.AUTH_APPLE_PRIVATE_KEY_ERROR);
             }
             
-            // 2. 파일 내용 읽기
-            String privateKeyContent = new String(resource.getInputStream().readAllBytes());
-            log.debug("Apple private key 파일 로드 완료");
-            
-            // 3. PEM 알맹이만 남기고 제거 + Base64 디코딩
+            // 4. PEM 형식 정리 및 Base64 디코딩
             String privateKeyPEM = privateKeyContent
                     .replace("-----BEGIN PRIVATE KEY-----", "")
                     .replace("-----END PRIVATE KEY-----", "")
                     .replaceAll("\\s", ""); // 공백, 줄바꿈 제거
+            
             byte[] keyBytes = Base64.getDecoder().decode(privateKeyPEM);
             
-            // 4. PKCS8 형태로 EC 개인키 생성
+            // 5. PKCS8 형태로 EC 개인키 생성
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             ECPrivateKey privateKey = (ECPrivateKey) keyFactory.generatePrivate(keySpec);
             
-            log.debug("Apple Private Key 로드 성공");
+            log.info("Apple Private Key 로드 성공");
             return privateKey;
             
         } catch (Exception e) {

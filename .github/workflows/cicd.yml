@@ -20,10 +20,10 @@ jobs:
           distribution: 'adopt'
           cache: gradle # Gradle dependency caching
 
-      - name: Setup application.properties
+      - name: Setup cicd.properties
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.STAGING_PROPERTIES }}" > ./src/main/resources/application.properties
+          echo "${{ secrets.PROD_PROPERTIES }}" > ./src/main/resources/application.properties
 
       - name: Setup firebase-adminsdk-fbsvc-5d0ae449ec.json
         run: |
