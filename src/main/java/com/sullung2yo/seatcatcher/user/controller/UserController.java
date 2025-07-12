@@ -88,12 +88,22 @@ public class UserController {
 
     @DeleteMapping("/me")
     @Operation(
-            summary = "사용자 정보 삭제 API",
-            description = "AccessToken에 담긴 사용자를 삭제합니다.",
+            summary = "사용자 계정 삭제 API",
+            description = "AccessToken에 담긴 사용자 계정을 완전히 삭제합니다. " +
+                         "Apple 사용자의 경우 앱스토어 가이드라인에 따라 Apple 토큰도 함께 취소됩니다. " +
+                         "모든 개인 데이터가 영구적으로 삭제되며 복구할 수 없습니다.",
             responses = {
                     @ApiResponse(
                             responseCode = "204",
-                            description = "사용자 정보 삭제 성공"
+                            description = "사용자 계정 삭제 성공"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "인증 실패 - 유효하지 않은 토큰"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "사용자를 찾을 수 없음"
                     )
             }
     )
@@ -108,7 +118,9 @@ public class UserController {
         String token = bearerToken.replace("Bearer ", "");
         log.debug("JWT 파싱 성공");
 
+        log.info("사용자 계정 삭제 요청 시작");
         userService.deleteUser(token);
+        log.info("사용자 계정 삭제 요청 완료");
 
         return ResponseEntity.noContent().build();
     }

@@ -17,4 +17,11 @@ public class AppleAuthRequest {
     @NotNull
     @Schema(description = "FCM 토큰", example = "fcmToken")
     private String fcmToken;
+
+    @NotNull
+    @Schema(description = "Apple에서 발급한 Authorization Code", example = "authorization-code-value")
+    private String authorizationCode;
+
+    @Schema(description = "Replay attack 방지를 위한 nonce 값. Apple 개발자 문서 참고해주세요", example = "random-nonce-value")
+    private String nonce;
 }

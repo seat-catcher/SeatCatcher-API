@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -52,6 +53,10 @@ class KakaoAuthTest {
     @Mock
     private WebClient webClient;
     // WebClient는 외부와 통신할 때 사용하는 객체이므로, 테스트 환경에서는 사용 불가 -> Mocking
+
+    @Mock
+    private ResourceLoader resourceLoader;
+    // ResourceLoader Mocking
 
     // ====================Web Client 체이닝 메서드 호출에 필요한 다양한 타입 Mocking===========================
     // WebClient -> RequestHeadersUriSpec -> RequestHeadersSpec -> ResponseSpec -> Mono<KakaoUserDataResponse> 순으로 호출되므로
@@ -95,7 +100,7 @@ class KakaoAuthTest {
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
         // authService 인스턴스 생성해야 하니까 Mocking WebClient + 필요한 의존성 주입
-        authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder, nameGenerator);
+        authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder, nameGenerator, resourceLoader);
     }
 
     @Test
