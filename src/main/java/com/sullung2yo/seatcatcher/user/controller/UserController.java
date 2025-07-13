@@ -90,8 +90,10 @@ public class UserController {
     @Operation(
             summary = "사용자 계정 삭제 API",
             description = "AccessToken에 담긴 사용자 계정을 완전히 삭제합니다. " +
-                         "Apple 사용자의 경우 앱스토어 가이드라인에 따라 Apple 토큰도 함께 취소됩니다. " +
-                         "모든 개인 데이터가 영구적으로 삭제되며 복구할 수 없습니다.",
+                         "Apple 사용자의 경우에는 앱스토어 가이드라인에 따라 Apple 토큰도 함께 취소됩니다. " +
+                         "모든 개인 데이터가 영구적으로 삭제되며 복구할 수 없습니다." +
+                         "그리고 계정 삭제 전 반드시 user update API를 통해서 apple authorization code를 갱신해줘야" +
+                         "애플 계정 삭제가 정상적으로 이루어집니다.",
             responses = {
                     @ApiResponse(
                             responseCode = "204",

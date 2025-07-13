@@ -93,6 +93,10 @@ public class UserServiceImpl implements UserService {
             log.debug("온보딩 진행 여부 업데이트: {}", userInformationUpdateRequest.getHasOnBoarded());
             user.setHasOnBoarded(userInformationUpdateRequest.getHasOnBoarded());
         }
+        if (userInformationUpdateRequest.getAppleAuthorizationCode() != null) {
+            log.debug("Apple Authorization Code 업데이트");
+            user.setAppleAuthorizationCode(userInformationUpdateRequest.getAppleAuthorizationCode());
+        }
 
         // 태그 정보 업데이트
         List<UserTagType> tags = userInformationUpdateRequest.getTags();
