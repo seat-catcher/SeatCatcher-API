@@ -8,6 +8,7 @@ import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.dto.request.FcmMessage;
+import com.sullung2yo.seatcatcher.user.dto.request.FcmMessageWithData;
 import com.sullung2yo.seatcatcher.user.dto.request.FcmRequest;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +73,30 @@ public class FcmServiceImpl implements FcmService {
     }
 
     @Override
+    public void sendMessageTo(FcmRequest.NotificationAndData request) throws IOException {
+        RestClient restClient = RestClient.create();
+        restClient.post()
+                .uri(FCM_API_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(makeMessage(request.getTargetToken(), request.getTitle(), request.getBody(), request.getData()))
+                .header(AUTHORIZATION,"Bearer " + getAccessToken())
+                .header(ACCEPT, "application/json; UTF-8")
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (fcmRequest, fcmResponse) -> {
+                    String error = new String(fcmResponse.getBody().readAllBytes(), StandardCharsets.UTF_8);
+
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String errorMessage = objectMapper.readTree(error).toPrettyString();
+
+                    throw new FcmException("Firebase 메시지 전송 실패 : " + errorMessage, ErrorCode.INVALID_REQUEST_URI);
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (fcmRequest, fcmResponse) -> {
+                    throw new FcmException("FCM 요청 URI가 잘못되었습니다", ErrorCode.FIREBASE_SERVER_ERROR);
+                })
+                .toBodilessEntity();
+    }
+
+    @Override
     public void saveToken(FcmRequest.Token request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();
@@ -91,6 +116,24 @@ public class FcmServiceImpl implements FcmService {
                                 .image(null)
                                 .build()
                         ).build()).validateOnly(false).build();
+        return objectMapper.writeValueAsString(fcmMessage);
+    }
+
+    private String makeMessage(String targetToken, String title, String body, Object data) throws com.fasterxml.jackson.core.JsonProcessingException {
+        String dataPayload = objectMapper.writeValueAsString(data);
+        objectMapper.readTree(dataPayload); // JSON 형태가 아니면 여기서 Exception 발생.
+
+        FcmMessageWithData fcmMessage = FcmMessageWithData.builder()
+                .message(FcmMessageWithData.Message.builder()
+                        .token(targetToken)
+                        .notification(FcmMessageWithData.Notification.builder()
+                                .title(title)
+                                .body(body)
+                                .image(null)
+                                .build()
+                        )
+                        .data(dataPayload)
+                        .build()).validateOnly(false).build();
         return objectMapper.writeValueAsString(fcmMessage);
     }
 

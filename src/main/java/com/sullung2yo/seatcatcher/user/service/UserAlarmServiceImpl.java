@@ -107,7 +107,33 @@ public class UserAlarmServiceImpl implements UserAlarmService {
                 .build();
 
         userAlarmRepository.save(userAlarm);
+    }
 
+    private void send(String receiverToken, Object ResponseDTO, PushNotificationType type, Object... args) {
+        String title = type.generateTitle(args);
+        String body = type.generateBody(args);
+
+        FcmRequest.NotificationAndData fcmRequest = FcmRequest.NotificationAndData.builder()
+                .targetToken(receiverToken).title(title).body(body).data(ResponseDTO)
+                .build();
+        try {
+            fcmService.sendMessageTo(fcmRequest);
+        } catch (IOException e) {
+            log.error("FCM 메시지 전송 실패 - receiverToken: {}, message: {}", receiverToken, body, e);
+        }
+
+        User user = userRepository.findByFcmToken(receiverToken)
+                .orElseThrow(()->new UserException("사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
+
+        UserAlarm userAlarm = UserAlarm.builder()
+                .user(user)
+                .title(title)
+                .body(body)
+                .type(type)
+                .isRead(false)
+                .build();
+
+        userAlarmRepository.save(userAlarm);
     }
 
     @Override
