@@ -5,6 +5,9 @@ import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.common.exception.UserAlarmException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
 import com.sullung2yo.seatcatcher.user.converter.UserAlarmConverter;
 import com.sullung2yo.seatcatcher.user.domain.PushNotificationType;
 import com.sullung2yo.seatcatcher.user.domain.User;
@@ -83,18 +86,40 @@ public class UserAlarmServiceImpl implements UserAlarmService {
 
 
     private void send(String receiverToken, PushNotificationType type, Object... args) {
+        sendFcmMessage(receiverToken, null, type, args);
+    }
+
+    private void send(String receiverToken, Object responseDTO, PushNotificationType type, Object... args) {
+        sendFcmMessage(receiverToken, responseDTO, type, args);
+    }
+
+    private void sendFcmMessage(String receiverToken, Object responseDTO, PushNotificationType type, Object... args){
         String title = type.generateTitle(args);
         String body = type.generateBody(args);
 
-        FcmRequest.Notification fcmRequest = FcmRequest.Notification.builder()
+        try{
+            if(responseDTO == null)
+            {
+                FcmRequest.Notification fcmRequest = FcmRequest.Notification.builder()
                         .targetToken(receiverToken).title(title).body(body)
                         .build();
-        try {
-            fcmService.sendMessageTo(fcmRequest);
+                fcmService.sendMessageTo(fcmRequest);
+            }
+            else
+            {
+                FcmRequest.NotificationAndData fcmRequest = FcmRequest.NotificationAndData.builder()
+                        .targetToken(receiverToken).title(title).body(body).data(responseDTO)
+                        .build();
+                fcmService.sendMessageTo(fcmRequest);
+            }
         } catch (IOException e) {
             log.error("FCM 메시지 전송 실패 - receiverToken: {}, message: {}", receiverToken, body, e);
         }
 
+        saveUserAlarm(receiverToken, title, body, type);
+    }
+
+    private void saveUserAlarm(String receiverToken, String title, String body, PushNotificationType type){
         User user = userRepository.findByFcmToken(receiverToken)
                 .orElseThrow(()->new UserException("사용자를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND));
 
@@ -107,7 +132,6 @@ public class UserAlarmServiceImpl implements UserAlarmService {
                 .build();
 
         userAlarmRepository.save(userAlarm);
-
     }
 
     @Override
@@ -136,14 +160,14 @@ public class UserAlarmServiceImpl implements UserAlarmService {
      * @param creditAmount : 좌석 양보를 요청한 사람이 제시한 크레딧
      */
     @Override
-    public void sendSeatRequestReceivedAlarm(String receiverToken, String nickname, long creditAmount) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_RECEIVED, nickname, creditAmount);
+    public void sendSeatRequestReceivedAlarm(String receiverToken, String nickname, long creditAmount, SeatYieldRequestResponse response) {
+        send(receiverToken, response, PushNotificationType.SEAT_REQUEST_RECEIVED, nickname, creditAmount);
     }
 
     // 좌석 요청 거절 알림
     @Override
-    public void sendSeatRequestRejectedAlarm(String receiverToken) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_REJECTED);
+    public void sendSeatRequestRejectedAlarm(String receiverToken, SeatYieldAcceptRejectResponse response) {
+        send(receiverToken, response, PushNotificationType.SEAT_REQUEST_REJECTED);
     }
 
     /** 좌석 요청 수락 알림
@@ -153,8 +177,8 @@ public class UserAlarmServiceImpl implements UserAlarmService {
      * @param stationName : 좌석에 앉아있는 사람의 목적지 역 이름
      */
     @Override
-    public void sendSeatRequestAcceptedAlarm(String receiverToken, String nickname, String stationName) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_ACCEPTED, nickname, stationName);
+    public void sendSeatRequestAcceptedAlarm(String receiverToken, String nickname, String stationName, SeatYieldAcceptRejectResponse response) {
+        send(receiverToken, response, PushNotificationType.SEAT_REQUEST_ACCEPTED, nickname, stationName);
     }
 
     // 자리 교환 성공 알림
@@ -170,7 +194,7 @@ public class UserAlarmServiceImpl implements UserAlarmService {
      * @param nickname : 좌석 양보를 요청한 사람의 닉네임
      */
     @Override
-    public void sendSeatRequestCanceledAlarm(String receiverToken, String nickname) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_CANCELED, nickname);
+    public void sendSeatRequestCanceledAlarm(String receiverToken, String nickname, SeatYieldCanceledResponse response) {
+        send(receiverToken, response, PushNotificationType.SEAT_REQUEST_CANCELED, nickname);
     }
 }

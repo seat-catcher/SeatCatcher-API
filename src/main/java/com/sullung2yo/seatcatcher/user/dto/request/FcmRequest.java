@@ -23,4 +23,17 @@ public class FcmRequest {
         private String token;
 
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class NotificationAndData{
+        private String targetToken;
+        private String title;
+        private String body;
+
+        Object data;
+    }
 }

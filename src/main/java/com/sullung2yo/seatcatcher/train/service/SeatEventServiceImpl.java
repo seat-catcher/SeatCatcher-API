@@ -169,18 +169,18 @@ public class SeatEventServiceImpl implements SeatEventService {
         // 양보 요청을 보낸 사용자의 크레딧 감소 (서비스 내부에서 검증)
         creditService.creditModification(requestUserId, creditAmount, false, YieldRequestType.REQUEST);
 
+        SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
+                .seatId(seatId)
+                .requestUserId(requestUserId)
+                .requestUserNickname(requestUser.getName())
+                .requestUserProfileImageNum(requestUser.getProfileImageNum())
+                .creditAmount(creditAmount)
+                .requestUserTags(requestUser.getUserTag().stream().map(userTag -> userTag.getTag().getTagName()).toList())
+                .build(); // 좌석 양보 요청에 대한 응답 객체 생성
+        // TODO :: 추후 사용자의 태그 정보도 전달해야함
+
         if (owner.getDeviceStatus()) { // 만약 좌석 점유자가 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
-            SeatYieldRequestResponse seatYieldRequestResponse = SeatYieldRequestResponse.builder()
-                    .seatId(seatId)
-                    .requestUserId(requestUserId)
-                    .requestUserNickname(requestUser.getName())
-                    .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                    .creditAmount(creditAmount)
-                    .requestUserTags(requestUser.getUserTag().stream().map(userTag -> userTag.getTag().getTagName()).toList())
-                    .build(); // 좌석 양보 요청에 대한 응답 객체 생성
-            // TODO :: 추후 사용자의 태그 정보도 전달해야함
-
             String topic = "/topic/seat" + "." + seatId + "." + "owner"; // 좌석 점유자가 구독한 경로에다 전달
             try {
                 webSocketMessagingTemplate.convertAndSend(topic, seatYieldRequestResponse);
@@ -190,7 +190,7 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            userAlarmService.sendSeatRequestReceivedAlarm(owner.getFcmToken(), requestUser.getName(), creditAmount);
+            userAlarmService.sendSeatRequestReceivedAlarm(owner.getFcmToken(), requestUser.getName(), creditAmount, seatYieldRequestResponse);
             log.debug("좌석 요청 푸시 알람 전송 성공");
         }
     }
@@ -214,16 +214,18 @@ public class SeatEventServiceImpl implements SeatEventService {
         // 검증이 되었으므로, 양보를 수락했다는 메세지 생성 후, 양보를 요청한 사람(oppositeUser)한테 전달
         // 양보 요청 수락 시 크레딧 증가 로직은, 클라이언트에서 "좌석 교환" API를 호출할 때 처리됨
         User oppositeUser = userService.getUserWithId(oppositeUserId);
+
+        SeatYieldAcceptRejectResponse response = SeatYieldAcceptRejectResponse.builder()
+                .seatId(seatId)
+                .ownerId(requestUserId) // owner ID
+                .ownerNickname(owner.getName())
+                .ownerProfileImageNum(owner.getProfileImageNum())
+                .oppositeUserId(oppositeUserId) // 양보 요청을 보낸 사용자 ID
+                .isAccepted(true)
+                .build();
+
         if (oppositeUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 수락하셨어요 -> 이 메세지는 양보 요청을 보낸 사용자가 볼 수 있어야 함
-            SeatYieldAcceptRejectResponse response = SeatYieldAcceptRejectResponse.builder()
-                    .seatId(seatId)
-                    .ownerId(requestUserId) // owner ID
-                    .ownerNickname(owner.getName())
-                    .ownerProfileImageNum(owner.getProfileImageNum())
-                    .oppositeUserId(oppositeUserId) // 양보 요청을 보낸 사용자 ID
-                    .isAccepted(true)
-                    .build();
 
             String topic = "/topic/seat." + seatId + "." + "requester." + oppositeUserId;
             try {
@@ -241,7 +243,7 @@ public class SeatEventServiceImpl implements SeatEventService {
                 throw new SeatException("양보 수락 실패: 양보를 수락한 사람(좌석 점유자)의 목적지를 찾을 수 없습니다.", ErrorCode.YIELD_ACCEPT_FAILED);
             }
             // 양보를 요청한 사람의 FCM 토큰을 통해 좌석 점유자가 양보를 수락/거절했다는 푸시 알림 전송
-            userAlarmService.sendSeatRequestAcceptedAlarm(oppositeUser.getFcmToken(), owner.getName(), destination.get());
+            userAlarmService.sendSeatRequestAcceptedAlarm(oppositeUser.getFcmToken(), owner.getName(), destination.get(), response);
             log.debug("수락 푸시 알람 전송 성공");
         }
     }
@@ -269,17 +271,17 @@ public class SeatEventServiceImpl implements SeatEventService {
         // 한 편, 요청이 거절됐으므로 요청할 때 지불했던 크레딧은 복구되어야 함.
         creditService.creditModification(oppositeUserId, creditAmount, true, YieldRequestType.REJECT); // TODO :: MVP 단계에선 상관 없지만 실제 서비스를 하게 되면 악성 클라이언트에게 악용될 가능성 존재. 이 부분 고려할 것.
 
+        SeatYieldAcceptRejectResponse response = SeatYieldAcceptRejectResponse.builder()
+                .seatId(seatId)
+                .ownerId(requestUserId) // owner ID
+                .ownerNickname(owner.getName())
+                .ownerProfileImageNum(owner.getProfileImageNum())
+                .oppositeUserId(oppositeUserId)
+                .isAccepted(false) // 거절당했으므로 false.
+                .build();
+
         if (oppositeUser.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 거절하셨어요 -> 이 메세지는 양보 요청을 보낸 사용자가 볼 수 있어야 함
-            SeatYieldAcceptRejectResponse response = SeatYieldAcceptRejectResponse.builder()
-                    .seatId(seatId)
-                    .ownerId(requestUserId) // owner ID
-                    .ownerNickname(owner.getName())
-                    .ownerProfileImageNum(owner.getProfileImageNum())
-                    .oppositeUserId(oppositeUserId)
-                    .isAccepted(false) // 거절당했으므로 false.
-                    .build();
-
             String topic = "/topic/seat." + seatId + "." + "requester." + oppositeUserId;
             try {
                 webSocketMessagingTemplate.convertAndSend(topic, response);
@@ -289,7 +291,7 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // 좌석 양보 요청자에게 FCM 푸시 알림 전송
-            userAlarmService.sendSeatRequestRejectedAlarm(oppositeUser.getFcmToken());
+            userAlarmService.sendSeatRequestRejectedAlarm(oppositeUser.getFcmToken(), response);
             log.debug("거절 푸시 알람 전송 성공");
         }
     }
@@ -307,15 +309,16 @@ public class SeatEventServiceImpl implements SeatEventService {
         // 양보 요청을 보낸 사용자는 요청을 취소했으므로 소모했던 크레딧을 반환받아야 함.
         creditService.creditModification(requestUser.getId(), creditAmount, true, YieldRequestType.CANCEL); // TODO :: MVP 단계에선 상관 없지만 실제 서비스를 하게 되면 악성 클라이언트에게 악용될 가능성 존재. 이 부분 고려할 것.
 
+        SeatYieldCanceledResponse seatYieldCanceledResponse = SeatYieldCanceledResponse.builder()
+                .requestUserId(requestUserId)
+                .requestUserNickname(requestUser.getName())
+                .requestUserProfileImageNum(requestUser.getProfileImageNum())
+                .build(); // 좌석 양보 요청 취소 응답 객체 생성
+
         if (owner.getDeviceStatus()) { // 만약 현재 앱을 사용중이라면, WebSocket 메세지 전송
             // OOO님이 좌석 양보 요청을 취소하셨어요 -> 이 메세지는 좌석을 점유하고 있는 사용자가 볼 수 있어야 함
             // 기존에 좌석 양보 요청 메세지는 알아서 프론트에서 처리?
             // 구독 해제도 프론트에서 해제
-            SeatYieldCanceledResponse seatYieldCanceledResponse = SeatYieldCanceledResponse.builder()
-                    .requestUserId(requestUserId)
-                    .requestUserNickname(requestUser.getName())
-                    .requestUserProfileImageNum(requestUser.getProfileImageNum())
-                    .build(); // 좌석 양보 요청 취소 응답 객체 생성
             // TODO :: 추후 사용자의 태그 정보도 전달해야함
 
             String topic = "/topic/seat" + "." + seatId + "." + "owner"; // 좌석에 앉아있는 사용자의 routingKey로 취소 메세지 전달해야함
@@ -327,7 +330,7 @@ public class SeatEventServiceImpl implements SeatEventService {
             }
         } else {
             // FCM 푸시 알림 전송
-            userAlarmService.sendSeatRequestCanceledAlarm(owner.getFcmToken(), requestUser.getName());
+            userAlarmService.sendSeatRequestCanceledAlarm(owner.getFcmToken(), requestUser.getName(), seatYieldCanceledResponse);
             log.debug("취소 푸시 알람 전송 성공");
         }
     }
