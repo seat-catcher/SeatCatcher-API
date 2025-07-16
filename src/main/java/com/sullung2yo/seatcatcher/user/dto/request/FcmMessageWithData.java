@@ -4,11 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Schema(description = "firebase에 요청하기  위한 DTO 입니다.")
 public class FcmMessageWithData {
@@ -17,6 +19,7 @@ public class FcmMessageWithData {
     private Message message;
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     @Getter
     public static class Message {
         private String token;
@@ -25,6 +28,7 @@ public class FcmMessageWithData {
     }
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     @Getter
     public static class Notification {
         private String title;
