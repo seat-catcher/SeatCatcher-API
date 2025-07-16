@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -44,12 +45,15 @@ class AppleAuthTest {
     @Mock
     private WebClient webClient; // webClient 사용해서 apple 서버와 통신, 테스트 환경에서는 불가 -> Mocking
 
+    @Mock
+    private ResourceLoader resourceLoader; // 리소스 로더 Mocking
+
     private AuthServiceImpl authService; // 테스트 대상 인스턴스
 
     @BeforeEach
     void setUp() {
         when(webClientBuilder.build()).thenReturn(webClient); // webClientBuilder.build() 호출 시 Mocked webClient 반환하도록 설정
-        authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder, nameGenerator); // 테스트 대상 인스턴스 생성
+        authService = new AuthServiceImpl(userRepository, jwtTokenProvider, webClientBuilder, nameGenerator, resourceLoader); // 테스트 대상 인스턴스 생성
         ReflectionTestUtils.setField(authService, "appleClientId", "com.example.app"); // 테스트 appleClientId 설정
     }
 
@@ -63,14 +67,17 @@ class AppleAuthTest {
         // Given
         AppleAuthRequest request = new AppleAuthRequest();
         request.setIdentityToken("fake.apple.token");
+        request.setFcmToken("fcmToken");
+        request.setNonce("test-nonce");
+        request.setAuthorizationCode("fake-auth-code");
         String appleUserId = "apple123";
 
         // When
         // Spying : 실제 객체를 감싸고, 특정 메서드만 가짜 동작을 하도록 설정하는 방법
         AuthServiceImpl authServiceSpy = spy(authService); // authService 인스턴스를 spy로 생성 (가짜 객체 생성)
 
-        // Spying한 validateAppleIdentityToken 메서드 호출 시 테스트로 설정한 appleUserId 반환하도록 설정 (실제 메서드에서는 Apple providerId 값)
-        doReturn(appleUserId).when(authServiceSpy).validateAppleIdentityToken(anyString());
+        // Spying한 validateAppleIdentityToken 메서드 호출 시 테스트로 설정한 appleUserId 반환하도록 Mocking
+        doReturn(appleUserId).when(authServiceSpy).validateAppleIdentityToken(anyString(), anyString());
 
         // 새로운 사용자라고 가정 (null을 반환했다고 가정)
         when(userRepository.findByProviderId(appleUserId)).thenReturn(Optional.empty());
@@ -101,6 +108,9 @@ class AppleAuthTest {
         // Given
         AppleAuthRequest request = new AppleAuthRequest();
         request.setIdentityToken("fake.apple.token");
+        request.setFcmToken("fcmToken");
+        request.setNonce("test-nonce");
+        request.setAuthorizationCode("fake-auth-code");
         String appleUserId = "apple123";
         LocalDateTime now = LocalDateTime.now();
 
@@ -113,8 +123,8 @@ class AppleAuthTest {
         // authService Spying
         AuthServiceImpl authServiceSpy = spy(authService);
 
-        // Spying한 validateAppleIdentityToken 메서드 호출 시 테스트로 설정한 appleUserId 반환하도록 설정 (실제 메서드에서는 Apple providerId 값)
-        doReturn(appleUserId).when(authServiceSpy).validateAppleIdentityToken(anyString());
+        // Spying한 validateAppleIdentityToken 메서드 호출 시 테스트로 설정한 appleUserId 반환하도록 Mocking
+        doReturn(appleUserId).when(authServiceSpy).validateAppleIdentityToken(anyString(), anyString());
 
         // 사용자 DB에서 찾았다고 가정
         when(userRepository.findByProviderId(appleUserId)).thenReturn(Optional.of(existingUser));
@@ -151,6 +161,6 @@ class AppleAuthTest {
         // When/Then
         Exception exception = assertThrows(TokenException.class, () ->
                 authService.authenticate(request, Provider.APPLE));
-        assertTrue(exception.getMessage().contains("올바르지 않은 IdentityToken"));
+        assertTrue(exception.getMessage().contains("Identity Token 파싱 실패"));
     }
 }

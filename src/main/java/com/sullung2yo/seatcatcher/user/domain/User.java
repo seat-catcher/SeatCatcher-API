@@ -43,6 +43,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String providerId; // 인증 제공자에서 받은 ID
 
+    @Column
+    private String appleAuthorizationCode; // Apple 인증 시에만 사용되는 Authorization Code
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'ROLE_USER'") // default role = ROLE_USER

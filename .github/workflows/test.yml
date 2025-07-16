@@ -6,6 +6,8 @@ on:
       - uijong
       - yuseok
       - wonseok
+      - Seunghan
+      - kihye
 
 permissions:
   contents: read
@@ -29,11 +31,23 @@ jobs:
       - name: Setup application.properties
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+          cat << 'EOF' > ./src/main/resources/application.properties
+          ${{ secrets.TEST_PROPERTIES }}
+          EOF
 
       - name: Setup firebase-adminsdk-fbsvc-5d0ae449ec.json
         run: |
           echo "${{ secrets.FIREBASE_KEY_JSON }}" | base64 --decode > ./src/main/resources/seat-catcher-firebase-adminsdk-fbsvc-5d0ae449ec.json
+
+      - name: Check java compilable # Java 컴파일 가능 여부 확인
+        run: |
+          ./gradlew compileJava
+          if [ $? -ne 0 ]; then
+            echo "❌ Java compilation failed"
+            exit 1
+          else
+            echo "✅ Java compilation succeeded"
+          fi
 
       - name: Run tests # 전체 테스트 실행
         run: ./gradlew test

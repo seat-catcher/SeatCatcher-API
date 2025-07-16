@@ -151,6 +151,38 @@ class UserControllerTest {
         assertThat(userTags).isEmpty();
     }
 
+    @Test
+    void deleteAppleUser() throws Exception {
+        // Given - Apple 사용자 생성
+        User appleUser = User.builder()
+                .name("Apple Test User")
+                .providerId("appleProviderId")
+                .fcmToken("appleFcmToken")
+                .provider(Provider.APPLE)
+                .role(UserRole.ROLE_USER)
+                .credit(0L)
+                .build();
+        userRepository.save(appleUser);
+
+        String appleAccessToken = jwtTokenProvider.createToken(
+                appleUser.getProviderId(),
+                null,
+                TokenType.ACCESS
+        );
+
+        // When - Apple 사용자 삭제 요청
+        mockMvc.perform(delete("/user/me")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + appleAccessToken))
+
+        // Then - 정상적으로 삭제됨 (토큰 취소 실패해도 삭제 진행)
+                .andExpect(status().isNoContent());
+
+        // Apple 사용자가 데이터베이스에서 삭제되었는지 확인
+        Optional<User> foundAppleUser = userRepository.findByProviderId("appleProviderId");
+        assertThat(foundAppleUser).isEmpty();
+    }
+
     @AfterEach
     void tearDown() {
         userTagRepository.deleteAll();

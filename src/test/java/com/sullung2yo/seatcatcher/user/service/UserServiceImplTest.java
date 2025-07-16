@@ -91,6 +91,7 @@ public class UserServiceImplTest {
                 .profileImageNum(ProfileImageNum.IMAGE_2)
                 .hasOnBoarded(true)
                 .tags(List.of(UserTagType.USERTAG_CARRIER))
+                .appleAuthorizationCode("sampleAuthorizationCode")
                 .build();
 
         // When
@@ -100,5 +101,6 @@ public class UserServiceImplTest {
         assertThat(updatedUser.getName()).isEqualTo("updatedName");
         assertThat(updatedUser.getProfileImageNum()).isEqualTo(ProfileImageNum.IMAGE_2);
         assertThat(updatedUser.getHasOnBoarded()).isTrue();
+        assertThat(updatedUser.getAppleAuthorizationCode()).isEqualTo("sampleAuthorizationCode");
     }
 }

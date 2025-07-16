@@ -29,4 +29,7 @@ public class UserInformationUpdateRequest {
 
     @Schema(description = "디바이스 Foreground/Background 여부", example = "true, false")
     private Boolean isActive; // 디바이스 Foreground/Background 여부
+
+    @Schema(description = "애플 authorization code", example = "authorization_code_example")
+    private String appleAuthorizationCode; // 애플 authorization code (회원탈퇴 시 토큰이 이미 만료된 경우 필요함)
 }
