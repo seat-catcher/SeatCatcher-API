@@ -97,27 +97,23 @@ public class UserAlarmServiceImpl implements UserAlarmService {
         String title = type.generateTitle(args);
         String body = type.generateBody(args);
 
-        if(responseDTO == null)
-        {
-            FcmRequest.Notification fcmRequest = FcmRequest.Notification.builder()
-                    .targetToken(receiverToken).title(title).body(body)
-                    .build();
-            try {
+        try{
+            if(responseDTO == null)
+            {
+                FcmRequest.Notification fcmRequest = FcmRequest.Notification.builder()
+                        .targetToken(receiverToken).title(title).body(body)
+                        .build();
                 fcmService.sendMessageTo(fcmRequest);
-            } catch (IOException e) {
-                log.error("FCM 메시지 전송 실패 - receiverToken: {}, message: {}", receiverToken, body, e);
             }
-        }
-        else
-        {
-            FcmRequest.NotificationAndData fcmRequest = FcmRequest.NotificationAndData.builder()
-                    .targetToken(receiverToken).title(title).body(body).data(responseDTO)
-                    .build();
-            try {
+            else
+            {
+                FcmRequest.NotificationAndData fcmRequest = FcmRequest.NotificationAndData.builder()
+                        .targetToken(receiverToken).title(title).body(body).data(responseDTO)
+                        .build();
                 fcmService.sendMessageTo(fcmRequest);
-            } catch (IOException e) {
-                log.error("FCM 메시지 전송 실패 - receiverToken: {}, message: {}", receiverToken, body, e);
             }
+        } catch (IOException e) {
+            log.error("FCM 메시지 전송 실패 - receiverToken: {}, message: {}", receiverToken, body, e);
         }
 
         saveUserAlarm(receiverToken, title, body, type);
