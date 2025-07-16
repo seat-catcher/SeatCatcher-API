@@ -5,6 +5,9 @@ import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.common.exception.UserAlarmException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
+import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
 import com.sullung2yo.seatcatcher.user.converter.UserAlarmConverter;
 import com.sullung2yo.seatcatcher.user.domain.PushNotificationType;
 import com.sullung2yo.seatcatcher.user.domain.User;
@@ -162,14 +165,14 @@ public class UserAlarmServiceImpl implements UserAlarmService {
      * @param creditAmount : 좌석 양보를 요청한 사람이 제시한 크레딧
      */
     @Override
-    public void sendSeatRequestReceivedAlarm(String receiverToken, String nickname, long creditAmount) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_RECEIVED, nickname, creditAmount);
+    public void sendSeatRequestReceivedAlarm(String receiverToken, String nickname, long creditAmount, SeatYieldRequestResponse response) {
+        send(receiverToken, response, PushNotificationType.SEAT_REQUEST_RECEIVED, nickname, creditAmount);
     }
 
     // 좌석 요청 거절 알림
     @Override
-    public void sendSeatRequestRejectedAlarm(String receiverToken) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_REJECTED);
+    public void sendSeatRequestRejectedAlarm(String receiverToken, SeatYieldAcceptRejectResponse response) {
+        send(receiverToken, response, PushNotificationType.SEAT_REQUEST_REJECTED);
     }
 
     /** 좌석 요청 수락 알림
@@ -179,8 +182,8 @@ public class UserAlarmServiceImpl implements UserAlarmService {
      * @param stationName : 좌석에 앉아있는 사람의 목적지 역 이름
      */
     @Override
-    public void sendSeatRequestAcceptedAlarm(String receiverToken, String nickname, String stationName) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_ACCEPTED, nickname, stationName);
+    public void sendSeatRequestAcceptedAlarm(String receiverToken, String nickname, String stationName, SeatYieldAcceptRejectResponse response) {
+        send(receiverToken, response, PushNotificationType.SEAT_REQUEST_ACCEPTED, nickname, stationName);
     }
 
     // 자리 교환 성공 알림
@@ -196,7 +199,7 @@ public class UserAlarmServiceImpl implements UserAlarmService {
      * @param nickname : 좌석 양보를 요청한 사람의 닉네임
      */
     @Override
-    public void sendSeatRequestCanceledAlarm(String receiverToken, String nickname) {
-        send(receiverToken, PushNotificationType.SEAT_REQUEST_CANCELED, nickname);
+    public void sendSeatRequestCanceledAlarm(String receiverToken, String nickname, SeatYieldCanceledResponse response) {
+        send(receiverToken, PushNotificationType.SEAT_REQUEST_CANCELED, nickname, response);
     }
 }

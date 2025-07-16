@@ -25,6 +25,7 @@ import org.springframework.web.client.RestClient;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -132,7 +133,11 @@ public class FcmServiceImpl implements FcmService {
                                 .image(null)
                                 .build()
                         )
-                        .data(dataPayload)
+                        .data(
+                                Map.of(
+                                        "payload", dataPayload
+                                )
+                        )
                         .build()).validateOnly(false).build();
         return objectMapper.writeValueAsString(fcmMessage);
     }

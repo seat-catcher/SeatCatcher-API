@@ -21,7 +21,7 @@ public class FcmMessageWithData {
     public static class Message {
         private String token;
         private Notification notification;
-        private String data; // ObjectMapper 의 writeValueAsString 함수를 통해 객체를 JSON 으로 변환한 후 넣어야 합니다!
+        private Map<String, String> data; // ObjectMapper 의 writeValueAsString 함수를 통해 객체를 JSON 으로 변환한 후 넣어야 합니다!
     }
     @Builder
     @AllArgsConstructor
