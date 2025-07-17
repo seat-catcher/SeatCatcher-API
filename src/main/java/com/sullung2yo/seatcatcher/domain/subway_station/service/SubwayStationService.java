@@ -3,7 +3,7 @@ package com.sullung2yo.seatcatcher.domain.subway_station.service;
 import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
 import com.sullung2yo.seatcatcher.domain.subway_station.dto.SubwayStationData;
-import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
+import com.sullung2yo.seatcatcher.domain.train.dto.response.IncomingTrainsResponse;
 
 import java.util.List;
 import java.util.Optional;

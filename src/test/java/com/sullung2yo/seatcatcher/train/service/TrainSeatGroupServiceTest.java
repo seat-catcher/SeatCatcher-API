@@ -1,7 +1,11 @@
 package com.sullung2yo.seatcatcher.train.service;
 
-import com.sullung2yo.seatcatcher.train.domain.*;
-import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
+import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeat;
+import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeatGroup;
+import com.sullung2yo.seatcatcher.domain.train.enums.SeatGroupType;
+import com.sullung2yo.seatcatcher.domain.train.enums.SeatType;
+import com.sullung2yo.seatcatcher.domain.train.repository.TrainSeatGroupRepository;
+import com.sullung2yo.seatcatcher.domain.train.service.TrainSeatGroupService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

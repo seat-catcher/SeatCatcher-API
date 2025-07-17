@@ -1,10 +1,13 @@
 package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryService;
-import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
-import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
+import com.sullung2yo.seatcatcher.domain.train.enums.SeatGroupType;
+import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeatGroup;
+import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
+import com.sullung2yo.seatcatcher.domain.train.service.SeatEventServiceImpl;
+import com.sullung2yo.seatcatcher.domain.train.service.TrainSeatGroupService;
+import com.sullung2yo.seatcatcher.domain.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

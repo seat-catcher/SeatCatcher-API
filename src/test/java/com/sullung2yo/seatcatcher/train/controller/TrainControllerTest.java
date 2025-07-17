@@ -1,5 +1,5 @@
 package com.sullung2yo.seatcatcher.train.controller;
-import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
+import com.sullung2yo.seatcatcher.domain.train.service.TrainSeatGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;

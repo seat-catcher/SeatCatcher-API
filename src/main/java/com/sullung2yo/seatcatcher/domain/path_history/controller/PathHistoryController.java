@@ -13,7 +13,7 @@ import com.sullung2yo.seatcatcher.domain.path_history.dto.response.StartJourneyR
 import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryRealtimeUpdateService;
 import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.subway_station.service.TransactionalExecuteService;
-import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
+import com.sullung2yo.seatcatcher.domain.train.enums.TrainArrivalState;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

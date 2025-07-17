@@ -1,10 +1,11 @@
 package com.sullung2yo.seatcatcher.train.utility;
 
-import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
-import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatStatus;
-import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
-import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
+import com.sullung2yo.seatcatcher.domain.train.enums.SeatGroupType;
+import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeatGroup;
+import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatStatus;
+import com.sullung2yo.seatcatcher.domain.train.repository.TrainSeatGroupRepository;
+import com.sullung2yo.seatcatcher.domain.train.service.TrainSeatGroupService;
+import com.sullung2yo.seatcatcher.domain.train.utiliry.SeatStatusAssembler;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;

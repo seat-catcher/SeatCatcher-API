@@ -1,8 +1,8 @@
 package com.sullung2yo.seatcatcher.domain.alarm.service;
 
-import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
-import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
+import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldAcceptRejectResponse;
+import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldCanceledResponse;
+import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldRequestResponse;
 import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.response.UserAlarmResponse;
 
