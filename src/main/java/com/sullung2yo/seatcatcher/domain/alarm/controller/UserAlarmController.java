@@ -77,16 +77,4 @@ public class UserAlarmController {
     public ResponseEntity<List<?>> getAllAlarms(){
         return null;
     }
-
-    @PostMapping("/hello")
-    @Operation(
-            summary = "FCM 테스트용 API",
-            description = "FCM 메시지 수신에 이상이 없는지 테스트해보는 API입니다. 테스트용입니다!"
-    )
-    public ResponseEntity<?> createHelloPushNotification(@RequestHeader("Authorization") String bearerToken)
-    {
-        String token = bearerToken.replace("Bearer ", ""); // 검증은 생략합니다. 테스트용이니까!
-        userAlarmService.sendHelloAlarm(token);
-        return ResponseEntity.ok("성공적으로 푸시 알림을 전달했습니다!");
-    }
 }
