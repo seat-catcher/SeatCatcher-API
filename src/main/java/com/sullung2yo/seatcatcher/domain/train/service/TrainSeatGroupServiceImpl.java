@@ -8,7 +8,7 @@ import com.sullung2yo.seatcatcher.domain.train.enums.SeatType;
 import com.sullung2yo.seatcatcher.domain.train.dto.TrainCarDTO;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.domain.train.repository.TrainSeatGroupRepository;
-import com.sullung2yo.seatcatcher.domain.train.utiliry.SeatStatusAssembler;
+import com.sullung2yo.seatcatcher.domain.train.utility.SeatStatusAssembler;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;

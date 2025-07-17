@@ -3,6 +3,7 @@ package com.sullung2yo.seatcatcher.domain.subway_station.controller;
 import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
 import com.sullung2yo.seatcatcher.domain.subway_station.dto.response.SubwayStationResponse;
+import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationService;
 import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,7 +26,7 @@ import java.util.List;
 @Tag(name = "지하철 역 API", description = "지하철 역에 대한 API입니다.")
 public class SubwayStationController {
 
-    private final SubwayStationServiceImpl subwayStationService;
+    private final SubwayStationService subwayStationService;
 
     @GetMapping
     @Operation(

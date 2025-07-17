@@ -5,7 +5,7 @@ import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
 import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationService;
-import com.sullung2yo.seatcatcher.domain.subway_station.utiliry.StationNameMapper;
+import com.sullung2yo.seatcatcher.domain.subway_station.utility.StationNameMapper;
 import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.IncomingTrainsResponse;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatInfoResponse;
