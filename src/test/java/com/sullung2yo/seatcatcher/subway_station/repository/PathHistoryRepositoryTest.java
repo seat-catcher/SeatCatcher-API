@@ -1,8 +1,10 @@
 package com.sullung2yo.seatcatcher.subway_station.repository;
 
-import com.sullung2yo.seatcatcher.subway_station.domain.Line;
-import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
-import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
+import com.sullung2yo.seatcatcher.domain.path_history.repository.PathHistoryRepository;
+import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
+import com.sullung2yo.seatcatcher.domain.path_history.entity.PathHistory;
+import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
+import com.sullung2yo.seatcatcher.domain.subway_station.repository.SubwayStationRepository;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;

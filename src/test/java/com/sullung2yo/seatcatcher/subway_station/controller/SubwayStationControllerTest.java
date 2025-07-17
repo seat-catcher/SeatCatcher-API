@@ -1,10 +1,10 @@
 package com.sullung2yo.seatcatcher.subway_station.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sullung2yo.seatcatcher.subway_station.domain.Line;
-import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
-import com.sullung2yo.seatcatcher.subway_station.repository.SubwayStationRepository;
-import com.sullung2yo.seatcatcher.subway_station.service.SubwayStationService;
+import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
+import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
+import com.sullung2yo.seatcatcher.domain.subway_station.repository.SubwayStationRepository;
+import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

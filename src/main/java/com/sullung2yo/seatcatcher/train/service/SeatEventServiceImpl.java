@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.train.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.SeatException;
-import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
+import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;

@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.train.service;
 
-import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
+import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;

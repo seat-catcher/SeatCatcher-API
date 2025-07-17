@@ -1,16 +1,17 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
 import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
-import com.sullung2yo.seatcatcher.subway_station.domain.Line;
-import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
-import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
-import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
+import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryEventService;
+import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryRealtimeUpdateServiceImpl;
+import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
+import com.sullung2yo.seatcatcher.domain.path_history.entity.PathHistory;
+import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
+import com.sullung2yo.seatcatcher.domain.path_history.repository.PathHistoryRepository;
+import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationService;
 import com.sullung2yo.seatcatcher.train.domain.TrainArrivalState;
-import com.sullung2yo.seatcatcher.train.dto.TrainCarDTO;
 import com.sullung2yo.seatcatcher.train.dto.response.IncomingTrainsResponse;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
-import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;

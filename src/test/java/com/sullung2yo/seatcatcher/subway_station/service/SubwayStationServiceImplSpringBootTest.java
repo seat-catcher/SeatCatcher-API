@@ -1,7 +1,8 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
-import com.sullung2yo.seatcatcher.subway_station.domain.Line;
-import com.sullung2yo.seatcatcher.subway_station.domain.SubwayStation;
+import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
+import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
+import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

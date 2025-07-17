@@ -1,7 +1,9 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
-import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
-import com.sullung2yo.seatcatcher.subway_station.dto.response.StartJourneyResponse;
+import com.sullung2yo.seatcatcher.domain.path_history.dto.response.PathHistoryResponse;
+import com.sullung2yo.seatcatcher.domain.path_history.dto.response.StartJourneyResponse;
+import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryEventServiceImpl;
+import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
 package com.sullung2yo.seatcatcher.subway_station.utility;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sullung2yo.seatcatcher.subway_station.dto.SubwayStationData;
-import com.sullung2yo.seatcatcher.subway_station.utility.parser.StationDataJsonParser;
+import com.sullung2yo.seatcatcher.domain.subway_station.dto.SubwayStationData;
+import com.sullung2yo.seatcatcher.domain.subway_station.utiliry.parser.StationDataJsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
