@@ -1,10 +1,10 @@
-package com.sullung2yo.seatcatcher.user.controller;
+package com.sullung2yo.seatcatcher.domain.user_status.controller;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
-import com.sullung2yo.seatcatcher.user.dto.request.UserStatusRequest;
-import com.sullung2yo.seatcatcher.user.dto.response.UserStatusResponse;
-import com.sullung2yo.seatcatcher.user.service.UserStatusService;
+import com.sullung2yo.seatcatcher.domain.user_status.dto.request.UserStatusRequest;
+import com.sullung2yo.seatcatcher.domain.user_status.dto.response.UserStatusResponse;
+import com.sullung2yo.seatcatcher.domain.user_status.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

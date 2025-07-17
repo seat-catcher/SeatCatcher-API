@@ -17,7 +17,7 @@ import com.sullung2yo.seatcatcher.domain.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.domain.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.domain.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
-import com.sullung2yo.seatcatcher.user.service.UserStatusService;
+import com.sullung2yo.seatcatcher.domain.user_status.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

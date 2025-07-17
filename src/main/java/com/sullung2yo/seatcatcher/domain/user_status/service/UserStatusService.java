@@ -1,9 +1,8 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.user_status.service;
 
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserStatus;
-import com.sullung2yo.seatcatcher.user.dto.request.UserStatusRequest;
-import com.sullung2yo.seatcatcher.user.dto.response.UserStatusResponse;
+import com.sullung2yo.seatcatcher.domain.user_status.dto.request.UserStatusRequest;
+import com.sullung2yo.seatcatcher.domain.user_status.dto.response.UserStatusResponse;
 
 public interface UserStatusService {
 

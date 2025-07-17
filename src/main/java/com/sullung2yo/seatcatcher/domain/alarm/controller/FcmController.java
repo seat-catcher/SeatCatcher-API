@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.controller;
+package com.sullung2yo.seatcatcher.domain.alarm.controller;
 
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;
 import com.sullung2yo.seatcatcher.domain.alarm.service.FcmService;

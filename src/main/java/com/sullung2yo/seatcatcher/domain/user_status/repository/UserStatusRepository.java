@@ -1,6 +1,6 @@
-package com.sullung2yo.seatcatcher.user.repository;
+package com.sullung2yo.seatcatcher.domain.user_status.repository;
 
-import com.sullung2yo.seatcatcher.user.domain.UserStatus;
+import com.sullung2yo.seatcatcher.domain.user_status.entity.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
