@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.common.service;
+package com.sullung2yo.seatcatcher.common.domain.task_schedule.service;
 
 import java.time.LocalDateTime;
 

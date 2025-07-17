@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.subway_station.service;
+package com.sullung2yo.seatcatcher.common.domain.transactional_execute.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

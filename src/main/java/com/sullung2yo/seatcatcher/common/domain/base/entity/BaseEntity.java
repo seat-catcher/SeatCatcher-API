@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.common.domain;
+package com.sullung2yo.seatcatcher.common.domain.base.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

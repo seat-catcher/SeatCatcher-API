@@ -4,7 +4,7 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.SubwayException;
 import com.sullung2yo.seatcatcher.common.exception.UserAlarmException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
-import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
+import com.sullung2yo.seatcatcher.common.utility.ScrollPaginationCollection;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldAcceptRejectResponse;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldCanceledResponse;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldRequestResponse;

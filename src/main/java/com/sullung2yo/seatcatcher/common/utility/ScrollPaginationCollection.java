@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.subway_station.utility;
+package com.sullung2yo.seatcatcher.common.utility;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

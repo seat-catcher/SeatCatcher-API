@@ -11,7 +11,7 @@ import com.sullung2yo.seatcatcher.domain.path_history.dto.request.PathHistoryReq
 import com.sullung2yo.seatcatcher.domain.path_history.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.domain.path_history.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.domain.subway_station.repository.SubwayStationRepository;
-import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
+import com.sullung2yo.seatcatcher.common.utility.ScrollPaginationCollection;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.service.UserService;

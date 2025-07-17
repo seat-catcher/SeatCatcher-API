@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.domain.alarm.converter;
 
-import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
+import com.sullung2yo.seatcatcher.common.utility.ScrollPaginationCollection;
 import com.sullung2yo.seatcatcher.domain.alarm.entity.UserAlarm;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.response.UserAlarmResponse;
 import org.springframework.stereotype.Component;

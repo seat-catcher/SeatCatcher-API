@@ -1,5 +1,6 @@
 package com.sullung2yo.seatcatcher.common.service;
 
+import com.sullung2yo.seatcatcher.common.domain.task_schedule.service.TaskScheduleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

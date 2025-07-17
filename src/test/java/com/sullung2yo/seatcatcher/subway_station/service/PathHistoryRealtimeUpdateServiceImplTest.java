@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.subway_station.service;
 
-import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
+import com.sullung2yo.seatcatcher.common.domain.task_schedule.service.TaskScheduleService;
 import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryEventService;
 import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryRealtimeUpdateServiceImpl;
 import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;

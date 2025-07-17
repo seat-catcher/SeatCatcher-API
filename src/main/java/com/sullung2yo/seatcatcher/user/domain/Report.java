@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.user.domain;
 
-import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
+import com.sullung2yo.seatcatcher.common.domain.base.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

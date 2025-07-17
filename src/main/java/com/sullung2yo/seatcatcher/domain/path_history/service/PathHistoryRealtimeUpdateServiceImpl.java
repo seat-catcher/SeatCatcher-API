@@ -3,12 +3,12 @@ package com.sullung2yo.seatcatcher.domain.path_history.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.PathHistoryException;
-import com.sullung2yo.seatcatcher.common.service.TaskScheduleService;
+import com.sullung2yo.seatcatcher.common.domain.task_schedule.service.TaskScheduleService;
 import com.sullung2yo.seatcatcher.domain.path_history.entity.PathHistory;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
 import com.sullung2yo.seatcatcher.domain.path_history.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationService;
-import com.sullung2yo.seatcatcher.subway_station.service.TransactionalExecuteService;
+import com.sullung2yo.seatcatcher.common.domain.transactional_execute.service.TransactionalExecuteService;
 import com.sullung2yo.seatcatcher.domain.train.enums.TrainArrivalState;
 import com.sullung2yo.seatcatcher.domain.train.dto.TrainCarDTO;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.IncomingTrainsResponse;

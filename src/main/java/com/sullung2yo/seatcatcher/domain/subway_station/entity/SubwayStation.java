@@ -3,7 +3,7 @@ package com.sullung2yo.seatcatcher.domain.subway_station.entity;
 import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
 import jakarta.persistence.*;
 import lombok.*;
-import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
+import com.sullung2yo.seatcatcher.common.domain.base.entity.BaseEntity;
 
 @Entity
 @Getter
