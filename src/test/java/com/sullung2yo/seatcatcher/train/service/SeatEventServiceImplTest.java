@@ -4,7 +4,7 @@ import com.sullung2yo.seatcatcher.subway_station.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.train.domain.SeatGroupType;
 import com.sullung2yo.seatcatcher.train.domain.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatInfoResponse;
-import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
+import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when; // ✅ 올바른 import

@@ -1,6 +1,6 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.alarm.service;
 
-import com.sullung2yo.seatcatcher.user.dto.request.FcmRequest;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;
 
 import java.io.IOException;
 

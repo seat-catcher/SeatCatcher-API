@@ -1,12 +1,10 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.alarm.service;
 
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
-import com.sullung2yo.seatcatcher.user.domain.PushNotificationType;
-import com.sullung2yo.seatcatcher.user.dto.response.UserAlarmResponse;
-
-import java.util.List;
+import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.response.UserAlarmResponse;
 
 public interface UserAlarmService {
 

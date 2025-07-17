@@ -1,12 +1,9 @@
-package com.sullung2yo.seatcatcher.user.dto.response;
+package com.sullung2yo.seatcatcher.domain.alarm.dto.response;
 
-import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
-import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
-import com.sullung2yo.seatcatcher.user.domain.PushNotificationType;
+import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 

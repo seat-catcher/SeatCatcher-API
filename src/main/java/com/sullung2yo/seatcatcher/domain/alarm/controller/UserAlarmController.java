@@ -1,9 +1,8 @@
-package com.sullung2yo.seatcatcher.user.controller;
+package com.sullung2yo.seatcatcher.domain.alarm.controller;
 
-import com.sullung2yo.seatcatcher.user.domain.PushNotificationType;
-import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.dto.response.UserAlarmResponse;
-import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
+import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.response.UserAlarmResponse;
+import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

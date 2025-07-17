@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.alarm.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -7,10 +7,11 @@ import com.sullung2yo.seatcatcher.common.exception.FcmException;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.dto.request.FcmMessage;
-import com.sullung2yo.seatcatcher.user.dto.request.FcmMessageWithData;
-import com.sullung2yo.seatcatcher.user.dto.request.FcmRequest;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmMessage;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmMessageWithData;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

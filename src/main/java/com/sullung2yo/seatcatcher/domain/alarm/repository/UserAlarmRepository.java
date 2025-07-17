@@ -1,8 +1,8 @@
-package com.sullung2yo.seatcatcher.user.repository;
+package com.sullung2yo.seatcatcher.domain.alarm.repository;
 
-import com.sullung2yo.seatcatcher.user.domain.PushNotificationType;
+import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserAlarm;
+import com.sullung2yo.seatcatcher.domain.alarm.entity.UserAlarm;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

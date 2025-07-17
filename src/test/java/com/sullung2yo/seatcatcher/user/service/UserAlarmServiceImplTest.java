@@ -1,10 +1,13 @@
 package com.sullung2yo.seatcatcher.user.service;
 
 import com.sullung2yo.seatcatcher.SeatCatcherApiApplication;
+import com.sullung2yo.seatcatcher.domain.alarm.entity.UserAlarm;
+import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
+import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
 import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.*;
-import com.sullung2yo.seatcatcher.user.repository.UserAlarmRepository;
+import com.sullung2yo.seatcatcher.domain.alarm.repository.UserAlarmRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;

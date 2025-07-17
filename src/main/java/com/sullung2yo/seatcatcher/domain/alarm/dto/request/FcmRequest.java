@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.dto.request;
+package com.sullung2yo.seatcatcher.domain.alarm.dto.request;
 
 import lombok.*;
 

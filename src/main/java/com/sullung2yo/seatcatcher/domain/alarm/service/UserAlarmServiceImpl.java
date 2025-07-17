@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.alarm.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.SubwayException;
@@ -8,14 +8,15 @@ import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollect
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldAcceptRejectResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldCanceledResponse;
 import com.sullung2yo.seatcatcher.train.dto.response.SeatYieldRequestResponse;
-import com.sullung2yo.seatcatcher.user.converter.UserAlarmConverter;
-import com.sullung2yo.seatcatcher.user.domain.PushNotificationType;
+import com.sullung2yo.seatcatcher.domain.alarm.converter.UserAlarmConverter;
+import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserAlarm;
-import com.sullung2yo.seatcatcher.user.dto.request.FcmRequest;
-import com.sullung2yo.seatcatcher.user.dto.response.UserAlarmResponse;
-import com.sullung2yo.seatcatcher.user.repository.UserAlarmRepository;
+import com.sullung2yo.seatcatcher.domain.alarm.entity.UserAlarm;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.response.UserAlarmResponse;
+import com.sullung2yo.seatcatcher.domain.alarm.repository.UserAlarmRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

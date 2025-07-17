@@ -1,10 +1,8 @@
-package com.sullung2yo.seatcatcher.user.converter;
+package com.sullung2yo.seatcatcher.domain.alarm.converter;
 
-import com.sullung2yo.seatcatcher.subway_station.domain.PathHistory;
-import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.subway_station.utility.ScrollPaginationCollection;
-import com.sullung2yo.seatcatcher.user.domain.UserAlarm;
-import com.sullung2yo.seatcatcher.user.dto.response.UserAlarmResponse;
+import com.sullung2yo.seatcatcher.domain.alarm.entity.UserAlarm;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.response.UserAlarmResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

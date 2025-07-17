@@ -14,7 +14,7 @@ import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.train.service.UserTrainSeatService;
-import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
+import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.user.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

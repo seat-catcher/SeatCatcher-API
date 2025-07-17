@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.user.controller;
 
-import com.sullung2yo.seatcatcher.user.dto.request.FcmRequest;
-import com.sullung2yo.seatcatcher.user.service.FcmService;
+import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;
+import com.sullung2yo.seatcatcher.domain.alarm.service.FcmService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 
 @Slf4j
 @RestController
