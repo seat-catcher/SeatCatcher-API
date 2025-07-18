@@ -11,7 +11,7 @@ import com.sullung2yo.seatcatcher.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.train.repository.UserTrainSeatRepository;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import com.sullung2yo.seatcatcher.user.service.CreditService;
+import com.sullung2yo.seatcatcher.domain.credit.service.CreditService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

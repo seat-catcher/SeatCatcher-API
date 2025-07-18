@@ -8,7 +8,7 @@ import com.sullung2yo.seatcatcher.train.domain.UserTrainSeat;
 import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
 import com.sullung2yo.seatcatcher.train.dto.response.*;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.service.CreditService;
+import com.sullung2yo.seatcatcher.domain.credit.service.CreditService;
 import com.sullung2yo.seatcatcher.user.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.user.service.UserService;
 import org.springframework.transaction.annotation.Transactional;
