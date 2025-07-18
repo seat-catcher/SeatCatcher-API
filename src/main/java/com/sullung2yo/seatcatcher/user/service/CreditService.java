@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.user.service;
 
-import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
+import com.sullung2yo.seatcatcher.domain.train.enums.YieldRequestType;
 import com.sullung2yo.seatcatcher.user.domain.User;
 
 public interface CreditService {
