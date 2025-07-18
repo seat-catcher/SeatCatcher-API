@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.domain;
+package com.sullung2yo.seatcatcher.domain.tag.enums;
 
 
 public enum UserTagType {

@@ -1,9 +1,8 @@
-package com.sullung2yo.seatcatcher.user.controller;
+package com.sullung2yo.seatcatcher.domain.tag.controller;
 
-import com.sullung2yo.seatcatcher.train.dto.response.CascadeTrainSeatResponse;
-import com.sullung2yo.seatcatcher.user.domain.Tag;
-import com.sullung2yo.seatcatcher.user.dto.response.TagResponse;
-import com.sullung2yo.seatcatcher.user.service.TagService;
+import com.sullung2yo.seatcatcher.domain.tag.entity.Tag;
+import com.sullung2yo.seatcatcher.domain.tag.dto.response.TagResponse;
+import com.sullung2yo.seatcatcher.domain.tag.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;

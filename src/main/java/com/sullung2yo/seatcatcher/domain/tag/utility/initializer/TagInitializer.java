@@ -1,8 +1,8 @@
-package com.sullung2yo.seatcatcher.user.utility.initializer;
+package com.sullung2yo.seatcatcher.domain.tag.utility.initializer;
 
-import com.sullung2yo.seatcatcher.user.domain.Tag;
-import com.sullung2yo.seatcatcher.user.domain.UserTagType;
-import com.sullung2yo.seatcatcher.user.repository.TagRepository;
+import com.sullung2yo.seatcatcher.domain.tag.entity.Tag;
+import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
+import com.sullung2yo.seatcatcher.domain.tag.repository.TagRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

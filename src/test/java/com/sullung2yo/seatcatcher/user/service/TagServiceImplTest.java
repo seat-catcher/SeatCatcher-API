@@ -1,9 +1,10 @@
 package com.sullung2yo.seatcatcher.user.service;
 
 import com.sullung2yo.seatcatcher.common.exception.TagException;
-import com.sullung2yo.seatcatcher.user.domain.Tag;
-import com.sullung2yo.seatcatcher.user.domain.UserTagType;
-import com.sullung2yo.seatcatcher.user.repository.TagRepository;
+import com.sullung2yo.seatcatcher.domain.tag.entity.Tag;
+import com.sullung2yo.seatcatcher.domain.tag.service.TagServiceImpl;
+import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
+import com.sullung2yo.seatcatcher.domain.tag.repository.TagRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

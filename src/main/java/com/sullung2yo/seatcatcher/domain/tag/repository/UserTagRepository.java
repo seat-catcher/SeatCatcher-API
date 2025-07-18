@@ -1,7 +1,7 @@
-package com.sullung2yo.seatcatcher.user.repository;
+package com.sullung2yo.seatcatcher.domain.tag.repository;
 
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserTag;
+import com.sullung2yo.seatcatcher.domain.tag.entity.UserTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

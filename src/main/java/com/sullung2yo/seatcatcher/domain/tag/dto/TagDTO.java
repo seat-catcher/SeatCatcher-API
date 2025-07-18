@@ -1,6 +1,6 @@
-package com.sullung2yo.seatcatcher.user.dto;
+package com.sullung2yo.seatcatcher.domain.tag.dto;
 
-import com.sullung2yo.seatcatcher.user.domain.UserTagType;
+import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
