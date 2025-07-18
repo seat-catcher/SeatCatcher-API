@@ -1,13 +1,13 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.report.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
-import com.sullung2yo.seatcatcher.user.converter.ReportConverter;
-import com.sullung2yo.seatcatcher.user.domain.Report;
+import com.sullung2yo.seatcatcher.domain.report.converter.ReportConverter;
+import com.sullung2yo.seatcatcher.domain.report.entity.Report;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.dto.request.ReportRequest;
-import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
-import com.sullung2yo.seatcatcher.user.repository.ReportRepository;
+import com.sullung2yo.seatcatcher.domain.report.dto.request.ReportRequest;
+import com.sullung2yo.seatcatcher.domain.report.dto.response.ReportResponse;
+import com.sullung2yo.seatcatcher.domain.report.repository.ReportRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

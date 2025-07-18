@@ -1,6 +1,6 @@
-package com.sullung2yo.seatcatcher.jwt.filter;
+package com.sullung2yo.seatcatcher.common.jwt.filter;
 
-import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

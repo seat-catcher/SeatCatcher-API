@@ -1,8 +1,7 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.report.service;
 
-import com.sullung2yo.seatcatcher.user.domain.Report;
-import com.sullung2yo.seatcatcher.user.dto.request.ReportRequest;
-import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
+import com.sullung2yo.seatcatcher.domain.report.dto.request.ReportRequest;
+import com.sullung2yo.seatcatcher.domain.report.dto.response.ReportResponse;
 
 import java.util.List;
 

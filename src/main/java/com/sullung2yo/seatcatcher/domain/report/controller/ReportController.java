@@ -1,9 +1,9 @@
-package com.sullung2yo.seatcatcher.user.controller;
+package com.sullung2yo.seatcatcher.domain.report.controller;
 
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
-import com.sullung2yo.seatcatcher.user.dto.request.ReportRequest;
-import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
-import com.sullung2yo.seatcatcher.user.service.ReportService;
+import com.sullung2yo.seatcatcher.domain.report.dto.request.ReportRequest;
+import com.sullung2yo.seatcatcher.domain.report.dto.response.ReportResponse;
+import com.sullung2yo.seatcatcher.domain.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

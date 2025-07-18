@@ -1,7 +1,7 @@
 //package com.sullung2yo.seatcatcher.user.converter;
 //
-//import com.sullung2yo.seatcatcher.user.domain.Report;
-//import com.sullung2yo.seatcatcher.user.dto.response.ReportResponse;
+//import com.sullung2yo.seatcatcher.domain.report.entity.Report;
+//import com.sullung2yo.seatcatcher.domain.report.dto.response.ReportResponse;
 //import org.springframework.stereotype.Component;
 //
 //import java.util.List;

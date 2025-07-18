@@ -1,8 +1,8 @@
 package com.sullung2yo.seatcatcher.jwt;
 
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
-import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
-import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.common.domain.TokenType;
+import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.RefreshToken;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.Provider;

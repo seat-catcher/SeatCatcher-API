@@ -1,14 +1,13 @@
 package com.sullung2yo.seatcatcher.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
-import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.common.domain.TokenType;
+import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.dto.request.CreditModificationRequest;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

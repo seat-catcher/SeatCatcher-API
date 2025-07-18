@@ -1,18 +1,15 @@
 package com.sullung2yo.seatcatcher.train.controller;
 
-import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
-import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
+import com.sullung2yo.seatcatcher.common.domain.TokenType;
+import com.sullung2yo.seatcatcher.common.jwt.provider.TokenProvider;
 import com.sullung2yo.seatcatcher.train.repository.TrainSeatGroupRepository;
 import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
 import com.sullung2yo.seatcatcher.user.domain.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.repository.TagRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @AutoConfigureMockMvc

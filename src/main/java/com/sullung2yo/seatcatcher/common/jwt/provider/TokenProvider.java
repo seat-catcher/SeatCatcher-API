@@ -1,6 +1,6 @@
-package com.sullung2yo.seatcatcher.jwt.provider;
+package com.sullung2yo.seatcatcher.common.jwt.provider;
 
-import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
+import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
