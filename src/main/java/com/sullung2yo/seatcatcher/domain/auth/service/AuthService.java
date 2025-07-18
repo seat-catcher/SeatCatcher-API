@@ -1,6 +1,6 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.auth.service;
 
-import com.sullung2yo.seatcatcher.user.domain.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 
 import java.util.List;
 

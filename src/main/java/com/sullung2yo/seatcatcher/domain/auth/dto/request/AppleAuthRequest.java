@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.dto.request;
+package com.sullung2yo.seatcatcher.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

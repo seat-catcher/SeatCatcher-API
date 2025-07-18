@@ -3,11 +3,11 @@ package com.sullung2yo.seatcatcher.jwt;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
-import com.sullung2yo.seatcatcher.user.domain.RefreshToken;
+import com.sullung2yo.seatcatcher.domain.auth.entity.RefreshToken;
 import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
-import com.sullung2yo.seatcatcher.user.repository.RefreshTokenRepository;
+import com.sullung2yo.seatcatcher.domain.auth.repository.RefreshTokenRepository;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 
 import org.junit.jupiter.api.BeforeEach;

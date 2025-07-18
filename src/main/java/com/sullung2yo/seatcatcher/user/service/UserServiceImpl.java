@@ -6,6 +6,8 @@ import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.service.AuthServiceImpl;
 import com.sullung2yo.seatcatcher.user.domain.*;
 import com.sullung2yo.seatcatcher.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.user.repository.TagRepository;

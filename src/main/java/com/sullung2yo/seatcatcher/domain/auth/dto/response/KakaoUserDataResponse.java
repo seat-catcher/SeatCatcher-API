@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.dto.response;
+package com.sullung2yo.seatcatcher.domain.auth.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;

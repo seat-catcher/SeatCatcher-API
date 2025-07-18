@@ -10,7 +10,7 @@ import com.sullung2yo.seatcatcher.subway_station.dto.request.PathHistoryRequest;
 import com.sullung2yo.seatcatcher.subway_station.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.subway_station.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.subway_station.repository.SubwayStationRepository;
-import com.sullung2yo.seatcatcher.user.domain.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;

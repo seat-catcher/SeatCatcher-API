@@ -1,6 +1,6 @@
-package com.sullung2yo.seatcatcher.user.repository;
+package com.sullung2yo.seatcatcher.domain.auth.repository;
 
-import com.sullung2yo.seatcatcher.user.domain.RefreshToken;
+import com.sullung2yo.seatcatcher.domain.auth.entity.RefreshToken;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

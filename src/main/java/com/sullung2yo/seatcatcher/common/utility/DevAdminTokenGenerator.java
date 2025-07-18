@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.common.utility;
 
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.TokenProvider;
-import com.sullung2yo.seatcatcher.user.domain.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;

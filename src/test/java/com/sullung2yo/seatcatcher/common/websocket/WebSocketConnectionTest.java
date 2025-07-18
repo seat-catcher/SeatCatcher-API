@@ -3,7 +3,7 @@ package com.sullung2yo.seatcatcher.common.websocket;
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
-import com.sullung2yo.seatcatcher.user.domain.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;

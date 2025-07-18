@@ -2,6 +2,7 @@ package com.sullung2yo.seatcatcher.user.controller;
 
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.user.domain.*;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;

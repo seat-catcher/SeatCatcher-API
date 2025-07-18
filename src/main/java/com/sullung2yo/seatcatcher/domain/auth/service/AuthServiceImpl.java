@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.user.service;
+package com.sullung2yo.seatcatcher.domain.auth.service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -15,12 +15,12 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
-import com.sullung2yo.seatcatcher.user.domain.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.domain.UserRole;
-import com.sullung2yo.seatcatcher.user.dto.request.AppleAuthRequest;
-import com.sullung2yo.seatcatcher.user.dto.request.KakaoAuthRequest;
-import com.sullung2yo.seatcatcher.user.dto.response.KakaoUserDataResponse;
+import com.sullung2yo.seatcatcher.domain.auth.dto.request.AppleAuthRequest;
+import com.sullung2yo.seatcatcher.domain.auth.dto.request.KakaoAuthRequest;
+import com.sullung2yo.seatcatcher.domain.auth.dto.response.KakaoUserDataResponse;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.utility.random.NameGenerator;
 import lombok.extern.slf4j.Slf4j;

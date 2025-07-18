@@ -1,10 +1,10 @@
-package com.sullung2yo.seatcatcher.user.controller;
+package com.sullung2yo.seatcatcher.domain.auth.controller;
 
 
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
-import com.sullung2yo.seatcatcher.user.dto.request.TokenRefreshRequest;
-import com.sullung2yo.seatcatcher.user.dto.response.TokenResponse;
-import com.sullung2yo.seatcatcher.user.service.AuthServiceImpl;
+import com.sullung2yo.seatcatcher.domain.auth.dto.request.TokenRefreshRequest;
+import com.sullung2yo.seatcatcher.domain.auth.dto.response.TokenResponse;
+import com.sullung2yo.seatcatcher.domain.auth.service.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
