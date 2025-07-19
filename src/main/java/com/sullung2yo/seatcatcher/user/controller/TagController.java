@@ -1,6 +1,5 @@
 package com.sullung2yo.seatcatcher.user.controller;
 
-import com.sullung2yo.seatcatcher.train.dto.response.CascadeTrainSeatResponse;
 import com.sullung2yo.seatcatcher.user.domain.Tag;
 import com.sullung2yo.seatcatcher.user.dto.response.TagResponse;
 import com.sullung2yo.seatcatcher.user.service.TagService;
