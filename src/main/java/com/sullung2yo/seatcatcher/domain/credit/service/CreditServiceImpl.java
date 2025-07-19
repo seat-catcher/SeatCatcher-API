@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.domain.credit.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
-import com.sullung2yo.seatcatcher.train.domain.YieldRequestType;
+import com.sullung2yo.seatcatcher.domain.train.enums.YieldRequestType;
 import com.sullung2yo.seatcatcher.user.domain.User;
 import com.sullung2yo.seatcatcher.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.user.service.UserService;

@@ -1,8 +1,8 @@
 package com.sullung2yo.seatcatcher.domain.tag.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sullung2yo.seatcatcher.common.domain.BaseEntity;
 import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
+import com.sullung2yo.seatcatcher.common.domain.base.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
