@@ -11,8 +11,8 @@ import com.sullung2yo.seatcatcher.domain.train.dto.response.IncomingTrainsRespon
 import com.sullung2yo.seatcatcher.domain.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.domain.train.service.TrainSeatGroupService;
 import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
-import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserRole;
+import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.domain.UserRole;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

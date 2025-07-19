@@ -10,10 +10,10 @@ import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldRequestResp
 import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.domain.train.entity.UserTrainSeat;
 import com.sullung2yo.seatcatcher.domain.train.enums.YieldRequestType;
-import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.domain.User;
 import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.domain.credit.service.CreditService;
-import com.sullung2yo.seatcatcher.user.service.UserService;
+import com.sullung2yo.seatcatcher.domain.user.service.UserService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

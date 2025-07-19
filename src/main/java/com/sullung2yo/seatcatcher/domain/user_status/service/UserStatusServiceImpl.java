@@ -2,12 +2,12 @@ package com.sullung2yo.seatcatcher.domain.user_status.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
-import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.domain.User;
 import com.sullung2yo.seatcatcher.domain.user_status.entity.UserStatus;
 import com.sullung2yo.seatcatcher.domain.user_status.dto.request.UserStatusRequest;
 import com.sullung2yo.seatcatcher.domain.user_status.dto.response.UserStatusResponse;
 import com.sullung2yo.seatcatcher.domain.user_status.repository.UserStatusRepository;
-import com.sullung2yo.seatcatcher.user.service.UserService;
+import com.sullung2yo.seatcatcher.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

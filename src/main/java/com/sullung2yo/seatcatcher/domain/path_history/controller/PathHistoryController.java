@@ -14,7 +14,7 @@ import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryRealtim
 import com.sullung2yo.seatcatcher.domain.path_history.service.PathHistoryService;
 import com.sullung2yo.seatcatcher.common.domain.transactional_execute.service.TransactionalExecuteService;
 import com.sullung2yo.seatcatcher.domain.train.enums.TrainArrivalState;
-import com.sullung2yo.seatcatcher.user.service.UserService;
+import com.sullung2yo.seatcatcher.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

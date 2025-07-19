@@ -11,7 +11,7 @@ import com.sullung2yo.seatcatcher.domain.train.service.SeatEventService;
 import com.sullung2yo.seatcatcher.domain.train.service.UserTrainSeatService;
 import com.sullung2yo.seatcatcher.domain.credit.enums.CreditPolicy;
 import com.sullung2yo.seatcatcher.domain.credit.service.CreditService;
-import com.sullung2yo.seatcatcher.user.service.UserService;
+import com.sullung2yo.seatcatcher.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

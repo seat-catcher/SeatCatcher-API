@@ -4,7 +4,7 @@ import com.sullung2yo.seatcatcher.domain.path_history.entity.PathHistory;
 import com.sullung2yo.seatcatcher.domain.path_history.dto.request.PathHistoryRequest;
 
 import com.sullung2yo.seatcatcher.domain.path_history.dto.response.PathHistoryResponse;
-import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.domain.User;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

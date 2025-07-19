@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.domain.user_status.service;
 
-import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.domain.User;
 import com.sullung2yo.seatcatcher.domain.user_status.dto.request.UserStatusRequest;
 import com.sullung2yo.seatcatcher.domain.user_status.dto.response.UserStatusResponse;
 

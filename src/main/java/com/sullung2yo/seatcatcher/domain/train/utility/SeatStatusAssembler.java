@@ -8,7 +8,7 @@ import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatOccupant;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatStatus;
 import com.sullung2yo.seatcatcher.domain.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.domain.train.repository.UserTrainSeatRepository;
-import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.domain.User;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
