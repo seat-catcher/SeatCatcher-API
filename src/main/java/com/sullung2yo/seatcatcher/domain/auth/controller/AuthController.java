@@ -63,7 +63,6 @@ public class AuthController {
         return returnAfterTokenValidation(tokens);
     }
 
-
     @PostMapping("/kakao")
     @Operation(
             summary = "카카오로 로그인하기",
