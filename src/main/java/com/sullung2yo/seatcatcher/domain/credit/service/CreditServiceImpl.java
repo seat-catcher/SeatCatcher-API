@@ -3,7 +3,7 @@ package com.sullung2yo.seatcatcher.domain.credit.service;
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.domain.train.enums.YieldRequestType;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.domain.user.service.UserService;
 import org.springframework.transaction.annotation.Transactional;

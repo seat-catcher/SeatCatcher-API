@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.domain.user_status.service;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.user_status.entity.UserStatus;
 import com.sullung2yo.seatcatcher.domain.user_status.dto.request.UserStatusRequest;
 import com.sullung2yo.seatcatcher.domain.user_status.dto.response.UserStatusResponse;

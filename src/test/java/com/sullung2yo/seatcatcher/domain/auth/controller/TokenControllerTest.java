@@ -1,10 +1,10 @@
-package com.sullung2yo.seatcatcher.domain.user.controller;
+package com.sullung2yo.seatcatcher.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 
 import com.sullung2yo.seatcatcher.domain.auth.dto.request.TokenRefreshRequest;
 import com.sullung2yo.seatcatcher.domain.auth.repository.RefreshTokenRepository;

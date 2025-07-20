@@ -9,7 +9,7 @@ import com.sullung2yo.seatcatcher.domain.train.entity.UserTrainSeat;
 import com.sullung2yo.seatcatcher.domain.train.enums.YieldRequestType;
 import com.sullung2yo.seatcatcher.domain.train.repository.TrainSeatRepository;
 import com.sullung2yo.seatcatcher.domain.train.repository.UserTrainSeatRepository;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.domain.credit.service.CreditService;
 import jakarta.persistence.EntityNotFoundException;

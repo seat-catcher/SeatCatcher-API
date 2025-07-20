@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.domain.path_history.entity;
 
 import com.sullung2yo.seatcatcher.common.domain.base.entity.BaseEntity;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

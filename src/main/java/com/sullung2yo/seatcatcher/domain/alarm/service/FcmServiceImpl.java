@@ -6,7 +6,7 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.FcmException;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmMessage;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmMessageWithData;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;

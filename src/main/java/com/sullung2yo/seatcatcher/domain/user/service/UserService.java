@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.domain.user.service;
 
 
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.user.dto.request.UserInformationUpdateRequest;
 
 public interface UserService {

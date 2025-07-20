@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.domain.credit.controller;
 
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.credit.dto.request.CreditModificationRequest;
 import com.sullung2yo.seatcatcher.domain.credit.service.CreditService;
 import com.sullung2yo.seatcatcher.domain.user.service.UserService;

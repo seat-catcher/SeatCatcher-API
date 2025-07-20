@@ -10,7 +10,7 @@ import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldCanceledRes
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldRequestResponse;
 import com.sullung2yo.seatcatcher.domain.alarm.converter.UserAlarmConverter;
 import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.alarm.entity.UserAlarm;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.response.UserAlarmResponse;

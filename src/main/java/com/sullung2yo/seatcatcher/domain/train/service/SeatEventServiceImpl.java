@@ -10,7 +10,7 @@ import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldRequestResp
 import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.domain.train.entity.UserTrainSeat;
 import com.sullung2yo.seatcatcher.domain.train.enums.YieldRequestType;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
 import com.sullung2yo.seatcatcher.domain.credit.service.CreditService;
 import com.sullung2yo.seatcatcher.domain.user.service.UserService;

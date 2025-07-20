@@ -1,8 +1,8 @@
 package com.sullung2yo.seatcatcher.domain.user.repository;
 
 import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
-import com.sullung2yo.seatcatcher.domain.user.domain.UserRole;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
+import com.sullung2yo.seatcatcher.domain.user.enums.UserRole;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;

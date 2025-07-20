@@ -1,4 +1,4 @@
-package com.sullung2yo.seatcatcher.domain.user.domain;
+package com.sullung2yo.seatcatcher.domain.user.enums;
 
 
 // 프로필 이미지 번호를 나타내는 Enum 클래스

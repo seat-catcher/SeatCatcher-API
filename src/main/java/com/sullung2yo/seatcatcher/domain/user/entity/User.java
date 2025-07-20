@@ -1,9 +1,11 @@
-package com.sullung2yo.seatcatcher.domain.user.domain;
+package com.sullung2yo.seatcatcher.domain.user.entity;
 
 import com.sullung2yo.seatcatcher.common.domain.base.entity.BaseEntity;
 import com.sullung2yo.seatcatcher.domain.auth.entity.RefreshToken;
 import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.domain.tag.entity.UserTag;
+import com.sullung2yo.seatcatcher.domain.user.enums.ProfileImageNum;
+import com.sullung2yo.seatcatcher.domain.user.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;

@@ -4,7 +4,7 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.domain.report.converter.ReportConverter;
 import com.sullung2yo.seatcatcher.domain.report.entity.Report;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.report.dto.request.ReportRequest;
 import com.sullung2yo.seatcatcher.domain.report.dto.response.ReportResponse;
 import com.sullung2yo.seatcatcher.domain.report.repository.ReportRepository;

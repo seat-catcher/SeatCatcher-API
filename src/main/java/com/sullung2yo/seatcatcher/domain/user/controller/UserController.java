@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.domain.user.controller;
 
 import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
-import com.sullung2yo.seatcatcher.domain.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
 import com.sullung2yo.seatcatcher.domain.user.dto.request.UserInformationUpdateRequest;
 import com.sullung2yo.seatcatcher.domain.user.dto.response.UserInformationResponse;
