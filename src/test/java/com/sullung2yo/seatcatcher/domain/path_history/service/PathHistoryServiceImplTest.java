@@ -2,8 +2,6 @@ package com.sullung2yo.seatcatcher.domain.path_history.service;
 
 import com.sullung2yo.seatcatcher.domain.path_history.converter.PathHistoryConverter;
 import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationService;
-import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
-import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
 import com.sullung2yo.seatcatcher.domain.path_history.entity.PathHistory;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
@@ -11,10 +9,12 @@ import com.sullung2yo.seatcatcher.domain.path_history.dto.request.PathHistoryReq
 import com.sullung2yo.seatcatcher.domain.path_history.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.domain.path_history.repository.PathHistoryRepository;
 import com.sullung2yo.seatcatcher.domain.subway_station.repository.SubwayStationRepository;
-import com.sullung2yo.seatcatcher.user.domain.Provider;
-import com.sullung2yo.seatcatcher.user.domain.User;
-import com.sullung2yo.seatcatcher.user.domain.UserRole;
-import com.sullung2yo.seatcatcher.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.common.domain.TokenType;
+import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
+import com.sullung2yo.seatcatcher.domain.user.enums.UserRole;
+import com.sullung2yo.seatcatcher.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

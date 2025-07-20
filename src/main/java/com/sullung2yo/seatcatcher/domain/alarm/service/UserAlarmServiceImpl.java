@@ -10,13 +10,13 @@ import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldCanceledRes
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatYieldRequestResponse;
 import com.sullung2yo.seatcatcher.domain.alarm.converter.UserAlarmConverter;
 import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
-import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.alarm.entity.UserAlarm;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.response.UserAlarmResponse;
 import com.sullung2yo.seatcatcher.domain.alarm.repository.UserAlarmRepository;
-import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import com.sullung2yo.seatcatcher.user.service.UserService;
+import com.sullung2yo.seatcatcher.domain.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

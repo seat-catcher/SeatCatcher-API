@@ -2,7 +2,7 @@ package com.sullung2yo.seatcatcher.domain.path_history.repository;
 
 import com.sullung2yo.seatcatcher.domain.path_history.entity.PathHistory;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
-import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

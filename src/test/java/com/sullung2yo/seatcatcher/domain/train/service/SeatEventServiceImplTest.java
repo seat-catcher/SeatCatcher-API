@@ -5,7 +5,7 @@ import com.sullung2yo.seatcatcher.domain.train.enums.SeatGroupType;
 import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeatGroup;
 import com.sullung2yo.seatcatcher.domain.train.dto.response.SeatInfoResponse;
 import com.sullung2yo.seatcatcher.domain.alarm.service.UserAlarmService;
-import com.sullung2yo.seatcatcher.user.service.UserService;
+import com.sullung2yo.seatcatcher.domain.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

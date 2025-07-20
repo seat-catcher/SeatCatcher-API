@@ -1,14 +1,19 @@
 package com.sullung2yo.seatcatcher.domain.train.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sullung2yo.seatcatcher.jwt.domain.TokenType;
-import com.sullung2yo.seatcatcher.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.common.domain.TokenType;
+import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
+import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
+import com.sullung2yo.seatcatcher.domain.tag.entity.Tag;
+import com.sullung2yo.seatcatcher.domain.tag.entity.UserTag;
+import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
 import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeat;
 import com.sullung2yo.seatcatcher.domain.train.service.TrainSeatGroupService;
-import com.sullung2yo.seatcatcher.user.domain.*;
-import com.sullung2yo.seatcatcher.user.repository.TagRepository;
-import com.sullung2yo.seatcatcher.user.repository.UserRepository;
-import com.sullung2yo.seatcatcher.user.repository.UserTagRepository;
+import com.sullung2yo.seatcatcher.domain.user.enums.ProfileImageNum;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
+import com.sullung2yo.seatcatcher.domain.tag.repository.TagRepository;
+import com.sullung2yo.seatcatcher.domain.user.repository.UserRepository;
+import com.sullung2yo.seatcatcher.domain.tag.repository.UserTagRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;

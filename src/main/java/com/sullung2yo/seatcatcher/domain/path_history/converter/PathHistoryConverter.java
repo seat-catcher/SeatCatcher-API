@@ -4,7 +4,7 @@ import com.sullung2yo.seatcatcher.domain.path_history.entity.PathHistory;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
 import com.sullung2yo.seatcatcher.domain.path_history.dto.response.PathHistoryResponse;
 import com.sullung2yo.seatcatcher.common.utility.ScrollPaginationCollection;
-import com.sullung2yo.seatcatcher.user.domain.User;
+import com.sullung2yo.seatcatcher.domain.user.entity.User;
 
 import java.util.List;
 
