@@ -1,6 +1,6 @@
 package com.sullung2yo.seatcatcher.config;
 
-import com.sullung2yo.seatcatcher.jwt.filter.JwtAuthenticationFilter;
+import com.sullung2yo.seatcatcher.common.jwt.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

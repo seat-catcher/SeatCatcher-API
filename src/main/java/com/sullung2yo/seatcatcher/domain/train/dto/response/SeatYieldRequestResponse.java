@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.domain.train.dto.response;
 
-import com.sullung2yo.seatcatcher.user.domain.ProfileImageNum;
-import com.sullung2yo.seatcatcher.user.domain.UserTagType;
+import com.sullung2yo.seatcatcher.domain.user.enums.ProfileImageNum;
+import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

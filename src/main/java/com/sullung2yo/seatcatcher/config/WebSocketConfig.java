@@ -1,7 +1,7 @@
 package com.sullung2yo.seatcatcher.config;
 
 
-import com.sullung2yo.seatcatcher.jwt.provider.TokenProvider;
+import com.sullung2yo.seatcatcher.common.jwt.provider.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
