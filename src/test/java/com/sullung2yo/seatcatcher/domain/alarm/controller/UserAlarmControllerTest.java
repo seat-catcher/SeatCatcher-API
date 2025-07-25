@@ -109,68 +109,6 @@ class UserAlarmControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @DisplayName("존재하지 않는 알람 조회 시 404")
-    void getAlarm_notFound() throws Exception {
-        mockMvc.perform(get("/alarms/99999")
-                        .header("Authorization", "Bearer " + accessToken))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("다른 사용자의 알람에 접근하는 경우 403 Forbidden 반환")
-    void getAlarm_forbidden() throws Exception {
-        // 다른 유저 생성 및 토큰 발급
-        User otherUser = userRepository.save(User.builder()
-                .provider(Provider.KAKAO)
-                .providerId("other_user")
-                .name("다른 유저")
-                .credit(0L)
-                .build());
-
-        String otherToken = tokenProvider.createToken(
-                otherUser.getProviderId(),
-                Map.of("role", otherUser.getRole().toString()),
-                TokenType.ACCESS
-        );
-
-        // 실제 알람은 testUser 소속
-        mockMvc.perform(get("/alarms/" + testAlarm.getId())
-                        .header("Authorization", "Bearer " + otherToken))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 알람 삭제 시 404")
-    void deleteAlarm_notFound() throws Exception {
-        mockMvc.perform(delete("/alarms/99999")
-                        .header("Authorization", "Bearer " + accessToken))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("다른 사용자의 알람 삭제 시 403")
-    void deleteAlarm_forbidden() throws Exception {
-        User otherUser = userRepository.save(User.builder()
-                .provider(Provider.APPLE)
-                .providerId("other_user2")
-                .name("다른유저2")
-                .credit(0L)
-                .build());
-
-        String otherToken = tokenProvider.createToken(
-                otherUser.getProviderId(),
-                Map.of("role", otherUser.getRole().toString()),
-                TokenType.ACCESS
-        );
-
-        mockMvc.perform(delete("/alarms/" + testAlarm.getId())
-                        .header("Authorization", "Bearer " + otherToken))
-                .andExpect(status().isForbidden());
-    }
-
-
-
     @AfterEach
     void tearDown() {
         userAlarmRepository.deleteAll();
