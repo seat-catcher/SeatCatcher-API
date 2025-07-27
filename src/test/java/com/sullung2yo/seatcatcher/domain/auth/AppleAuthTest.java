@@ -4,6 +4,7 @@ import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.service.AuthService;
 import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.user.enums.UserRole;
 import com.sullung2yo.seatcatcher.domain.auth.dto.request.AppleAuthRequest;
@@ -48,7 +49,9 @@ class AppleAuthTest {
     @Mock
     private ResourceLoader resourceLoader; // 리소스 로더 Mocking
 
-    private AuthServiceImpl authService; // 테스트 대상 인스턴스
+//    private AuthServiceImpl authService; // 테스트 대상 인스턴스
+
+    private AuthService authService; // 테스트 대상 인스턴스
 
     @BeforeEach
     void setUp() {
@@ -74,7 +77,8 @@ class AppleAuthTest {
 
         // When
         // Spying : 실제 객체를 감싸고, 특정 메서드만 가짜 동작을 하도록 설정하는 방법
-        AuthServiceImpl authServiceSpy = spy(authService); // authService 인스턴스를 spy로 생성 (가짜 객체 생성)
+//        AuthServiceImpl authServiceSpy = spy(authService); // authService 인스턴스를 spy로 생성 (가짜 객체 생성)
+        AuthService authServiceSpy = spy(authService); // authService 인스턴스를 spy로 생성 (가짜 객체 생성)
 
         // Spying한 validateAppleIdentityToken 메서드 호출 시 테스트로 설정한 appleUserId 반환하도록 Mocking
         doReturn(appleUserId).when(authServiceSpy).validateAppleIdentityToken(anyString(), anyString());
@@ -121,7 +125,8 @@ class AppleAuthTest {
                 .build();
 
         // authService Spying
-        AuthServiceImpl authServiceSpy = spy(authService);
+//        AuthServiceImpl authServiceSpy = spy(authService);
+        AuthService authServiceSpy = spy(authService);
 
         // Spying한 validateAppleIdentityToken 메서드 호출 시 테스트로 설정한 appleUserId 반환하도록 Mocking
         doReturn(appleUserId).when(authServiceSpy).validateAppleIdentityToken(anyString(), anyString());

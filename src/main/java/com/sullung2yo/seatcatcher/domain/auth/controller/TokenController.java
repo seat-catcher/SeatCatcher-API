@@ -4,7 +4,8 @@ package com.sullung2yo.seatcatcher.domain.auth.controller;
 import com.sullung2yo.seatcatcher.common.exception.dto.ErrorResponse;
 import com.sullung2yo.seatcatcher.domain.auth.dto.request.TokenRefreshRequest;
 import com.sullung2yo.seatcatcher.domain.auth.dto.response.TokenResponse;
-import com.sullung2yo.seatcatcher.domain.auth.service.AuthServiceImpl;
+import com.sullung2yo.seatcatcher.domain.auth.service.AuthService;
+//import com.sullung2yo.seatcatcher.domain.auth.service.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +27,8 @@ import java.util.List;
 @Tag(name = "Token API", description = "Token APIs")
 public class TokenController {
 
-    private final AuthServiceImpl authServiceImpl;
+//    private final AuthServiceImpl authServiceImpl;
+    private final AuthService authService;
 
     @PostMapping("/refresh")
     @Operation(
@@ -52,7 +54,7 @@ public class TokenController {
     )
     public ResponseEntity<TokenResponse> tokenRefresh(@RequestBody TokenRefreshRequest tokenRefreshRequest) {
         // Refresh token 재발급
-        List<String> tokens = authServiceImpl.refreshToken(tokenRefreshRequest.getRefreshToken());
+        List<String> tokens = authService.refreshToken(tokenRefreshRequest.getRefreshToken());
         return ResponseEntity.status(HttpStatus.CREATED).body(new TokenResponse(tokens.get(0), tokens.get(1)));
     }
 
@@ -80,7 +82,7 @@ public class TokenController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token format");
         }
         String accessToken = bearerToken.replace("Bearer ", "");
-        boolean isValid = authServiceImpl.validateAccessToken(accessToken);
+        boolean isValid = authService.validateAccessToken(accessToken);
         if (!isValid) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Expired");
         }
