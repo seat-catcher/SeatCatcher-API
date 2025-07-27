@@ -1,5 +1,6 @@
 package com.sullung2yo.seatcatcher.domain.alarm.dto.request;
 
+import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
 import lombok.*;
 
 public class FcmRequest {
@@ -33,6 +34,8 @@ public class FcmRequest {
         private String targetToken;
         private String title;
         private String body;
+
+        private PushNotificationType type;
 
         Object data;
     }
