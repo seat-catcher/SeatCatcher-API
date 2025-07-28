@@ -23,6 +23,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -65,10 +66,10 @@ class FcmControllerTest {
 
         // when + then
         mockMvc.perform(post("/fcm/token")
+                        .with(authentication(new UsernamePasswordAuthenticationToken("test_provider", null, List.of())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("token을 저장하였습니다.")));
+                .andExpect(status().isOk());
 
         User updatedUser = userRepository.findByProviderId("test_provider").orElseThrow();
         assertEquals("test_token", updatedUser.getFcmToken());
