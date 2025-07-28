@@ -20,7 +20,7 @@ public class FcmRequest {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public class Token{
+    public static class Token{
         private String token;
 
     }

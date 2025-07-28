@@ -53,8 +53,7 @@ public class FcmServiceImplTest {
 
         setAuthentication("test_provider");
 
-        FcmRequest fcmRequest = new FcmRequest();
-        FcmRequest.Token tokenRequest = fcmRequest.new Token("test_token");
+        FcmRequest.Token tokenRequest = new FcmRequest.Token("test_token");
 
         // when
         fcmService.saveToken(tokenRequest);
@@ -70,8 +69,7 @@ public class FcmServiceImplTest {
         // given
         setAuthentication("missing_provider");
 
-        FcmRequest fcmRequest = new FcmRequest();
-        FcmRequest.Token tokenRequest = fcmRequest.new Token("test_token");
+        FcmRequest.Token tokenRequest = new FcmRequest.Token("test_token");
 
         // when + then
         UserException ex = assertThrows(UserException.class, () -> {
