@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-public class FcmServiceImplTests {
+public class FcmServiceImplTest {
 
     @Autowired
     private FcmService fcmService;
