@@ -109,7 +109,7 @@ public class UserAlarmServiceImpl implements UserAlarmService {
             else
             {
                 FcmRequest.NotificationAndData fcmRequest = FcmRequest.NotificationAndData.builder()
-                        .targetToken(receiverToken).title(title).body(body).data(responseDTO)
+                        .targetToken(receiverToken).title(title).body(body).type(type).data(responseDTO)
                         .build();
                 fcmService.sendMessageTo(fcmRequest);
             }

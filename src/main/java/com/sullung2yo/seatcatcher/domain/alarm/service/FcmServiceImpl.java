@@ -6,6 +6,7 @@ import com.sullung2yo.seatcatcher.common.exception.ErrorCode;
 import com.sullung2yo.seatcatcher.common.exception.FcmException;
 import com.sullung2yo.seatcatcher.common.exception.TokenException;
 import com.sullung2yo.seatcatcher.common.exception.UserException;
+import com.sullung2yo.seatcatcher.domain.alarm.enums.PushNotificationType;
 import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmMessage;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmMessageWithData;
@@ -80,7 +81,7 @@ public class FcmServiceImpl implements FcmService {
         restClient.post()
                 .uri(FCM_API_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(makeMessage(request.getTargetToken(), request.getTitle(), request.getBody(), request.getData()))
+                .body(makeMessage(request.getTargetToken(), request.getTitle(), request.getBody(), request.getType(), request.getData()))
                 .header(AUTHORIZATION,"Bearer " + getAccessToken())
                 .header(ACCEPT, "application/json; UTF-8")
                 .retrieve()
@@ -121,7 +122,7 @@ public class FcmServiceImpl implements FcmService {
         return objectMapper.writeValueAsString(fcmMessage);
     }
 
-    private String makeMessage(String targetToken, String title, String body, Object data) throws com.fasterxml.jackson.core.JsonProcessingException {
+    private String makeMessage(String targetToken, String title, String body, PushNotificationType type, Object data) throws com.fasterxml.jackson.core.JsonProcessingException {
         String dataPayload = objectMapper.writeValueAsString(data);
         objectMapper.readTree(dataPayload); // JSON 형태가 아니면 여기서 Exception 발생.
 
@@ -136,6 +137,7 @@ public class FcmServiceImpl implements FcmService {
                         )
                         .data(
                                 Map.of(
+                                        "type", type.name(),
                                         "payload", dataPayload
                                 )
                         )
