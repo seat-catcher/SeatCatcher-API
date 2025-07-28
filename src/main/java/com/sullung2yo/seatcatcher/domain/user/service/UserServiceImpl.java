@@ -7,7 +7,8 @@ import com.sullung2yo.seatcatcher.common.exception.UserException;
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
-import com.sullung2yo.seatcatcher.domain.auth.service.AuthServiceImpl;
+import com.sullung2yo.seatcatcher.domain.auth.service.AuthService;
+//import com.sullung2yo.seatcatcher.domain.auth.service.AuthServiceImpl;
 import com.sullung2yo.seatcatcher.domain.tag.entity.Tag;
 import com.sullung2yo.seatcatcher.domain.tag.entity.UserTag;
 import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
@@ -36,7 +37,8 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProviderImpl jwtTokenProvider;
     private final TagRepository tagRepository;
     private final UserTagRepository userTagRepository;
-    private final AuthServiceImpl authService;
+//    private final AuthServiceImpl authService;
+    private final AuthService authService;
 
     @Override
     public User getUserWithId(Long userId) throws RuntimeException {

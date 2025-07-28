@@ -5,7 +5,8 @@ import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.domain.auth.dto.request.AppleAuthRequest;
 import com.sullung2yo.seatcatcher.domain.auth.dto.request.KakaoAuthRequest;
 import com.sullung2yo.seatcatcher.domain.auth.dto.response.TokenResponse;
-import com.sullung2yo.seatcatcher.domain.auth.service.AuthServiceImpl;
+import com.sullung2yo.seatcatcher.domain.auth.service.AuthService;
+//import com.sullung2yo.seatcatcher.domain.auth.service.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,7 +32,8 @@ import java.util.List;
 @Tag(name = "인증 API", description = "사용자 인증 관련 API")
 public class AuthController {
 
-    private final AuthServiceImpl authServiceImpl;
+//    private final AuthServiceImpl authServiceImpl;
+    private final AuthService authService;
 
     @PostMapping("/apple")
     @Operation(
@@ -58,7 +60,7 @@ public class AuthController {
         log.debug("Authenticate with Apple: {}", appleAuthRequest);
 
         // 인증 로직 수행 후 토큰 생성
-        List<String> tokens = authServiceImpl.authenticate(appleAuthRequest, Provider.APPLE);
+        List<String> tokens = authService.authenticate(appleAuthRequest, Provider.APPLE);
 
         return returnAfterTokenValidation(tokens);
     }
@@ -88,7 +90,7 @@ public class AuthController {
             }
 
             // 인증 로직 수행 후 토큰 생성
-            List<String> tokens = authServiceImpl.authenticate(kakaoAuthRequest, Provider.KAKAO);
+            List<String> tokens = authService.authenticate(kakaoAuthRequest, Provider.KAKAO);
 
             return returnAfterTokenValidation(tokens);
         } catch (Exception e) {
