@@ -83,6 +83,7 @@ public class AuthServiceImpl implements AuthService {
         this.resourceLoader = resourceLoader;
     }
 
+    @Override
     public List<String> authenticate(Object request, Provider provider) {
 
         if (provider == Provider.KAKAO) {
@@ -204,6 +205,7 @@ public class AuthServiceImpl implements AuthService {
         return user;
     }
 
+    @Override
     public String validateAppleIdentityToken(String identityToken, String expectedNonce) {
         try {
             log.debug("Apple Identity Token 검증 시작");
@@ -302,6 +304,7 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Apple Sign in with Apple 토큰 취소 메서드
      */
+    @Override
     public void revokeAppleToken(String authorizationCode) {
         try {
             log.debug("Apple 토큰 취소 시작. 사용자 auth code: {}", authorizationCode);

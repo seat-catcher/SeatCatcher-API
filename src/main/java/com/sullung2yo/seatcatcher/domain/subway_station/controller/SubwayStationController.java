@@ -4,7 +4,6 @@ import com.sullung2yo.seatcatcher.domain.subway_station.enums.Line;
 import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
 import com.sullung2yo.seatcatcher.domain.subway_station.dto.response.SubwayStationResponse;
 import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationService;
-import com.sullung2yo.seatcatcher.domain.subway_station.service.SubwayStationServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

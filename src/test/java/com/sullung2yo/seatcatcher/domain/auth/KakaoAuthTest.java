@@ -3,6 +3,7 @@ package com.sullung2yo.seatcatcher.domain.auth;
 import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
+import com.sullung2yo.seatcatcher.domain.auth.service.AuthService;
 import com.sullung2yo.seatcatcher.domain.user.entity.User;
 import com.sullung2yo.seatcatcher.domain.user.enums.UserRole;
 import com.sullung2yo.seatcatcher.domain.auth.dto.request.KakaoAuthRequest;
@@ -76,7 +77,9 @@ class KakaoAuthTest {
 
     // =================================================================================================
 
-    private AuthServiceImpl authService; // 실제 테스트 대상 객체
+//    private AuthServiceImpl authService; // 실제 테스트 대상 객체
+
+    private AuthService authService; // 실제 테스트 대상 객체
 
     /**
      * 각 테스트 메서드 실행 전(BeforeEach)에 공통으로 수행할 셋업 로직.
