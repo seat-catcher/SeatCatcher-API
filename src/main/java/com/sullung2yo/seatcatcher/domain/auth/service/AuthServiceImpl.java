@@ -257,6 +257,7 @@ public class AuthServiceImpl implements AuthService {
 
             // aud 검증
             List<String> audience = claimsSet.getAudience();
+            log.debug("토큰의 Audience: {}, 설정된 Client ID: {}", audience, appleClientId);
             if (audience == null || !audience.contains(appleClientId)) {
                 throw new TokenException("토큰 대상이 일치하지 않습니다", ErrorCode.INVALID_TOKEN);
             }
