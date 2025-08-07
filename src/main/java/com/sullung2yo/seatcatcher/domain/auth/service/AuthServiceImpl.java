@@ -35,6 +35,7 @@ import java.net.URL;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -257,16 +258,21 @@ public class AuthServiceImpl implements AuthService {
 
             // aud 검증
             List<String> audience = claimsSet.getAudience();
-            log.debug("토큰의 Audience: {}, 설정된 Client ID: {}", audience, appleClientId);
+            log.debug("Identity token's audience: {}, Actual Client ID: {}", audience, appleClientId);
             if (audience == null || !audience.contains(appleClientId)) {
                 throw new TokenException("토큰 대상이 일치하지 않습니다", ErrorCode.INVALID_TOKEN);
             }
-            log.debug("대상(Audience) 검증 성공");
+            log.debug("AUD 검증 성공");
 
             // nonce 검증
             if (expectedNonce != null && !expectedNonce.isEmpty()) {
                 String tokenNonce = (String) claimsSet.getClaim("nonce");
-                if (!expectedNonce.equals(tokenNonce)) {
+                log.debug("Expected Nonce: {}, Identity token's Nonce: {}", expectedNonce, tokenNonce);
+                
+                String hashedExpectedNonce = hashSHA256(expectedNonce);
+                log.debug("Hashed expected nonce: {}", hashedExpectedNonce);
+                
+                if (!hashedExpectedNonce.equals(tokenNonce)) {
                     throw new TokenException("Nonce 값이 일치하지 않습니다", ErrorCode.INVALID_TOKEN);
                 }
                 log.debug("Nonce 검증 성공");
@@ -431,5 +437,26 @@ public class AuthServiceImpl implements AuthService {
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .reduce((p1, p2) -> p1 + "&" + p2)
                 .orElse("");
+    }
+    
+    /**
+     * SHA256 해시 함수
+     */
+    private String hashSHA256(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("SHA256 해시 생성 실패", e);
+        }
     }
 }
