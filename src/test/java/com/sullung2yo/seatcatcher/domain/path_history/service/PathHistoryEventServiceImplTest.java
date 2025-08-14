@@ -15,6 +15,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,14 +27,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class PathHistoryEventServiceImplTest {
 
-    @Mock
-    private RabbitTemplate rabbitTemplate;
-
-    @Mock
-    private PathHistoryService pathHistoryService;
-
-    @Mock
-    private SimpMessagingTemplate simpMessagingTemplate;
+    @Mock private RabbitTemplate rabbitTemplate;
+    @Mock private PathHistoryService pathHistoryService;
+    @Mock private SimpMessagingTemplate simpMessagingTemplate;
 
     @InjectMocks
     private PathHistoryEventServiceImpl pathHistoryEventService;
@@ -44,16 +41,19 @@ public class PathHistoryEventServiceImplTest {
     @DisplayName("Test for verify that event is really send to RabbitMQ")
     void publishPathHistoryEvent_shouldSendMessageToRabbitMQ() {
 
-        //given
-        PathHistoryResponse.PathHistoryInfoResponse pathHistoryInfoResponse = new PathHistoryResponse.PathHistoryInfoResponse();
-        pathHistoryInfoResponse.setId(1L);
+        // given
+        PathHistoryResponse.PathHistoryInfoResponse pathHistoryInfoResponse =
+                PathHistoryResponse.PathHistoryInfoResponse.builder()
+                        .id(1L)
+                        .expectedArrivalTime(LocalDateTime.now().plusMinutes(3))
+                        .build();
 
         when(pathHistoryService.getPathHistoryAfterAuthenticate(1L)).thenReturn(pathHistoryInfoResponse);
 
-        //when
+        // when
         pathHistoryEventService.publishPathHistoryEvent(1L, null, false);
 
-        //then
+        // then
         verify(rabbitTemplate).convertAndSend(eq(exchangeName), eq("path-histories.1"), any(StartJourneyResponse.class));
     }
 
@@ -62,9 +62,12 @@ public class PathHistoryEventServiceImplTest {
 
         // given
         Long pathHistoryId = 1L;
-        StartJourneyResponse mockResponse =
-                new StartJourneyResponse();
-        mockResponse.setPathHistoryId(pathHistoryId);
+        StartJourneyResponse mockResponse = StartJourneyResponse.builder()
+                .pathHistoryId(pathHistoryId)
+                .expectedArrivalTime(LocalDateTime.now().plusMinutes(3))
+                .nextScheduleTime(LocalDateTime.now().plusMinutes(1))
+                .isArrived(false)
+                .build();
 
         // when
         pathHistoryEventService.handlePathHistoryEvent(mockResponse);
