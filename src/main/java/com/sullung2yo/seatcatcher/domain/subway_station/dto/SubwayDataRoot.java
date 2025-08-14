@@ -7,9 +7,17 @@ import lombok.Setter;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+import java.util.List;
+import java.util.Map;
+
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SubwayDataRoot {
+
     // Description - json 파일 참고
     @JsonProperty("DESCRIPTION")
     private Map<String, String> description;
