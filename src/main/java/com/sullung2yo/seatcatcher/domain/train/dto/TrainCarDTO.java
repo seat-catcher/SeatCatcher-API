@@ -1,18 +1,13 @@
 package com.sullung2yo.seatcatcher.domain.train.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TrainCarDTO {
 
     private String trainCode;
-
     private String carCode;
-
 }

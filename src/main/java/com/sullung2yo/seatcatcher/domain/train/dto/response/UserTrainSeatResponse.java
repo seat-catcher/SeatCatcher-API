@@ -3,15 +3,12 @@ package com.sullung2yo.seatcatcher.domain.train.dto.response;
 import com.sullung2yo.seatcatcher.domain.train.entity.UserTrainSeat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "착석 정보에 대한 Response DTO입니다.")
 public class UserTrainSeatResponse {
     @Schema(description = "착석 정보의 ID입니다. Primary Key 로 사용됩니다.")
