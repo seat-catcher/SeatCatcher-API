@@ -7,8 +7,10 @@ import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "사용자 정보 수정 요청 DTO")
 public class UserInformationUpdateRequest {
 
