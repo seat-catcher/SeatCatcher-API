@@ -14,19 +14,24 @@ public class SubwayStationData {
      */
 
     @JsonProperty("acml_dist")
-    private float accumulatedDistance; // 기준역부터 축적거리 (km)
+    @Builder.Default
+    private float accumulatedDistance = 0.0f;
 
     @JsonProperty("sbwy_rout_ln")
-    private String subwayLine; // 지하철 노선 번호 (1, 2, ...)
+    @Builder.Default
+    private String subwayLine = "";
 
     @JsonProperty("dist_km")
-    private float distanceKm; // 현재 위치에서 다음 역까지 거리 (km)
+    @Builder.Default
+    private float distanceKm = 0.0f;
 
     @JsonProperty("hm")
-    private String hourMinutes; // 현재 위치에서 다음 역까지 소요 시간 (H:MM)
+    @Builder.Default
+    private String hourMinutes = "0:00";
 
     @JsonProperty("sbwy_stns_nm")
-    private String subwayStationName; // 지하철 역 이름 (서울시청, 강남역, ...)
+    @Builder.Default
+    private String subwayStationName = "";
 
     @Override
     public String toString() {
