@@ -264,21 +264,6 @@ public class AuthServiceImpl implements AuthService {
             }
             log.debug("AUD 검증 성공");
 
-            // nonce 검증
-            if (expectedNonce != null && !expectedNonce.isEmpty()) {
-                String tokenNonce = (String) claimsSet.getClaim("nonce");
-                log.debug("Expected Nonce: {}, Identity token's Nonce: {}", expectedNonce, tokenNonce);
-                
-                String hashedExpectedNonce = hashSHA256(expectedNonce);
-                log.debug("Hashed expected nonce: {}", hashedExpectedNonce);
-                
-                if (!hashedExpectedNonce.equals(tokenNonce)) {
-                    throw new TokenException("Nonce 값이 일치하지 않습니다", ErrorCode.INVALID_TOKEN);
-                }
-                log.debug("Nonce 검증 성공");
-            }
-
-            // 5. 사용자 ID 반환
             String subject = claimsSet.getSubject();
             if (subject == null || subject.isEmpty()) {
                 throw new TokenException("토큰에서 사용자 ID를 찾을 수 없습니다", ErrorCode.INVALID_TOKEN);
@@ -437,26 +422,5 @@ public class AuthServiceImpl implements AuthService {
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .reduce((p1, p2) -> p1 + "&" + p2)
                 .orElse("");
-    }
-    
-    /**
-     * SHA256 해시 함수
-     */
-    private String hashSHA256(String input) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(input.getBytes("UTF-8"));
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("SHA256 해시 생성 실패", e);
-        }
     }
 }
