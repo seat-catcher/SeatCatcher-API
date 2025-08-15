@@ -13,6 +13,7 @@ import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmMessageWithData;
 import com.sullung2yo.seatcatcher.domain.alarm.dto.request.FcmRequest;
 import com.sullung2yo.seatcatcher.domain.user.repository.UserRepository;
 import com.sullung2yo.seatcatcher.domain.user.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,6 +101,7 @@ public class FcmServiceImpl implements FcmService {
     }
 
     @Override
+    @Transactional
     public void saveToken(FcmRequest.Token request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String providerId = authentication.getName();
