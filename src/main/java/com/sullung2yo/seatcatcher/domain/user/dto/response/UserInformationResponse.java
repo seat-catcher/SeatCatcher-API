@@ -3,15 +3,14 @@ package com.sullung2yo.seatcatcher.domain.user.dto.response;
 import com.sullung2yo.seatcatcher.domain.user.enums.ProfileImageNum;
 import com.sullung2yo.seatcatcher.domain.tag.enums.UserTagType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
-@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "사용자 정보 응답 DTO")
 public class UserInformationResponse {
 

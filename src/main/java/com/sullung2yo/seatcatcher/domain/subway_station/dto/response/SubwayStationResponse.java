@@ -1,16 +1,13 @@
 package com.sullung2yo.seatcatcher.domain.subway_station.dto.response;
 
-import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import com.sullung2yo.seatcatcher.domain.subway_station.entity.SubwayStation;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "요청에 응답하기 위한 역에 대한 DTO입니다.")
 public class SubwayStationResponse {
 
@@ -35,6 +32,7 @@ public class SubwayStationResponse {
     @Schema(description = "처음 역에서부터 해당 역까지 오는 데에 필요한 누계 거리입니다. km 단위입니다.")
     private Float acmlDist;
 
+    // ✅ 컨트롤러가 사용하는 엔티티 생성자 복구
     public SubwayStationResponse(SubwayStation subwayStation) {
         this.id = subwayStation.getId();
         this.name = subwayStation.getStationName();

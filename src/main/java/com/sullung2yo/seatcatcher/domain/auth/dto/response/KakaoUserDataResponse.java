@@ -1,10 +1,13 @@
 package com.sullung2yo.seatcatcher.domain.auth.dto.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class KakaoUserDataResponse {
-    private String id; // Kakao user id
+    @Schema(description = "Kakao user id", example = "1234567890")
+    private String id;
 }

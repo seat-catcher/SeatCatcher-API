@@ -3,14 +3,12 @@ package com.sullung2yo.seatcatcher.domain.train.dto.response;
 import com.sullung2yo.seatcatcher.domain.user.enums.ProfileImageNum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
-@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Schema(description = "좌석 양보 요청 응답 객체", title = "SeatYieldRequestResponse")
 public class TempSeatYieldRequestResponse {

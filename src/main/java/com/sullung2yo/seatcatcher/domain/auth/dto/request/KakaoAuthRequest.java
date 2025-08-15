@@ -2,13 +2,14 @@ package com.sullung2yo.seatcatcher.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "카카오 인증 요청 DTO")
-public class KakaoAuthRequest{
+public class KakaoAuthRequest {
 
     @NotNull
     @Schema(description = "카카오 Auth server에서 제공받은 accessToken", example = "qwer.asdf.zxcv")

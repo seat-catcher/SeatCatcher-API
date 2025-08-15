@@ -3,15 +3,11 @@ package com.sullung2yo.seatcatcher.domain.train.dto.response;
 import com.sullung2yo.seatcatcher.domain.train.enums.SeatType;
 import com.sullung2yo.seatcatcher.domain.train.entity.TrainSeat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "어떤 좌석 자체에 대한 정보를 담은 DTO입니다.")
 public class TrainSeatResponse {
     @Schema(description = "좌석의 ID입니다. Primary Key 로 사용됩니다.")

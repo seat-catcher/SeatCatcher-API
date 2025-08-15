@@ -4,11 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "Access token 및 Refresh token 응답 DTO")
 public class TokenResponse {
+
     @Schema(description = "Access token", example = "qwer.asdf.zxcv")
     private String accessToken;
 

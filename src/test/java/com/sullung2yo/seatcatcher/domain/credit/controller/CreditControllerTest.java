@@ -24,25 +24,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class CreditControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private JwtTokenProviderImpl jwtTokenProvider;
-
-    @Autowired
-    ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper 객체
+    @Autowired private MockMvc mockMvc;
+    @Autowired private UserRepository userRepository;
+    @Autowired private JwtTokenProviderImpl jwtTokenProvider;
+    @Autowired ObjectMapper objectMapper;
 
     private User user;
-
     private String accessToken;
 
     @BeforeEach
     void setUp() {
-        // 1. 사용자 생성
         user = userRepository.save(
                 User.builder()
                         .provider(Provider.APPLE)
@@ -52,8 +43,6 @@ class CreditControllerTest {
                         .profileImageNum(ProfileImageNum.IMAGE_1)
                         .build()
         );
-
-        // 2. 인증 토큰
         accessToken = jwtTokenProvider.createToken(user.getProviderId(), null, TokenType.ACCESS);
     }
 
@@ -67,9 +56,10 @@ class CreditControllerTest {
         Long beforeCredit = user.getCredit();
         Long amountToAdd = 100L;
 
-        CreditModificationRequest request = new CreditModificationRequest();
-        request.setAmount(amountToAdd);
-        request.setTargetUserId(user.getId());
+        CreditModificationRequest request = CreditModificationRequest.builder()
+                .amount(amountToAdd)
+                .targetUserId(user.getId())
+                .build();
 
         mockMvc.perform(
                         patch("/credit")
@@ -89,9 +79,10 @@ class CreditControllerTest {
         Long beforeCredit = user.getCredit();
         Long amountToMinus = 100L;
 
-        CreditModificationRequest request = new CreditModificationRequest();
-        request.setAmount(amountToMinus);
-        request.setTargetUserId(user.getId());
+        CreditModificationRequest request = CreditModificationRequest.builder()
+                .amount(amountToMinus)
+                .targetUserId(user.getId())
+                .build();
 
         mockMvc.perform(
                         patch("/credit")
@@ -109,9 +100,10 @@ class CreditControllerTest {
     @Test
     void invalidCreditModificationRequest() throws Exception {
         // 잘못된 요청: amount가 음수인 경우
-        CreditModificationRequest request = new CreditModificationRequest();
-        request.setAmount(-50L); // 음수로 설정
-        request.setTargetUserId(user.getId());
+        CreditModificationRequest request = CreditModificationRequest.builder()
+                .amount(-50L)
+                .targetUserId(user.getId())
+                .build();
 
         mockMvc.perform(
                         patch("/credit")

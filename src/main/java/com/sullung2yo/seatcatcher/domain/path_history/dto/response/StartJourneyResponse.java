@@ -7,10 +7,10 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Schema(description = "여정 시작 응답 DTO")
 public class StartJourneyResponse {
 
     @Schema(description = "생성/추적중인 PathHistory 의 id")

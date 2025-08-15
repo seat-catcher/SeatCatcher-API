@@ -73,8 +73,9 @@ class SubwayStationServiceImplTest {
     @Test
     void testSaveSubwayData() {
         // Given
-        SubwayStationData subwayStationData = new SubwayStationData();
-        subwayStationData.setSubwayLine("2");
+        SubwayStationData subwayStationData = SubwayStationData.builder()
+                .subwayLine("2")
+                .build();
 
         // When
         subwayStationService.saveSubwayData(List.of(subwayStationData));

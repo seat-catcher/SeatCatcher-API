@@ -10,8 +10,9 @@ import java.util.List;
 
 
 @Getter
-@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Schema(description = "좌석 양보 요청 응답 객체", title = "SeatYieldRequestResponse")
 public class SeatYieldRequestResponse {

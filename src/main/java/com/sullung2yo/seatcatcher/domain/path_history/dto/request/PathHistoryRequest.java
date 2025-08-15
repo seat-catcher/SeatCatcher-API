@@ -1,20 +1,18 @@
 package com.sullung2yo.seatcatcher.domain.path_history.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Schema(description = "경로 기록 요청 DTO")
 public class PathHistoryRequest {
 
     @Schema(description = "시작역 id")
-    Long startStationId;
+    private Long startStationId;
 
     @Schema(description = "도착역 id")
-    Long endStationId;
+    private Long endStationId;
 }

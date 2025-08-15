@@ -5,7 +5,6 @@ import com.sullung2yo.seatcatcher.common.domain.TokenType;
 import com.sullung2yo.seatcatcher.common.jwt.provider.JwtTokenProviderImpl;
 import com.sullung2yo.seatcatcher.domain.auth.enums.Provider;
 import com.sullung2yo.seatcatcher.domain.user.entity.User;
-
 import com.sullung2yo.seatcatcher.domain.auth.dto.request.TokenRefreshRequest;
 import com.sullung2yo.seatcatcher.domain.auth.repository.RefreshTokenRepository;
 import com.sullung2yo.seatcatcher.domain.user.repository.UserRepository;
@@ -31,10 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TokenControllerTest {
 
     @Autowired
-    MockMvc mockMvc; // 요청 보내주는 MockMvc 객체
+    MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper 객체
+    ObjectMapper objectMapper;
 
     @Autowired
     private JwtTokenProviderImpl jwtTokenProvider;
@@ -62,18 +61,18 @@ class TokenControllerTest {
     @Test
     @DisplayName("토큰 갱신 테스트")
     void testRefreshToken() throws Exception {
-        //Given
+        // Given
         String refreshToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.REFRESH);
-        TokenRefreshRequest tokenRefreshRequest = new TokenRefreshRequest();
-        tokenRefreshRequest.setRefreshToken(refreshToken);
+        TokenRefreshRequest tokenRefreshRequest = TokenRefreshRequest.builder()
+                .refreshToken(refreshToken)
+                .build();
 
-        //When
         String requestBody = objectMapper.writeValueAsString(tokenRefreshRequest);
 
-        //Then
+        // When / Then
         mockMvc.perform(post("/token/refresh")
-                        .contentType(MediaType.APPLICATION_JSON) // ContentType 설정
-                        .content(requestBody) // RequestBody 설정
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
                 )
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -86,15 +85,15 @@ class TokenControllerTest {
     void testExpiredRefreshToken() throws Exception {
         // Given
         ReflectionTestUtils.setField(jwtTokenProvider, "refreshTokenValidMilliseconds", 0L);
-        String expired_refreshToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.REFRESH);
+        String expiredRefreshToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.REFRESH);
 
-        TokenRefreshRequest tokenRefreshRequest = new TokenRefreshRequest();
-        tokenRefreshRequest.setRefreshToken(expired_refreshToken);
+        TokenRefreshRequest tokenRefreshRequest = TokenRefreshRequest.builder()
+                .refreshToken(expiredRefreshToken)
+                .build();
 
-        // When
         String requestBody = objectMapper.writeValueAsString(tokenRefreshRequest);
 
-        // Then
+        // When / Then
         mockMvc.perform(post("/token/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
@@ -111,7 +110,7 @@ class TokenControllerTest {
         // Given
         String accessToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.ACCESS);
 
-        // When
+        // When / Then
         mockMvc.perform(get("/token/validate")
                         .header("Authorization", "Bearer " + accessToken)
                 )
@@ -127,7 +126,7 @@ class TokenControllerTest {
         ReflectionTestUtils.setField(jwtTokenProvider, "accessTokenValidMilliseconds", 0L);
         String expiredAccessToken = jwtTokenProvider.createToken(testUser.getProviderId(), null, TokenType.ACCESS);
 
-        // When
+        // When / Then
         mockMvc.perform(get("/token/validate")
                         .header("Authorization", "Bearer " + expiredAccessToken)
                 )

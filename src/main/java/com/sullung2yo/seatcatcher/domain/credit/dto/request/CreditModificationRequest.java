@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "크레딧 증감 요청 DTO")
 public class CreditModificationRequest {
 
