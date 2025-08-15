@@ -264,7 +264,6 @@ public class AuthServiceImpl implements AuthService {
             }
             log.debug("AUD 검증 성공");
 
-            // 4. 사용자 ID 반환
             String subject = claimsSet.getSubject();
             if (subject == null || subject.isEmpty()) {
                 throw new TokenException("토큰에서 사용자 ID를 찾을 수 없습니다", ErrorCode.INVALID_TOKEN);
