@@ -3,9 +3,6 @@ package com.sullung2yo.seatcatcher.domain.user_status.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
 @Getter
 @Builder
 @AllArgsConstructor

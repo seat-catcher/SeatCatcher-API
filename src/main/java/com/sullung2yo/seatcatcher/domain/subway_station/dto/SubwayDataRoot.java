@@ -1,14 +1,8 @@
 package com.sullung2yo.seatcatcher.domain.subway_station.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
 import java.util.List;
 import java.util.Map;
 
